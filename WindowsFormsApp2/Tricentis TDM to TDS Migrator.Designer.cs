@@ -59,7 +59,7 @@
             // 
             this.pickFileButton.BackColor = System.Drawing.SystemColors.Control;
             this.pickFileButton.Enabled = false;
-            this.pickFileButton.Location = new System.Drawing.Point(796, 57);
+            this.pickFileButton.Location = new System.Drawing.Point(438, 60);
             this.pickFileButton.Name = "pickFileButton";
             this.pickFileButton.Size = new System.Drawing.Size(130, 27);
             this.pickFileButton.TabIndex = 4;
@@ -70,7 +70,7 @@
             // TDDPathTextBox
             // 
             this.TDDPathTextBox.Enabled = false;
-            this.TDDPathTextBox.Location = new System.Drawing.Point(522, 59);
+            this.TDDPathTextBox.Location = new System.Drawing.Point(164, 62);
             this.TDDPathTextBox.Name = "TDDPathTextBox";
             this.TDDPathTextBox.Size = new System.Drawing.Size(248, 22);
             this.TDDPathTextBox.TabIndex = 3;
@@ -87,7 +87,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Location = new System.Drawing.Point(415, 64);
+            this.label1.Location = new System.Drawing.Point(57, 67);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(101, 17);
             this.label1.TabIndex = 2;
@@ -96,7 +96,7 @@
             // GenerateButton
             // 
             this.GenerateButton.Enabled = false;
-            this.GenerateButton.Location = new System.Drawing.Point(414, 631);
+            this.GenerateButton.Location = new System.Drawing.Point(56, 634);
             this.GenerateButton.Name = "GenerateButton";
             this.GenerateButton.Size = new System.Drawing.Size(512, 59);
             this.GenerateButton.TabIndex = 13;
@@ -107,7 +107,7 @@
             // repositoryName
             // 
             this.repositoryName.Enabled = false;
-            this.repositoryName.Location = new System.Drawing.Point(603, 563);
+            this.repositoryName.Location = new System.Drawing.Point(245, 566);
             this.repositoryName.Name = "repositoryName";
             this.repositoryName.Size = new System.Drawing.Size(167, 22);
             this.repositoryName.TabIndex = 10;
@@ -116,7 +116,7 @@
             // 
             this.repositoryNameText.AutoSize = true;
             this.repositoryNameText.BackColor = System.Drawing.Color.Transparent;
-            this.repositoryNameText.Location = new System.Drawing.Point(415, 563);
+            this.repositoryNameText.Location = new System.Drawing.Point(57, 566);
             this.repositoryNameText.Name = "repositoryNameText";
             this.repositoryNameText.Size = new System.Drawing.Size(115, 17);
             this.repositoryNameText.TabIndex = 5;
@@ -125,7 +125,7 @@
             // createRepositoryButton
             // 
             this.createRepositoryButton.Enabled = false;
-            this.createRepositoryButton.Location = new System.Drawing.Point(796, 563);
+            this.createRepositoryButton.Location = new System.Drawing.Point(438, 566);
             this.createRepositoryButton.Name = "createRepositoryButton";
             this.createRepositoryButton.Size = new System.Drawing.Size(130, 33);
             this.createRepositoryButton.TabIndex = 12;
@@ -136,7 +136,7 @@
             // clearRepositoryButton
             // 
             this.clearRepositoryButton.Enabled = false;
-            this.clearRepositoryButton.Location = new System.Drawing.Point(796, 411);
+            this.clearRepositoryButton.Location = new System.Drawing.Point(438, 414);
             this.clearRepositoryButton.Name = "clearRepositoryButton";
             this.clearRepositoryButton.Size = new System.Drawing.Size(130, 33);
             this.clearRepositoryButton.TabIndex = 7;
@@ -150,7 +150,7 @@
             this.checkedListBox1.ColumnWidth = 111;
             this.checkedListBox1.Enabled = false;
             this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Location = new System.Drawing.Point(414, 140);
+            this.checkedListBox1.Location = new System.Drawing.Point(56, 143);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.checkedListBox1.Size = new System.Drawing.Size(356, 225);
@@ -161,7 +161,7 @@
             // deselectAllButton
             // 
             this.deselectAllButton.Enabled = false;
-            this.deselectAllButton.Location = new System.Drawing.Point(796, 179);
+            this.deselectAllButton.Location = new System.Drawing.Point(438, 182);
             this.deselectAllButton.Name = "deselectAllButton";
             this.deselectAllButton.Size = new System.Drawing.Size(130, 33);
             this.deselectAllButton.TabIndex = 6;
@@ -172,7 +172,7 @@
             // selectAllButton
             // 
             this.selectAllButton.Enabled = false;
-            this.selectAllButton.Location = new System.Drawing.Point(796, 140);
+            this.selectAllButton.Location = new System.Drawing.Point(438, 143);
             this.selectAllButton.Name = "selectAllButton";
             this.selectAllButton.Size = new System.Drawing.Size(130, 33);
             this.selectAllButton.TabIndex = 5;
@@ -184,7 +184,7 @@
             // 
             this.apiURL.AutoSize = true;
             this.apiURL.BackColor = System.Drawing.Color.Transparent;
-            this.apiURL.Location = new System.Drawing.Point(415, 33);
+            this.apiURL.Location = new System.Drawing.Point(57, 36);
             this.apiURL.Name = "apiURL";
             this.apiURL.Size = new System.Drawing.Size(69, 17);
             this.apiURL.TabIndex = 13;
@@ -193,7 +193,7 @@
             // apiUrlTextBox
             // 
             this.apiUrlTextBox.BackColor = System.Drawing.Color.White;
-            this.apiUrlTextBox.Location = new System.Drawing.Point(522, 30);
+            this.apiUrlTextBox.Location = new System.Drawing.Point(164, 33);
             this.apiUrlTextBox.Name = "apiUrlTextBox";
             this.apiUrlTextBox.Size = new System.Drawing.Size(248, 22);
             this.apiUrlTextBox.TabIndex = 1;
@@ -202,7 +202,7 @@
             // deleteRepositoryButton
             // 
             this.deleteRepositoryButton.Enabled = false;
-            this.deleteRepositoryButton.Location = new System.Drawing.Point(796, 450);
+            this.deleteRepositoryButton.Location = new System.Drawing.Point(438, 453);
             this.deleteRepositoryButton.Name = "deleteRepositoryButton";
             this.deleteRepositoryButton.Size = new System.Drawing.Size(130, 33);
             this.deleteRepositoryButton.TabIndex = 8;
@@ -214,7 +214,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.Transparent;
-            this.label3.Location = new System.Drawing.Point(415, 383);
+            this.label3.Location = new System.Drawing.Point(57, 386);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(87, 17);
             this.label3.TabIndex = 19;
@@ -223,7 +223,7 @@
             // loadRefreshRepositories
             // 
             this.loadRefreshRepositories.Enabled = false;
-            this.loadRefreshRepositories.Location = new System.Drawing.Point(796, 489);
+            this.loadRefreshRepositories.Location = new System.Drawing.Point(438, 492);
             this.loadRefreshRepositories.Name = "loadRefreshRepositories";
             this.loadRefreshRepositories.Size = new System.Drawing.Size(130, 33);
             this.loadRefreshRepositories.TabIndex = 9;
@@ -236,7 +236,7 @@
             this.repositoriesBox.Enabled = false;
             this.repositoriesBox.FormattingEnabled = true;
             this.repositoriesBox.ItemHeight = 16;
-            this.repositoriesBox.Location = new System.Drawing.Point(414, 411);
+            this.repositoriesBox.Location = new System.Drawing.Point(56, 414);
             this.repositoriesBox.Name = "repositoriesBox";
             this.repositoriesBox.Size = new System.Drawing.Size(356, 132);
             this.repositoriesBox.Sorted = true;
@@ -246,7 +246,7 @@
             // 
             this.repositoryDescriptionText.AutoSize = true;
             this.repositoryDescriptionText.BackColor = System.Drawing.Color.Transparent;
-            this.repositoryDescriptionText.Location = new System.Drawing.Point(415, 590);
+            this.repositoryDescriptionText.Location = new System.Drawing.Point(57, 593);
             this.repositoryDescriptionText.Name = "repositoryDescriptionText";
             this.repositoryDescriptionText.Size = new System.Drawing.Size(149, 17);
             this.repositoryDescriptionText.TabIndex = 23;
@@ -255,14 +255,14 @@
             // repositoryDescriptionTextbox
             // 
             this.repositoryDescriptionTextbox.Enabled = false;
-            this.repositoryDescriptionTextbox.Location = new System.Drawing.Point(603, 590);
+            this.repositoryDescriptionTextbox.Location = new System.Drawing.Point(245, 593);
             this.repositoryDescriptionTextbox.Name = "repositoryDescriptionTextbox";
             this.repositoryDescriptionTextbox.Size = new System.Drawing.Size(167, 22);
             this.repositoryDescriptionTextbox.TabIndex = 11;
             // 
             // logTextBox
             // 
-            this.logTextBox.Location = new System.Drawing.Point(56, 33);
+            this.logTextBox.Location = new System.Drawing.Point(625, 32);
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
             this.logTextBox.Size = new System.Drawing.Size(310, 657);
@@ -272,7 +272,7 @@
             // 
             // verifyUrlButton
             // 
-            this.verifyUrlButton.Location = new System.Drawing.Point(796, 29);
+            this.verifyUrlButton.Location = new System.Drawing.Point(438, 32);
             this.verifyUrlButton.Name = "verifyUrlButton";
             this.verifyUrlButton.Size = new System.Drawing.Size(130, 25);
             this.verifyUrlButton.TabIndex = 2;
@@ -284,7 +284,7 @@
             // 
             this.categoriesLabel.AutoSize = true;
             this.categoriesLabel.BackColor = System.Drawing.Color.Transparent;
-            this.categoriesLabel.Location = new System.Drawing.Point(415, 109);
+            this.categoriesLabel.Location = new System.Drawing.Point(57, 112);
             this.categoriesLabel.Name = "categoriesLabel";
             this.categoriesLabel.Size = new System.Drawing.Size(76, 17);
             this.categoriesLabel.TabIndex = 26;
@@ -292,7 +292,7 @@
             // 
             // progressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(56, 631);
+            this.progressBar.Location = new System.Drawing.Point(625, 634);
             this.progressBar.MarqueeAnimationSpeed = 25;
             this.progressBar.Name = "progressBar";
             this.progressBar.Size = new System.Drawing.Size(310, 59);
