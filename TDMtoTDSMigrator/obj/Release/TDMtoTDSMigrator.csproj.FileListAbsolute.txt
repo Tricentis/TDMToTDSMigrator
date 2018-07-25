@@ -1,0 +1,7 @@
+C:\Users\felpo\source\repos\XML\TDMtoTDSMigrator\bin\Release\TDMtoTDSMigrator.dll
+C:\Users\felpo\source\repos\XML\TDMtoTDSMigrator\bin\Release\TDMtoTDSMigrator.pdb
+C:\Users\felpo\source\repos\XML\TDMtoTDSMigrator\bin\Release\Newtonsoft.Json.dll
+C:\Users\felpo\source\repos\XML\TDMtoTDSMigrator\bin\Release\Newtonsoft.Json.xml
+C:\Users\felpo\source\repos\XML\TDMtoTDSMigrator\obj\Release\TDMtoTDSMigrator.csproj.CoreCompileInputs.cache
+C:\Users\felpo\source\repos\XML\TDMtoTDSMigrator\obj\Release\TDMtoTDSMigrator.dll
+C:\Users\felpo\source\repos\XML\TDMtoTDSMigrator\obj\Release\TDMtoTDSMigrator.pdb
