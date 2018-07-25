@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using System.Xml;
 using TDMtoTDSMigrator;
 
-namespace WindowsFormsApp2
+namespace MigratorUI
 {
     public partial class TDSMigrator : Form
     {
