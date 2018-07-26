@@ -255,7 +255,7 @@
             this.logTextBox.Location = new System.Drawing.Point(56, 100);
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
-            this.logTextBox.Size = new System.Drawing.Size(512, 447);
+            this.logTextBox.Size = new System.Drawing.Size(512, 535);
             this.logTextBox.TabIndex = 14;
             this.logTextBox.Text = "";
             this.logTextBox.TextChanged += new System.EventHandler(this.logTextBox_TextChanged);
@@ -293,9 +293,9 @@
             // GenerateButton
             // 
             this.GenerateButton.Enabled = false;
-            this.GenerateButton.Location = new System.Drawing.Point(56, 576);
+            this.GenerateButton.Location = new System.Drawing.Point(632, 576);
             this.GenerateButton.Name = "GenerateButton";
-            this.GenerateButton.Size = new System.Drawing.Size(1084, 59);
+            this.GenerateButton.Size = new System.Drawing.Size(508, 59);
             this.GenerateButton.TabIndex = 13;
             this.GenerateButton.Text = "Load categories into repository";
             this.GenerateButton.UseVisualStyleBackColor = true;
@@ -303,7 +303,7 @@
             // 
             // progressBar2
             // 
-            this.progressBar2.Location = new System.Drawing.Point(460, 641);
+            this.progressBar2.Location = new System.Drawing.Point(751, 641);
             this.progressBar2.MarqueeAnimationSpeed = 25;
             this.progressBar2.Name = "progressBar2";
             this.progressBar2.Size = new System.Drawing.Size(273, 15);
