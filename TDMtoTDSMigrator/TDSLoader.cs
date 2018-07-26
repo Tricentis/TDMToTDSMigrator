@@ -69,8 +69,10 @@ namespace TDMtoTDSMigrator
             Task<HttpResponseMessage> message = null;
             for (int i = 0; i < list.Count; i++)
             {
-                message = HTTPRequest.PostObject(JSONConverter.JsonifyObjectForAPI(list[i], metaInfoAttributes, list[i].GetType(list[i].GetTypeId(), metaInfoType)),repositoryName, apiURL);
+                message = HTTPRequest.PostObject(JSONConverter.JsonifyObjectForAPI(list[i], metaInfoAttributes),repositoryName, apiURL);
             }
+
+            // returns the response of the last request
             return message;
         }
         public static Task<HttpResponseMessage> LoadIntoTDSWithFilter(string xmlPath, List<TableObject> list, string repositoryName, List<string> authorizedTypes, string apiURL)
@@ -84,19 +86,21 @@ namespace TDMtoTDSMigrator
             Task<HttpResponseMessage> message = null;
             for (int i = 0; i < list.Count; i++)
             {
-                
-                if(authorizedTypes.Contains(list[i].GetType(list[i].GetTypeId(), metaInfoType)))
+
+                if (authorizedTypes.Contains(list[i].GetTypeName()))
                 {
-                    message = HTTPRequest.PostObject(JSONConverter.JsonifyObjectForAPI(list[i], metaInfoAttributes, list[i].GetType(list[i].GetTypeId(), metaInfoType)), repositoryName, apiURL);  
+                    message = HTTPRequest.PostObject(JSONConverter.JsonifyObjectForAPI(list[i], metaInfoAttributes), repositoryName, apiURL);  
                 }
             }
+
+            // returns the response of the last request
             return message;
 
 
         }
 
 
-
+        
 
 
         /*

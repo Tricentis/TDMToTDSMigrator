@@ -13,13 +13,13 @@ namespace TDMtoTDSMigrator
 
                     -MetaInfoTypes (ex: Person, City)
                     -MetaInfoAttributes (ex: Name, Adress ; Country, Population) --> each attribute is linked to a metaInfoType
-                    -MetaStringAttributes (ex: surrogate=1 , attribute=1 , value = John) --> sets the value of each attribute of an object (surrogate)
-                    -Associations (not supported by TDS, if there are any the user is warned that they will no longer be available)
+                    -MetaStringAttributes (ex: surrogate=1 , attribute=1 , value = John) --> sets the value of each attribute of an object (each object has a unique surrogate)
+                    -Associations (not supported by TDS, if there are any the user is warned that they will no longer be available in TDS)
              
              
         */
         
-        public static List<TableObject> CreateListOfRows(XmlNode stringAttributes, List<string[]> TypeIDs)
+        public static List<TableObject> CreateObjectList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes,List<string[]> TypeIDs)
         {
             XmlNodeList StringAttributes = stringAttributes.ChildNodes;
             //Create an empty list of rows (objects)
@@ -37,19 +37,21 @@ namespace TDMtoTDSMigrator
                 //If yes, the current object is stored in the list and a new object is created
                 if (currentsurrogate != StringAttributes[i].Attributes[0].Value)
                 {
-                    //Find and set the TypeID of the object
+                    //Find and set the TypeID and type of the object
                     for (int j = 0; j < TypeIDs.Count; j++)
                     {
                         if (obj.GetAttributes()[0][0] == TypeIDs[j][0])
                         {
                             obj.SetTypeId(TypeIDs[j][2]);
+
                             break;
                         }
                     }
 
 
+                    obj.SetTypeName(obj.GetTypeId(), metaInfoTypes);
+                    obj.SetAttributeNames(metaInfoAttributes);
 
-                    obj.SetSurrogate(currentsurrogate);
                     Objects.Add(new TableObject(obj));
                     obj = new TableObject();
                 }
@@ -59,7 +61,7 @@ namespace TDMtoTDSMigrator
 
 
             //Store the last object into the list
-            obj.SetSurrogate(currentsurrogate);
+
             //Find and set the TypeID of the object
             for (int j = 0; j < TypeIDs.Count; j++)
             {
@@ -69,6 +71,8 @@ namespace TDMtoTDSMigrator
                     break;
                 }
             }
+            obj.SetTypeName(obj.GetTypeId(), metaInfoTypes);
+            obj.SetAttributeNames(metaInfoAttributes);
             Objects.Add(new TableObject(obj));
 
             return Objects;
@@ -85,17 +89,19 @@ namespace TDMtoTDSMigrator
         {
             XmlNode repositoryDump = GetParentNodeOfData(doc);
 
-            XmlNode MetaInfoTypes = GetMetaInfoTypes(repositoryDump);
-            XmlNode MetaInfoAttributes = GetMetaInfoAttributes(repositoryDump);
-            XmlNode StringAttributes = GetStringAttributes(repositoryDump);
+            XmlNode metaInfoTypes = GetMetaInfoTypes(repositoryDump);
+            XmlNode metaInfoAttributes = GetMetaInfoAttributes(repositoryDump);
+            XmlNode stringAttributes = GetStringAttributes(repositoryDump);
 
-            List<string[]> Types = GetTypes(MetaInfoTypes);
-            List<string[]> TypeIDs = GetTypeIDs(MetaInfoAttributes);
+            List<string[]> Types = GetTypes(metaInfoTypes);
+            List<string[]> TypeIDs = GetTypeIDs(metaInfoAttributes);
 
-            List<TableObject> Rows = CreateListOfRows(StringAttributes, TypeIDs);
+            List<TableObject> objectList = CreateObjectList(stringAttributes, metaInfoTypes, metaInfoAttributes, TypeIDs);
 
-            return Rows;
+            return objectList;
         }
+
+
         public static XmlNode GetParentNodeOfData(XmlDocument doc)
         {
             XmlNode root = doc.FirstChild;

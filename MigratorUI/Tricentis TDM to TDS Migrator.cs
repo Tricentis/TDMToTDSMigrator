@@ -80,7 +80,7 @@ namespace MigratorUI
                 s.Append("Please note that the following associations will no longer be supported by Tricentis TDS :\n\n");
                 foreach (XmlNode node in metaInfoAssoc.ChildNodes)
                 {
-                    s.Append(node.Attributes[1].Value + " and " + obj.GetType(node.Attributes[3].Value, metaInfoTypes) + "\n");
+                    s.Append(node.Attributes[1].Value + " and " + obj.GetTypeName() + "\n");
                 }
                 System.Windows.Forms.MessageBox.Show(s.ToString(),
                                     "Associations not supported",
@@ -100,9 +100,10 @@ namespace MigratorUI
 
             for (int i = 0; i < objectList.Count; i++)
             {
+                Console.WriteLine(objectList[i].GetTypeName());
                 for (int j = 0; j < emptyType.Count; j++)
                 {
-                    if (objectList[i].GetType(objectList[i].GetTypeId(), metaInfoTypes) == emptyType[j])
+                    if (objectList[i].GetTypeName() == emptyType[j])
                     {
                         emptyType.RemoveAt(j);
                     }
@@ -200,10 +201,8 @@ namespace MigratorUI
         public int EstimatedWaitTime()
         {
             FileInfo tdd = new FileInfo(TDDPathTextBox.Text);
-            int scaleLength = 611797; // length of the tdd file that is the scale for processing time estimation (~17 minutes)
+            int scaleLength = 611797; // length of the tdd file that is the scale for processing time estimation (~25 seconds)
             return (int)((float)tdd.Length / (float)scaleLength * 25);
-
-
         }
 
 

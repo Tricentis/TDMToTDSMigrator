@@ -20,7 +20,7 @@ namespace TDMtoTDSMigrator
     }
     public class JSONConverter
     { 
-        public static string JsonifyObject(TableObject obj, Boolean lastRow, XmlNode metaInfoAttributes)
+        public static string JsonifyObject(TableObject obj)
         {
             StringBuilder builder = new StringBuilder();
             XMLParser parser = new XMLParser();
@@ -30,20 +30,14 @@ namespace TDMtoTDSMigrator
             //Unwraps the attribute "Attributes" (list<string[]>) of the TableObject for valid Json creation  
             for(int i = 0;i<obj.GetAttributes().Count-1; i++)
             {
-                builder.Append("\"" + XMLParser.GetAttributeName(obj.GetAttributes()[i][0], metaInfoAttributes) + "\":\"" + obj.GetAttributes()[i][1] + "\" , ");
+                builder.Append("\"" + obj.GetAttributes()[i][0] + "\":\"" + obj.GetAttributes()[i][1] + "\" , ");
             }
-            builder.Append("\""+ XMLParser.GetAttributeName(obj.GetAttributes()[obj.GetAttributes().Count - 1][0], metaInfoAttributes) + "\":\"" + obj.GetAttributes()[obj.GetAttributes().Count - 1][1]+"\"");
-            if (lastRow)
-            {
-                builder.Append("}\n");
-            }
-            else
-            {
-                builder.Append("},\n");
-            }
+            builder.Append("\""+ obj.GetAttributes()[obj.GetAttributes().Count - 1][0] + "\":\"" + obj.GetAttributes()[obj.GetAttributes().Count - 1][1] +"\"");
+            builder.Append("}\n");
+            
             return builder.ToString();
         }
-        public static string JsonifyObjectForAPI(TableObject obj, XmlNode metaInfoAttributes, string category) => "{\"category\" : \"" + category + "\" , \"consumed\" : false, \"data\" : " + JsonifyObject(obj, true, metaInfoAttributes) + "}";
+        public static string JsonifyObjectForAPI(TableObject obj, XmlNode metaInfoAttributes) => "{\"category\" : \"" +obj.GetTypeName()+ "\" , \"consumed\" : false, \"data\" : " + JsonifyObject(obj) + "}";
         public static string[] ParseJsonIntoRepositoryList(string json)
         {
             json = json.Remove(0,1);
