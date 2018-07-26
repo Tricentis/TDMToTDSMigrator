@@ -37,21 +37,11 @@ namespace TDMtoTDSMigrator
             using (HttpClient client = new HttpClient())
             {
                 {
-                    // Update port # in the following line.
                     client.BaseAddress = new Uri(apiURL);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                     HttpResponseMessage response = client.DeleteAsync(repositoryName).Result;
-                    //response.EnsureSuccessStatusCode();
-                    if (response.StatusCode.ToString() == "400")
-                    {
-                        //repo created message
-                    }
-                    else
-                    {
-                        //failed to create message
-                    }
 
                     // return URI of the created resource.
                     return response.Headers.Location;
@@ -69,18 +59,7 @@ namespace TDMtoTDSMigrator
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                     HttpResponseMessage response = client.DeleteAsync("configuration/repositories/" + repositoryName).Result;
-                    //response.EnsureSuccessStatusCode();
-                    if (response.StatusCode.ToString() == "400")
-                    {
-                        //repo deleted message
-                    }
-                    
-                    else
-                    {
-                        //failed to delete message
-                    }
 
-                    // return URI of the created resource.
                     return response.Headers.Location;
                 }
             }
@@ -92,10 +71,8 @@ namespace TDMtoTDSMigrator
                 {
                     string json = "";
 
-                    // Update port # in the following line.
                     apiURL.Remove(apiURL.Length - 1, 1);
                     client.BaseAddress = new Uri(apiURL);
-
                     client.DefaultRequestHeaders.Accept.Clear();
                     json = client.GetStringAsync("").Result;
                     JSONConverter.ParseJsonIntoRepositoryList(json);
@@ -143,7 +120,6 @@ namespace TDMtoTDSMigrator
         {
             try
             {
-                // Create a new row
 
                 StringContent json = new StringContent(jSon, Encoding.UTF8, "application/json");
 

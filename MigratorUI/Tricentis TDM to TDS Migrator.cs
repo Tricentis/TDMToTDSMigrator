@@ -127,7 +127,7 @@ namespace MigratorUI
 
         //UI element attributes and logText methods 
         private void TDDFileProcessingInWork(Boolean processing)
-        {//sets the enabled state of ui elements depending on if a .tdd file is being processed
+        {//sets the enabled state of ui elements depending on whether a .tdd file is being processed
 
             GenerateButton.Enabled = !processing;
             categoriesListBox.Enabled = !processing;
@@ -137,7 +137,7 @@ namespace MigratorUI
             pickFileButton.Enabled = !processing;
         }
         private void MigrationInWork(Boolean inWork)
-        {// sets the enabled state of ui elements depending on if files are currently being transferred to the api
+        {// sets the enabled state of ui elements depending on whether files are currently being transferred to the api
             if (inWork)
             {
                 progressBar2.Visible = true;
