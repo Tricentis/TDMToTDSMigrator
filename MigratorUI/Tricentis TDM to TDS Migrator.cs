@@ -103,7 +103,6 @@ namespace MigratorUI
 
             for (int i = 0; i < objectList.Count; i++)
             {
-                Console.WriteLine(objectList[i].GetTypeName());
                 for (int j = 0; j < emptyType.Count; j++)
                 {
                     if (objectList[i].GetTypeName() == emptyType[j])

@@ -17,24 +17,13 @@ namespace TDMtoTDSMigrator
             using (HttpClient client = new HttpClient())
             {
                 {
-                    // Update port # in the following line.
                     client.BaseAddress = new Uri(apiURL);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                     HttpResponseMessage response = client.PostAsync("configuration/repositories/", new StringContent("{\"description\":\"" + repositoryDescription + "\",\"location\":\"%PROGRAMDATA%\\\\Tricentis\\\\TestDataService\\\\" + repositoryName + ".db\",\"name\":\"" + repositoryName+ "\",\"type\":1,\"link\": \""+apiURL+"configuration/repositories/"+repositoryName+"\"}", Encoding.UTF8, "application/json") ).Result;
-                   // Console.WriteLine("{\"description\":\"" + repositoryDescription + "\",\"location\":\"%PROGRAMDATA%\\\\Tricentis\\\\TestDataService\\\\" + repositoryName + ".db\",\"name\":\"" + repositoryName + "\",\"type\":\"Sqlite\",\"link\": \"http://localhost:50/testdataservice/configuration/repositories/" + repositoryName + "\"}");
-                    //response.EnsureSuccessStatusCode();
-                    if (response.StatusCode.ToString() == "400")
-                    {
-                        //repo created message
-                    }
-                    else
-                    {
-                        //failed to create message
-                    }
-
-                    // return URI of the created resource.
+                  
+                    //return URI of the created resource.
                     return response.Headers.Location;
                 }
             }

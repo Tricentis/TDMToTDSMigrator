@@ -61,8 +61,7 @@ namespace TDMtoTDSMigrator
 
 
             //Store the last object into the list
-
-            //Find and set the TypeID of the object
+            //Find and set the TypeID of the last object
             for (int j = 0; j < TypeIDs.Count; j++)
             {
                 if (obj.GetAttributes()[0][0] == TypeIDs[j][0])
@@ -74,6 +73,8 @@ namespace TDMtoTDSMigrator
             obj.SetTypeName(obj.GetTypeId(), metaInfoTypes);
             obj.SetAttributeNames(metaInfoAttributes);
             Objects.Add(new TableObject(obj));
+
+
 
             return Objects;
         }
