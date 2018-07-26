@@ -27,7 +27,9 @@ namespace MigratorUI
         //Initialization 
         private void TDSMigrator_Load(object sender, EventArgs e)
         {
-            logTextBox.AppendText("Welcome to Tricentis TDM to TDS Migrator.\nPlease enter a valid API URL (ex: http://localhost:80/testdataservice) \n");
+            logTextBox.AppendText("Welcome to Tricentis TDM to TDS Migrator.\nPlease enter a valid API URL and click on \"Verify Url\". \nExample : http://localhost:80/testdataservice \n");
+            verifyUrlButton.Select();
+            //verifyUrlButton.BackColor = Color.Aquamarine;
         }
 
 
@@ -134,13 +136,13 @@ namespace MigratorUI
         {
             if (inWork)
             {
-                logTextBox.Height = 470;
-                progressBar.Visible = true;
+                //logTextBox.Height = 500;
+                progressBar2.Visible = true;
             }
             else
             {
-                progressBar.Visible = false;
-                logTextBox.Height = 533;
+                progressBar2.Visible = false;
+                //logTextBox.Height = 533;
             }
             //createRepositoryButton.Enabled = !inWork;
             deleteRepositoryButton.Enabled = !inWork;
@@ -163,6 +165,7 @@ namespace MigratorUI
         private void ApiConnectionOk(Boolean apiConnectionOK, object sender, EventArgs e)
         {
             Boolean tddFilePicked = TDDPathTextBox.Text != "";
+            //verifyUrlButton.BackColor = Color.White;
 
             createRepositoryButton.Enabled = apiConnectionOK;
             deleteRepositoryButton.Enabled = apiConnectionOK;
@@ -181,14 +184,16 @@ namespace MigratorUI
             if (apiConnectionOK)
             {
                 pickFileButton.Text = "Browse...";
+                //pickFileButton.BackColor = Color.Aquamarine;
                 loadRefreshRepositories_Click(sender, e);
+                pickFileButton.Select();
             }
             else
             {
                 pickFileButton.Text = "...";
             }
 
-
+            
 
 
         }
@@ -221,7 +226,7 @@ namespace MigratorUI
         }
         public string MigrationFinishedMessage(int numberOfCategories, string repositoryName)
         {
-            return "Successfully migrated "+numberOfCategories+" categories into the repository : \""+repositoryName+"\".\n";
+            return "Successfully migrated "+numberOfCategories+" out of "+checkedListBox1.Items.Count+" available categories into the repository : \""+repositoryName+"\".\n";
         }
 
 
@@ -272,6 +277,8 @@ namespace MigratorUI
         private async void TDDPathTextBox_TextChanged(object sender, EventArgs e)
         {
             int estimatedWait = EstimatedWaitTime();
+            //pickFileButton.BackColor = Color.White;
+            logTextBox.Select();
 
             logTextBox.AppendText("The .tdd file is being processed.\nPlease wait...\n");
             if (estimatedWait > 5)
@@ -290,7 +297,7 @@ namespace MigratorUI
             XmlNode metaInfoTypes = XMLParser.GetMetaInfoTypes(XMLParser.GetParentNodeOfData(doc));
             LoadCategories(metaInfoTypes);
 
-            logTextBox.Height = 470;
+            //logTextBox.Height = 500;
             progressBar.Visible = true;
 
 
@@ -301,12 +308,12 @@ namespace MigratorUI
             };
             worker.RunWorkerCompleted += (s, r) => {
                 this.objectList =(List<TableObject>)r.Result;
-                logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + metaInfoTypes.ChildNodes.Count + " categories were found. \nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n");
+                logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + metaInfoTypes.ChildNodes.Count + " categories were found. \n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
                 logTextBox.Refresh();
                 CheckForEmptyCategories(metaInfoTypes);    
                 TDDFileProcessingInWork(false);
                 progressBar.Visible = false;
-                logTextBox.Height = 533;
+                //logTextBox.Height = 533;
                 CheckForAssociations();
 
 

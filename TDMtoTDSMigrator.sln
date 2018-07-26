@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TDMtoTDSMigrator", "TDMtoTDSMigrator\TDMtoTDSMigrator.csproj", "{64C5F6DD-5424-47F4-BFF2-66537F419F0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigratorUI", "WindowsFormsApp2\MigratorUI.csproj", "{547A4193-25FE-4B38-8080-61A52CC426B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigratorUI", "MigratorUI\MigratorUI.csproj", "{547A4193-25FE-4B38-8080-61A52CC426B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

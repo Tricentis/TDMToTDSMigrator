@@ -12,3 +12,17 @@ C:\Users\felpo\source\repos\XML\WindowsFormsApp2\obj\Release\MigratorUI.csproj.C
 C:\Users\felpo\source\repos\XML\WindowsFormsApp2\obj\Release\MigratorUI.exe
 C:\Users\felpo\source\repos\XML\WindowsFormsApp2\obj\Release\MigratorUI.pdb
 C:\Users\felpo\source\repos\XML\WindowsFormsApp2\obj\Release\MigratorUI.TDSMigrator.resources
+C:\Users\felpo\source\repos\XML\MigratorUI\bin\Release\MigratorUI.exe.config
+C:\Users\felpo\source\repos\XML\MigratorUI\bin\Release\MigratorUI.exe
+C:\Users\felpo\source\repos\XML\MigratorUI\bin\Release\MigratorUI.pdb
+C:\Users\felpo\source\repos\XML\MigratorUI\bin\Release\TDMtoTDSMigrator.dll
+C:\Users\felpo\source\repos\XML\MigratorUI\bin\Release\Newtonsoft.Json.dll
+C:\Users\felpo\source\repos\XML\MigratorUI\bin\Release\TDMtoTDSMigrator.pdb
+C:\Users\felpo\source\repos\XML\MigratorUI\bin\Release\Newtonsoft.Json.xml
+C:\Users\felpo\source\repos\XML\MigratorUI\obj\Release\MigratorUI.csprojResolveAssemblyReference.cache
+C:\Users\felpo\source\repos\XML\MigratorUI\obj\Release\MigratorUI.TDSMigrator.resources
+C:\Users\felpo\source\repos\XML\MigratorUI\obj\Release\MigratorUI.Properties.Resources.resources
+C:\Users\felpo\source\repos\XML\MigratorUI\obj\Release\MigratorUI.csproj.GenerateResource.Cache
+C:\Users\felpo\source\repos\XML\MigratorUI\obj\Release\MigratorUI.csproj.CoreCompileInputs.cache
+C:\Users\felpo\source\repos\XML\MigratorUI\obj\Release\MigratorUI.exe
+C:\Users\felpo\source\repos\XML\MigratorUI\obj\Release\MigratorUI.pdb

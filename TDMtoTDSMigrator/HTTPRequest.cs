@@ -23,7 +23,7 @@ namespace TDMtoTDSMigrator
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                     HttpResponseMessage response = client.PostAsync("configuration/repositories/", new StringContent("{\"description\":\"" + repositoryDescription + "\",\"location\":\"%PROGRAMDATA%\\\\Tricentis\\\\TestDataService\\\\" + repositoryName + ".db\",\"name\":\"" + repositoryName+ "\",\"type\":1,\"link\": \""+apiURL+"configuration/repositories/"+repositoryName+"\"}", Encoding.UTF8, "application/json") ).Result;
-                    Console.WriteLine("{\"description\":\"" + repositoryDescription + "\",\"location\":\"%PROGRAMDATA%\\\\Tricentis\\\\TestDataService\\\\" + repositoryName + ".db\",\"name\":\"" + repositoryName + "\",\"type\":\"Sqlite\",\"link\": \"http://localhost:50/testdataservice/configuration/repositories/" + repositoryName + "\"}");
+                   // Console.WriteLine("{\"description\":\"" + repositoryDescription + "\",\"location\":\"%PROGRAMDATA%\\\\Tricentis\\\\TestDataService\\\\" + repositoryName + ".db\",\"name\":\"" + repositoryName + "\",\"type\":\"Sqlite\",\"link\": \"http://localhost:50/testdataservice/configuration/repositories/" + repositoryName + "\"}");
                     //response.EnsureSuccessStatusCode();
                     if (response.StatusCode.ToString() == "400")
                     {
