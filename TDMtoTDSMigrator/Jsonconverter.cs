@@ -20,10 +20,9 @@ namespace TDMtoTDSMigrator
     }
     public class JSONConverter
     { 
-        public static string JsonifyObject(TableObject obj)
+        public static string JSONifyObject(TableObject obj)
         {
             StringBuilder builder = new StringBuilder();
-            XMLParser parser = new XMLParser();
 
             builder.Append("{ ");
 
@@ -36,8 +35,9 @@ namespace TDMtoTDSMigrator
             builder.Append("}\n");
             
             return builder.ToString();
+
         }
-        public static string JsonifyObjectForAPI(TableObject obj, XmlNode metaInfoAttributes) => "{\"category\" : \"" +obj.GetTypeName()+ "\" , \"consumed\" : false, \"data\" : " + JsonifyObject(obj) + "}";
+        public static string JSONifyObjectForAPI(TableObject obj, XmlNode metaInfoAttributes) => "{\"category\" : \"" +obj.GetTypeName()+ "\" , \"consumed\" : false, \"data\" : " + JSONifyObject(obj) + "}";
         public static string[] ParseJsonIntoRepositoryList(string json)
         {
             json = json.Remove(0,1);

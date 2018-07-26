@@ -69,7 +69,7 @@ namespace TDMtoTDSMigrator
             Task<HttpResponseMessage> message = null;
             for (int i = 0; i < list.Count; i++)
             {
-                message = HTTPRequest.PostObject(JSONConverter.JsonifyObjectForAPI(list[i], metaInfoAttributes),repositoryName, apiURL);
+                message = HTTPRequest.PostObject(JSONConverter.JSONifyObjectForAPI(list[i], metaInfoAttributes),repositoryName, apiURL);
             }
 
             // returns the response of the last request
@@ -89,7 +89,7 @@ namespace TDMtoTDSMigrator
 
                 if (authorizedTypes.Contains(list[i].GetTypeName()))
                 {
-                    message = HTTPRequest.PostObject(JSONConverter.JsonifyObjectForAPI(list[i], metaInfoAttributes), repositoryName, apiURL);  
+                    message = HTTPRequest.PostObject(JSONConverter.JSONifyObjectForAPI(list[i], metaInfoAttributes), repositoryName, apiURL);  
                 }
             }
 

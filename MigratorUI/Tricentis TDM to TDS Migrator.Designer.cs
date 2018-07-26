@@ -37,7 +37,7 @@
             this.repositoryNameText = new System.Windows.Forms.Label();
             this.createRepositoryButton = new System.Windows.Forms.Button();
             this.clearRepositoryButton = new System.Windows.Forms.Button();
-            this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
+            this.categoriesListBox = new System.Windows.Forms.CheckedListBox();
             this.deselectAllButton = new System.Windows.Forms.Button();
             this.selectAllButton = new System.Windows.Forms.Button();
             this.apiURL = new System.Windows.Forms.Label();
@@ -134,19 +134,19 @@
             this.clearRepositoryButton.UseVisualStyleBackColor = true;
             this.clearRepositoryButton.Click += new System.EventHandler(this.clearRepositoryButton_Click);
             // 
-            // checkedListBox1
+            // categoriesListBox
             // 
-            this.checkedListBox1.CheckOnClick = true;
-            this.checkedListBox1.ColumnWidth = 111;
-            this.checkedListBox1.Enabled = false;
-            this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Location = new System.Drawing.Point(632, 322);
-            this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.checkedListBox1.Size = new System.Drawing.Size(356, 225);
-            this.checkedListBox1.Sorted = true;
-            this.checkedListBox1.TabIndex = 15;
-            this.checkedListBox1.ThreeDCheckBoxes = true;
+            this.categoriesListBox.CheckOnClick = true;
+            this.categoriesListBox.ColumnWidth = 111;
+            this.categoriesListBox.Enabled = false;
+            this.categoriesListBox.FormattingEnabled = true;
+            this.categoriesListBox.Location = new System.Drawing.Point(632, 322);
+            this.categoriesListBox.Name = "categoriesListBox";
+            this.categoriesListBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.categoriesListBox.Size = new System.Drawing.Size(356, 225);
+            this.categoriesListBox.Sorted = true;
+            this.categoriesListBox.TabIndex = 15;
+            this.categoriesListBox.ThreeDCheckBoxes = true;
             // 
             // deselectAllButton
             // 
@@ -332,7 +332,7 @@
             this.Controls.Add(this.apiURL);
             this.Controls.Add(this.selectAllButton);
             this.Controls.Add(this.deselectAllButton);
-            this.Controls.Add(this.checkedListBox1);
+            this.Controls.Add(this.categoriesListBox);
             this.Controls.Add(this.clearRepositoryButton);
             this.Controls.Add(this.createRepositoryButton);
             this.Controls.Add(this.repositoryNameText);
@@ -363,7 +363,7 @@
         private System.Windows.Forms.Label repositoryNameText;
         private System.Windows.Forms.Button createRepositoryButton;
         private System.Windows.Forms.Button clearRepositoryButton;
-        private System.Windows.Forms.CheckedListBox checkedListBox1;
+        private System.Windows.Forms.CheckedListBox categoriesListBox;
         private System.Windows.Forms.Button deselectAllButton;
         private System.Windows.Forms.Button selectAllButton;
         private System.Windows.Forms.Label apiURL;
