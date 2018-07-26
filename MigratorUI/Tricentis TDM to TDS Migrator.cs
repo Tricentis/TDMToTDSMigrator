@@ -75,18 +75,19 @@ namespace MigratorUI
             XmlNode metaInfoTypes = XMLParser.GetMetaInfoTypes(XMLParser.GetParentNodeOfData(doc));
             TableObject obj = new TableObject();
             StringBuilder s = new StringBuilder();
+
             if (metaInfoAssoc.HasChildNodes)
             {
-
+                
                 s.Append("Please note that the following associations will no longer be supported by Tricentis TDS :\n\n");
                 foreach (XmlNode node in metaInfoAssoc.ChildNodes)
                 {
-                    s.Append(node.Attributes[1].Value + " and " + obj.GetTypeName() + "\n");
+                    
+                    s.Append(node.Attributes[1].Value + " and " + obj.FindTypeName(node.Attributes[2].Value,metaInfoTypes) + "\n");
                 }
                 System.Windows.Forms.MessageBox.Show(s.ToString(),
                                     "Associations not supported",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
             }
         }
         private void CheckForEmptyCategories(XmlNode metaInfoTypes)
