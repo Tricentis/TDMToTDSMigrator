@@ -28,7 +28,8 @@ namespace MigratorUI
         private void TDSMigrator_Load(object sender, EventArgs e)
         {
             logTextBox.AppendText("Welcome to Tricentis TDM to TDS Migrator.\nPlease enter a valid API URL and click on \"Verify Url\". \nExample : http://localhost:80/testdataservice \n");
-            apiUrlTextBox.Select();
+            verifyUrlButton.Select();
+            //verifyUrlButton.BackColor = Color.Aquamarine;
         }
 
 
@@ -273,8 +274,6 @@ namespace MigratorUI
             
             logTextBox.Refresh();
             TDDFileProcessingInWork(true);
-            
-
 
             await Task.Delay(10);
 
@@ -311,7 +310,7 @@ namespace MigratorUI
             
             
             //Timer, bugs if something is written in the logbox while it is running
-            if (estimatedWait > 5)
+            /*if (estimatedWait > 5)
             {
                 int i = -1;
                 logTextBox.AppendText("Seconds elapsed :   ");
@@ -321,11 +320,10 @@ namespace MigratorUI
                     logTextBox.Text = logTextBox.Text.Remove(logTextBox.Text.Length - i.ToString().Length, i.ToString().Length);
                     logTextBox.AppendText(i.ToString());
                     logTextBox.Refresh();
-
-                    await Task.Delay(1100);
+                    await Task.Delay(1200);
 
                 }
-            }
+            }*/
             
         
 
