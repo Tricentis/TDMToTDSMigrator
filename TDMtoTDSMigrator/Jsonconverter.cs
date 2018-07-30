@@ -20,7 +20,7 @@ namespace TDMtoTDSMigrator
     }
     public class JSONConverter
     { 
-        public static string JSONifyObject(TableObject obj)
+        public static string ConvertObjectIntoJsonString(TableObject obj)
         {
             StringBuilder builder = new StringBuilder();
 
@@ -37,7 +37,7 @@ namespace TDMtoTDSMigrator
             return builder.ToString();
 
         }
-        public static string JSONifyObjectForAPI(TableObject obj, XmlNode metaInfoAttributes) => "{\"category\" : \"" +obj.GetTypeName()+ "\" , \"consumed\" : false, \"data\" : " + JSONifyObject(obj) + "}";
+        public static string ConvertObjectIntoJsonPostRequest(TableObject obj, XmlNode metaInfoAttributes) => "{\"category\" : \"" +obj.GetCategoryName()+ "\" , \"consumed\" : false, \"data\" : " + ConvertObjectIntoJsonString(obj) + "}";
         public static string[] ParseJsonIntoRepositoryList(string json)
         {
             json = json.Remove(0,1);
@@ -63,50 +63,8 @@ namespace TDMtoTDSMigrator
         }
     }
 
-    /*
-     Unused Method : TransformObjectListIntoJSonEquivalent
-
-    //Transforms the whole TableObject list into a valid Json file. Useless because API input is single object
-
-     public static string TransformObjectListIntoJSonEquivalent(List<TableObject> objectList, XmlDocument doc)
-        {
-            //Creates a list of stringbuilders, each will build the Json part corresponding to a type of object (ex:Person, City)
-            //The stringbuilders will then be appened to form a valid Json string
-
-            JSONconverter Jsonconverter = new JSONconverter();
-            XMLParser parser = new XMLParser();
-            List<StringBuilder> builders = new List<StringBuilder>();
-
-            //Determine the number of types
-            int numberOfTypes = XMLParser.getMetaInfoTypes(XMLParser.getParentNodeOfData(doc)).ChildNodes.Count;
-
-
-            for (int i = 0; i < numberOfTypes; i++)
-            {
-                builders.Add(new StringBuilder());
-            }
-
-            for (int i = 0; i < objectList.Count; i++)
-            {
-                builders[Int32.Parse(objectList[i].GetTypeId()) - 1].Append(JsonifyObject(objectList[i], false, XMLParser.getMetaInfoAttributes(XMLParser.getParentNodeOfData(doc))));
-            }
-
-            StringBuilder finaljson = new StringBuilder();
-            finaljson.Append("{");
-            for (int i = 0; i < numberOfTypes; i++)
-            {
-                finaljson.Append("\"" + XMLParser.getMetaInfoTypes(XMLParser.getParentNodeOfData(doc)).ChildNodes[i].Attributes[1].Value + "\" : [");
-                finaljson.Append(builders[i].ToString());
-                finaljson.Remove(finaljson.Length - 2, 1);
-                finaljson.Append("],");
-            }
-            finaljson.Remove(finaljson.Length - 1, 1);
-            finaljson.Append("}");
-            return finaljson.ToString();
-        }
-
+    
 
 
      
-     */
 }

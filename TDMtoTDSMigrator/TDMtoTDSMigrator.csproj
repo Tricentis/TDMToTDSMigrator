@@ -47,12 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HTTPRequest.cs" />
+    <Compile Include="HttpRequest.cs" />
     <Compile Include="JSONConverter.cs" />
-    <Compile Include="TDSLoader.cs" />
+    <Compile Include="TdsLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TableObject.cs" />
-    <Compile Include="XMLParser.cs" />
+    <Compile Include="XmlParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

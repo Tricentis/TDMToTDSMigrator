@@ -20,31 +20,30 @@ namespace MigratorUI
         }
 
 
-        private List<TableObject> objectList; // List of TableObjects each corresponding to one row of data 
-        private string xmlPath; // path of the decompressed xml file
-        private Boolean migrationInWork=false; 
+        private List<TableObject> _dataList; // List of TableObjects each corresponding to one row of data 
+        private string _xmlPath; 
+        private Boolean _migrationInWork=false;
 
         //Initialization 
         private void TDSMigrator_Load(object sender, EventArgs e)
         {
             logTextBox.AppendText("Welcome to Tricentis TDM to TDS Migrator.\nPlease enter a valid API URL and click on \"Verify Url\". \nExample : http://localhost:80/testdataservice \n");
             verifyUrlButton.Select();
-            //verifyUrlButton.BackColor = Color.Aquamarine;
         }
 
 
         //Migration and tdd processing methods
-        private async Task<HttpResponseMessage> Migrate(List<string> authorizedTypes, Boolean applyFilter, string xmlPath, List<TableObject> objectList, string selectedRepository, string apiUrl)
+        private async Task<HttpResponseMessage> LaunchMigration(List<string> authorizedTypes, Boolean applyFilter, string xmlPath, List<TableObject> objectList, string selectedRepository, string apiUrl)
         {//Loads the selected categories into the selected repository in TDS
 
             HttpResponseMessage message = null;
             if (applyFilter)
             {
-                message = await TDSLoader.LoadIntoTDSWithFilter(xmlPath, objectList, selectedRepository, authorizedTypes, apiUrl);
+                message = await TdsLoader.MigrateXmlDataIntoTdsWithFilter(xmlPath, objectList, selectedRepository, authorizedTypes, apiUrl);
             }
             else
             {
-                message = await TDSLoader.LoadIntoTDS(xmlPath, objectList, selectedRepository, apiUrl);
+                message = await TdsLoader.MigrateXmlDataIntoTdsWithoutFilter(xmlPath, objectList, selectedRepository, apiUrl);
             }
             return message;
         }
@@ -53,14 +52,15 @@ namespace MigratorUI
             var items = categoriesListBox.Items;
             for (int i = 0; i < metaInfoType.ChildNodes.Count; i++)
             {
-                items.Add(metaInfoType.ChildNodes[i].Attributes[1].Value, true);
+                items.Add(metaInfoType.ChildNodes[i].Attributes?[1].Value ?? throw new InvalidOperationException(), true);
             }
         }
 
 
         //Verification methods
-        private string ValidateURI(string uri)
-        {//checks for the last slash ("/") in the uri entered by the user. if not present, adds it.
+        private string ValidateUrl(string uri)
+        {
+            //checks for the last slash ("/") in the uri entered by the user. if not present, adds it.
             if (uri.Length > 0 && uri[uri.Length - 1] != '/')
             {
                 uri = uri + "/";
@@ -68,11 +68,12 @@ namespace MigratorUI
             return uri;
         }
         private void CheckForAssociations()
-        {//checks if there were any associations in the TDM. If yes, warns the user that they will no longer be supported
+        {
+            //checks if there were any associations in the TDM. If yes, warns the user that they will no longer be supported
             XmlDocument doc = new XmlDocument();
-            doc.Load(xmlPath);
-            XmlNode metaInfoAssoc = XMLParser.GetParentNodeOfData(doc).ChildNodes[3];
-            XmlNode metaInfoTypes = XMLParser.GetMetaInfoTypes(XMLParser.GetParentNodeOfData(doc));
+            doc.Load(_xmlPath);
+            XmlNode metaInfoAssoc = XmlParser.GetRepositoryDump(doc).ChildNodes[3];
+            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(_xmlPath);
             TableObject obj = new TableObject();
             StringBuilder s = new StringBuilder();
 
@@ -83,7 +84,7 @@ namespace MigratorUI
                 foreach (XmlNode node in metaInfoAssoc.ChildNodes)
                 {
                     
-                    s.Append(node.Attributes[1].Value + " and " + obj.FindTypeName(node.Attributes[2].Value,metaInfoTypes) + "\n");
+                    s.Append(node.Attributes?[1].Value + " and " + obj.FindCategoryName(node.Attributes?[2].Value,metaInfoTypes) + "\n");
                 }
                 System.Windows.Forms.MessageBox.Show(s.ToString(),
                                     "Associations not supported",
@@ -98,14 +99,14 @@ namespace MigratorUI
             var items = categoriesListBox.Items;
             for (int i = 0; i < metaInfoTypes.ChildNodes.Count; i++)
             {
-                emptyType.Add(metaInfoTypes.ChildNodes[i].Attributes[1].Value);
+                emptyType.Add(metaInfoTypes.ChildNodes[i].Attributes?[1].Value);
             }
 
-            for (int i = 0; i < objectList.Count; i++)
+            for (int i = 0; i < _dataList.Count; i++)
             {
                 for (int j = 0; j < emptyType.Count; j++)
                 {
-                    if (objectList[i].GetTypeName() == emptyType[j])
+                    if (_dataList[i].GetCategoryName() == emptyType[j])
                     {
                         emptyType.RemoveAt(j);
                     }
@@ -126,50 +127,45 @@ namespace MigratorUI
 
 
         //UI element attributes and logText methods 
-        private void TDDFileProcessingInWork(Boolean processing)
+        private void TddFileProcessingInWork(Boolean processingInWork)
         {//sets the enabled state of ui elements depending on whether a .tdd file is being processed
 
-            GenerateButton.Enabled = !processing;
-            categoriesListBox.Enabled = !processing;
-            selectAllButton.Enabled = !processing;
-            deselectAllButton.Enabled = !processing;
-            verifyUrlButton.Enabled = !processing;
-            pickFileButton.Enabled = !processing;
+            GenerateButton.Enabled = !processingInWork;
+            categoriesListBox.Enabled = !processingInWork;
+            selectAllButton.Enabled = !processingInWork;
+            deselectAllButton.Enabled = !processingInWork;
+            verifyUrlButton.Enabled = !processingInWork;
+            pickFileButton.Enabled = !processingInWork;
+            tddFileProcessingProgressBar.Visible = processingInWork;
         }
-        private void MigrationInWork(Boolean inWork)
-        {// sets the enabled state of ui elements depending on whether files are currently being transferred to the api
-            if (inWork)
-            {
-                progressBar2.Visible = true;
-            }
-            else
-            {
-                progressBar2.Visible = false;
-            }
-            deleteRepositoryButton.Enabled = !inWork;
-            clearRepositoryButton.Enabled = !inWork;
-            GenerateButton.Enabled = !inWork;
-            loadRefreshRepositories.Enabled = !inWork;
+        private void MigrationInWork(Boolean migrationInWork)
+        {// sets the enabled state of ui elements depending on whether data is currently being fed to the api
+           
+            migrationProgressBar.Visible = migrationInWork;
+            deleteRepositoryButton.Enabled = !migrationInWork;
+            clearRepositoryButton.Enabled = !migrationInWork;
+            GenerateButton.Enabled = !migrationInWork;
+            loadRefreshRepositories.Enabled = !migrationInWork;
         }
-        private void ApiConnectionOk(Boolean apiConnectionOK, object sender, EventArgs e)
+        private void ApiConnectionOk(Boolean apiConnectionOk, object sender, EventArgs e)
         {//sets the enabled state of ui elements depending on the success of api url verification
             Boolean tddFilePicked = TDDPathTextBox.Text != "";
 
-            createRepositoryButton.Enabled = apiConnectionOK;
-            deleteRepositoryButton.Enabled = apiConnectionOK;
-            clearRepositoryButton.Enabled = apiConnectionOK;
-            GenerateButton.Enabled = apiConnectionOK & tddFilePicked & !migrationInWork;
-            loadRefreshRepositories.Enabled = apiConnectionOK;
-            repositoriesBox.Enabled = apiConnectionOK;
-            repositoryDescriptionTextbox.Enabled = apiConnectionOK;
-            repositoryName.Enabled = apiConnectionOK;
-            categoriesListBox.Enabled = apiConnectionOK & tddFilePicked & !migrationInWork;
-            selectAllButton.Enabled = apiConnectionOK & tddFilePicked & !migrationInWork;
-            deselectAllButton.Enabled = apiConnectionOK & tddFilePicked & !migrationInWork;
-            apiUrlTextBox.Enabled = !apiConnectionOK & !migrationInWork;
-            pickFileButton.Enabled = apiConnectionOK & !migrationInWork;
+            createRepositoryButton.Enabled = apiConnectionOk;
+            deleteRepositoryButton.Enabled = apiConnectionOk;
+            clearRepositoryButton.Enabled = apiConnectionOk;
+            GenerateButton.Enabled = apiConnectionOk & tddFilePicked & !_migrationInWork;
+            loadRefreshRepositories.Enabled = apiConnectionOk;
+            repositoriesBox.Enabled = apiConnectionOk;
+            repositoryDescriptionTextbox.Enabled = apiConnectionOk;
+            repositoryNameTextBox.Enabled = apiConnectionOk;
+            categoriesListBox.Enabled = apiConnectionOk & tddFilePicked & !_migrationInWork;
+            selectAllButton.Enabled = apiConnectionOk & tddFilePicked & !_migrationInWork;
+            deselectAllButton.Enabled = apiConnectionOk & tddFilePicked & !_migrationInWork;
+            apiUrlTextBox.Enabled = !apiConnectionOk & !_migrationInWork;
+            pickFileButton.Enabled = apiConnectionOk & !_migrationInWork;
 
-            if (apiConnectionOK)
+            if (apiConnectionOk)
             {
                 pickFileButton.Text = "Browse...";
                 loadRefreshRepositories_Click(sender, e);
@@ -189,16 +185,26 @@ namespace MigratorUI
             // returns the waiting time for processing the tdd after the file was picked
             FileInfo tdd = new FileInfo(TDDPathTextBox.Text);
 
-            int scaleLength = 611797; // length of the tdd file that is the scale for processing time estimation (~35 seconds)
+            int scaleLength = 611797; // length of the tdd file that is the scale for processing time estimation (~35 seconds for this file)
             return (int)((float)tdd.Length / (float)scaleLength * 35);
         }
+        private void RefreshRepositoriesList()
+        {
+            repositoriesBox.Items.Clear();
+            string reposJson = HttpRequest.GetRepositories(ValidateUrl(apiUrlTextBox.Text));
+            string[] repoList = JSONConverter.ParseJsonIntoRepositoryList(reposJson);
 
+            for (int i = 0; i < repoList.Length; i++)
+            {
+                repositoriesBox.Items.Add(repoList[i]);
+            }
+            if (repoList.Length > 0)
+            {
+                repositoriesBox.SelectedItem = repositoriesBox.Items[0];
+            }
+        }
 
         //logText message generation methoids
-        private string CreatedRepositoryMessage(string name)
-        {
-            return "Repository Created : " + name+"\n";
-        }
         private string CreatedRepositoryMessage(string name, string description)
         {
             return "Repository Created : " + name +" , Description : "+description+"\n";
@@ -217,21 +223,20 @@ namespace MigratorUI
         }
 
 
-        //Event on click and text changed methods
+        //Event methods
         private async void loadIntoRepositoryButton_Click(object sender, EventArgs e)
 {   
             Boolean applyFilter = false;
-            Boolean atLeastOneItemChecked = false;
-            XmlNode metaInfoTypes = XMLParser.GetMetaInfoTypes(xmlPath);
-
-            List<string> authorizedTypes = new List<string>();
+            Boolean atLeastOneCategorySelected = false;
+            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(_xmlPath);
+            List<string> filteredCategories = new List<string>();
 
             for (int i = 0; i < categoriesListBox.Items.Count; i++)
             {
                 if (categoriesListBox.GetItemChecked(i))
                 {
-                     atLeastOneItemChecked = true;
-                     authorizedTypes.Add(categoriesListBox.Items[i].ToString());
+                     atLeastOneCategorySelected = true;
+                     filteredCategories.Add(categoriesListBox.Items[i].ToString());
                 }
                 else
                 {
@@ -243,20 +248,21 @@ namespace MigratorUI
                 logTextBox.AppendText("Please pick a repository, or create one\n");
 
             }
-            else if (!atLeastOneItemChecked)
+            else if (!atLeastOneCategorySelected)
                 {
                 logTextBox.AppendText("Please pick a category\n");
             }
             else
             {
-                logTextBox.AppendText("Migrating " + authorizedTypes.Count + " categories into \"" + repositoriesBox.SelectedItem.ToString() + "\". Please wait...\n");
+                logTextBox.AppendText("Migrating " + filteredCategories.Count + " categories into \"" + repositoriesBox.SelectedItem + "\". Please wait...\n");
 
                 MigrationInWork(true);
                 await Task.Delay(10);
-                await Migrate(authorizedTypes, applyFilter, xmlPath, objectList, repositoriesBox.SelectedItem.ToString(), ValidateURI(apiUrlTextBox.Text));
+                await LaunchMigration(filteredCategories, applyFilter, _xmlPath, _dataList, repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
 
-                logTextBox.AppendText(MigrationFinishedMessage(authorizedTypes.Count, repositoriesBox.SelectedItem.ToString()));
+                logTextBox.AppendText(MigrationFinishedMessage(filteredCategories.Count, repositoriesBox.SelectedItem.ToString()));
                 logTextBox.Refresh();
+
                 MigrationInWork(false);
             }
 
@@ -273,65 +279,44 @@ namespace MigratorUI
             }
             
             logTextBox.Refresh();
-            TDDFileProcessingInWork(true);
+            TddFileProcessingInWork(true);
 
-            await Task.Delay(10);
+            await Task.Delay(10); //small delay to set enabled status of UI components properly
 
-            //decompress tdd file into xml
+            
+
+            this._xmlPath = TdsLoader.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text));
             XmlDocument doc = new XmlDocument();
-            this.xmlPath = TDSLoader.Decompress(new FileInfo(TDDPathTextBox.Text));
-            doc.Load(xmlPath);
-
-
+            doc.Load(_xmlPath);
 
             //Loads categories into categories box
-            XmlNode metaInfoTypes = XMLParser.GetMetaInfoTypes(XMLParser.GetParentNodeOfData(doc));
+            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(XmlParser.GetRepositoryDump(doc));
             LoadCategories(metaInfoTypes);
-            progressBar.Visible = true;
+            
 
             //Asynchronously parses XML file and retrieves the TableObject list
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += (s, r) => {
-                //Some work...
-                r.Result = this.objectList = TDSLoader.TransformXMLIntoObjectList(xmlPath);
+                r.Result = this._dataList = XmlParser.ConvertXmlIntoDataList(_xmlPath);
             };
             worker.RunWorkerCompleted += (s, r) => {
-                this.objectList =(List<TableObject>)r.Result;
+                this._dataList =(List<TableObject>)r.Result;
 
                 logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + metaInfoTypes.ChildNodes.Count + " categories were found. \n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
                 logTextBox.Refresh();
 
                 CheckForEmptyCategories(metaInfoTypes);    
-                TDDFileProcessingInWork(false);
-                progressBar.Visible = false;
+                TddFileProcessingInWork(false);
+                tddFileProcessingProgressBar.Visible = false;
                 CheckForAssociations();
             };
             worker.RunWorkerAsync();
-            
-            
-            //Timer, bugs if something is written in the logbox while it is running
-            /*if (estimatedWait > 5)
-            {
-                int i = -1;
-                logTextBox.AppendText("Seconds elapsed :   ");
-                while (worker.IsBusy)
-                {
-                    i++;
-                    logTextBox.Text = logTextBox.Text.Remove(logTextBox.Text.Length - i.ToString().Length, i.ToString().Length);
-                    logTextBox.AppendText(i.ToString());
-                    logTextBox.Refresh();
-                    await Task.Delay(1200);
 
-                }
-            }*/
-            
-        
 
         }
         private void pickFileButton_Click(object sender, EventArgs e)
         {
-            openFileDialog.Multiselect = false;
-            openFileDialog.DefaultExt = "tdd";
+
             openFileDialog.ShowDialog();
 
         }
@@ -340,32 +325,23 @@ namespace MigratorUI
             categoriesListBox.Items.Clear();
             TDDPathTextBox.Text = openFileDialog.FileName;
             
-
         }
         private void createRepositoryButton_Click(object sender, EventArgs e)
         {
-            if (repositoryName.Text != "")
-            {//repository name is not empty
-                if (!repositoriesBox.Items.Contains(repositoryName.Text))
-                {//repository name is not already taken
-                    if (repositoryDescriptionTextbox.Text != "")
-                    {
-                        HTTPRequest.CreateRepository(repositoryName.Text, repositoryDescriptionTextbox.Text, ValidateURI(apiUrlTextBox.Text));
-                        logTextBox.AppendText(CreatedRepositoryMessage(repositoryName.Text, repositoryDescriptionTextbox.Text));
-                    }
-                    else
-                    {
-                        HTTPRequest.CreateRepository(repositoryName.Text, ValidateURI(apiUrlTextBox.Text));
-                        logTextBox.AppendText(CreatedRepositoryMessage(repositoryName.Text));
-                    }
-                    repositoriesBox.Items.Add(repositoryName.Text);
-                    repositoriesBox.SelectedItem = repositoryName.Text;
+            if (repositoryNameTextBox.Text != "")
+            {
+                RefreshRepositoriesList();
 
-                    
+                if (!repositoriesBox.Items.Contains(repositoryNameTextBox.Text))
+                {  
+                HttpRequest.CreateRepository(repositoryNameTextBox.Text, repositoryDescriptionTextbox.Text, ValidateUrl(apiUrlTextBox.Text));
+                logTextBox.AppendText(CreatedRepositoryMessage(repositoryNameTextBox.Text, repositoryDescriptionTextbox.Text));
+                repositoriesBox.Items.Add(repositoryNameTextBox.Text);
+                repositoriesBox.SelectedItem = repositoryNameTextBox.Text;
                 }
                 else
                 {
-                    logTextBox.AppendText("Repository \"" + repositoryName.Text + "\" already exists \n");
+                    logTextBox.AppendText("Repository \"" + repositoryNameTextBox.Text + "\" already exists \n");
                 }
             }
             else
@@ -384,7 +360,7 @@ namespace MigratorUI
                                      MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 if (confirmResult == DialogResult.OK)
                 {
-                    HTTPRequest.ClearRepository(repositoriesBox.SelectedItem.ToString(), ValidateURI(apiUrlTextBox.Text));
+                    HttpRequest.ClearRepository(repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
                     logTextBox.AppendText(ClearedRepositoryMessage(repositoriesBox.SelectedItem.ToString()));
                 }
                 
@@ -395,8 +371,9 @@ namespace MigratorUI
 
             }
         }
-        private void deleteRepositoryButton_Click(object sender, EventArgs e)
+        private void deleteRepositoryButton_Click(object sender, EventArgs e) 
         {
+            //Clears repository then deletes repository reference
             if (repositoriesBox.SelectedItem != null)
             {
                 var confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
@@ -406,8 +383,8 @@ namespace MigratorUI
                 if (confirmResult == DialogResult.OK)
                 {
 
-                    HTTPRequest.ClearRepository(repositoriesBox.SelectedItem.ToString(), ValidateURI(apiUrlTextBox.Text));
-                    HTTPRequest.DeleteRepository(repositoriesBox.SelectedItem.ToString(), ValidateURI(apiUrlTextBox.Text));
+                    HttpRequest.ClearRepository(repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
+                    HttpRequest.DeleteRepository(repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
                     logTextBox.AppendText(DeletedRepositoryMessage(repositoriesBox.SelectedItem.ToString()));
                     repositoriesBox.Items.Remove(repositoriesBox.SelectedItem);
 
@@ -445,18 +422,7 @@ namespace MigratorUI
         }
         private void loadRefreshRepositories_Click(object sender, EventArgs e)
         {
-            repositoriesBox.Items.Clear();
-            string reposJson = HTTPRequest.GetRepositories(ValidateURI(apiUrlTextBox.Text));
-            string[] repoList = JSONConverter.ParseJsonIntoRepositoryList(reposJson);
-
-            for (int i = 0; i < repoList.Length; i++)
-            {
-                repositoriesBox.Items.Add(repoList[i]);
-            }
-            if (repoList.Length > 0)
-            {
-                repositoriesBox.SelectedItem = repositoriesBox.Items[0];
-            }
+            RefreshRepositoriesList();
         }
         private void verifyUrlButton_Click_1(object sender, EventArgs e)
         {
@@ -468,7 +434,7 @@ namespace MigratorUI
             }
             else
             {
-                if (HTTPRequest.VerifyApiURI(ValidateURI(apiUrlTextBox.Text)))
+                if (HttpRequest.VerifyApiUrl(ValidateUrl(apiUrlTextBox.Text)))
                 {
                     apiUrlTextBox.BackColor = Color.Lime;
                     ApiConnectionOk(true, sender, e);

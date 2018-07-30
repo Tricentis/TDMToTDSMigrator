@@ -49,7 +49,7 @@
     <CodeAnalysisRuleSet>MigratorUI.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>cropped-512px_Product-Logo-Icon.ico</ApplicationIcon>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -127,7 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="cropped-512px_Product-Logo-Icon.ico" />
-    <Content Include="logo_Kk9_icon.ico" />
+    <Content Include="Icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

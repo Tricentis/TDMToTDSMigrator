@@ -15,29 +15,25 @@ using System.Diagnostics;
 namespace TDMtoTDSMigrator
 {
     
-    public class TDSLoader
+    public class TdsLoader
     {
 
-        public static string Decompress(FileInfo fi)
+        public static string DecompressTddFileIntoXml(FileInfo fi)
         {
-            // Get the stream of the source file. 
             using (FileStream inFile = fi.OpenRead())
             {
-                // Get original file extension, for example "doc" from report.doc.gz.
                 string curFile = fi.FullName;
                 string origName = curFile.Remove(curFile.Length - fi.Extension.Length);
-
-                //Create the decompressed file. 
+ 
                 string pathOfOutput = origName + ".xml";
                 using (FileStream outFile = File.Create(pathOfOutput))
                 {
-                    using (GZipStream Decompress = new GZipStream(inFile,
+                    using (GZipStream decompress = new GZipStream(inFile,
                             CompressionMode.Decompress))
                     {
-                        //Copy the decompression stream into the output file.
                         byte[] buffer = new byte[4096];
                         int numRead;
-                        while ((numRead = Decompress.Read(buffer, 0, buffer.Length)) != 0)
+                        while ((numRead = decompress.Read(buffer, 0, buffer.Length)) != 0)
                         {
                             outFile.Write(buffer, 0, numRead);
                         }
@@ -48,80 +44,48 @@ namespace TDMtoTDSMigrator
             }
 
         }
-        public static List<TableObject> TransformXMLIntoObjectList(string xmlPath)
-        {
-            List<TableObject> Objects = XMLParser.ParseXmlIntoObjectList(xmlPath);
-            Console.WriteLine(Objects.Count + " lines of data");
-            return Objects;
-        }
 
 
 
-        public static Task<HttpResponseMessage> LoadIntoTDS(string xmlPath, List<TableObject> list, string repositoryName, string apiURL)
+        public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithoutFilter(string xmlPath, List<TableObject> dataList, string repositoryName, string apiUrl)
         {
             
             XmlDocument doc = new XmlDocument();
             doc.Load(xmlPath);
 
-            XmlNode metaInfoAttributes = XMLParser.GetMetaInfoAttributes(XMLParser.GetParentNodeOfData(doc));
-            XmlNode metaInfoType = XMLParser.GetMetaInfoTypes(XMLParser.GetParentNodeOfData(doc));
+            XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(XmlParser.GetRepositoryDump(doc));
+            XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(XmlParser.GetRepositoryDump(doc));
 
             Task<HttpResponseMessage> message = null;
-            for (int i = 0; i < list.Count; i++)
+
+            for (int i = 0; i < dataList.Count; i++)
             {
-                message = HTTPRequest.PostObject(JSONConverter.JSONifyObjectForAPI(list[i], metaInfoAttributes),repositoryName, apiURL);
+                message = HttpRequest.PostObject(JSONConverter.ConvertObjectIntoJsonPostRequest(dataList[i], metaInfoAttributes),repositoryName, apiUrl);
             }
 
             // returns the response of the last request
             return message;
         }
-        public static Task<HttpResponseMessage> LoadIntoTDSWithFilter(string xmlPath, List<TableObject> list, string repositoryName, List<string> authorizedTypes, string apiURL)
+        public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithFilter(string xmlPath, List<TableObject> dataList, string repositoryName, List<string> filteredCategories, string apiUrl)
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(xmlPath);
 
-            XmlNode metaInfoAttributes = XMLParser.GetMetaInfoAttributes(XMLParser.GetParentNodeOfData(doc));
-            XmlNode metaInfoType = XMLParser.GetMetaInfoTypes(XMLParser.GetParentNodeOfData(doc));
+            XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(XmlParser.GetRepositoryDump(doc));
+            XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(XmlParser.GetRepositoryDump(doc));
 
             Task<HttpResponseMessage> message = null;
-            for (int i = 0; i < list.Count; i++)
-            {
 
-                if (authorizedTypes.Contains(list[i].GetTypeName()))
+            for (int i = 0; i < dataList.Count; i++)
+            {
+                if (filteredCategories.Contains(dataList[i].GetCategoryName()))
                 {
-                    message = HTTPRequest.PostObject(JSONConverter.JSONifyObjectForAPI(list[i], metaInfoAttributes), repositoryName, apiURL);  
+                    message = HttpRequest.PostObject(JSONConverter.ConvertObjectIntoJsonPostRequest(dataList[i], metaInfoAttributes), repositoryName, apiUrl);  
                 }
             }
 
             // returns the response of the last request
             return message;
-
-
         }
-
-
-        
-
-
-        /*
-         Unused methods
-         public static string CreateJSONString(string filepath)
-        {
-            XmlDocument doc = new XmlDocument();
-            string xmlPath = Decompress(new FileInfo(filepath));
-            doc.Load(xmlPath);
-
-            return JSONconverter.TransformObjectListIntoJSonEquivalent(TransformXMLIntoObjectList(xmlPath), doc);
-        }
-
-
-
-         
-         
-         */
-
-
-
-
     }
 }

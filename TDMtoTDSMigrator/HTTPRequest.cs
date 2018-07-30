@@ -10,94 +10,82 @@ using System.Threading.Tasks;
 namespace TDMtoTDSMigrator
 {
 
-    public class HTTPRequest
+    public class HttpRequest
     {
-        public static Uri CreateRepository(string repositoryName, string repositoryDescription, string apiURL)
+    
+        public static Uri CreateRepository(string repositoryName, string repositoryDescription, string apiUrl)
         {
             using (HttpClient client = new HttpClient())
             {
                 {
-                    client.BaseAddress = new Uri(apiURL);
-                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.BaseAddress = new Uri(apiUrl);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = client.PostAsync("configuration/repositories/", new StringContent("{\"description\":\"" + repositoryDescription + "\",\"location\":\"%PROGRAMDATA%\\\\Tricentis\\\\TestDataService\\\\" + repositoryName + ".db\",\"name\":\"" + repositoryName+ "\",\"type\":1,\"link\": \""+apiURL+"configuration/repositories/"+repositoryName+"\"}", Encoding.UTF8, "application/json") ).Result;
-                  
-                    //return URI of the created resource.
+                    HttpResponseMessage response = client.PostAsync("configuration/repositories/", new StringContent("{\"description\":\"" + repositoryDescription + "\"," +
+                                                                                                                     "\"location\":\"%PROGRAMDATA%\\\\Tricentis\\\\TestDataService\\\\" + repositoryName + ".db\"," +
+                                                                                                                     "\"name\":\"" + repositoryName+ "\"," +
+                                                                                                                     "\"type\":1," +
+                                                                                                                     "\"link\": \""+apiUrl+"configuration/repositories/"+repositoryName+"\"}",
+                                                                                                                      Encoding.UTF8, "application/json") ).Result;
                     return response.Headers.Location;
                 }
             }
         }
-        public static Uri CreateRepository(string repositoryName, string apiURL)
-        {
-            return CreateRepository(repositoryName,"",apiURL);
-        }
-        public static Uri ClearRepository(string repositoryName, string apiURL)
+        public static Uri ClearRepository(string repositoryName, string apiUrl)
         {
             using (HttpClient client = new HttpClient())
             {
                 {
-                    client.BaseAddress = new Uri(apiURL);
-                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.BaseAddress = new Uri(apiUrl);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                     HttpResponseMessage response = client.DeleteAsync(repositoryName).Result;
 
-                    // return URI of the created resource.
                     return response.Headers.Location;
                 }
             }
         }
-        public static Uri DeleteRepository(string repositoryName, string apiURL)
+        public static Uri DeleteRepository(string repositoryName, string apiUrl)
         {
             using (HttpClient client = new HttpClient())
             {
                 {
-                    // Update port # in the following line.
-                    client.BaseAddress = new Uri(apiURL);
-                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.BaseAddress = new Uri(apiUrl);
                     client.DefaultRequestHeaders.Accept.Add(
                         new MediaTypeWithQualityHeaderValue("application/json"));
                     HttpResponseMessage response = client.DeleteAsync("configuration/repositories/" + repositoryName).Result;
-
                     return response.Headers.Location;
                 }
             }
         }
-        public static string GetRepositories(string apiURL)
+        public static string GetRepositories(string apiUrl)
         {
             using (HttpClient client = new HttpClient())
             {
                 {
-                    string json = "";
-
-                    apiURL.Remove(apiURL.Length - 1, 1);
-                    client.BaseAddress = new Uri(apiURL);
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    json = client.GetStringAsync("").Result;
-                    JSONConverter.ParseJsonIntoRepositoryList(json);
-                    return json;
+                    Console.WriteLine(client.DefaultRequestHeaders.Accept.ToString()+"i");
+                    client.BaseAddress = new Uri(apiUrl);
+                    return client.GetStringAsync("").Result;
                 }
             }
         }
-        public static Boolean VerifyApiURI(string apiURL)
+        public static Boolean VerifyApiUrl(string apiUrl)
         {
             using (HttpClient client = new HttpClient())
             {
 
                 {
-                    if (apiURL.Length == 0)
+                    if (apiUrl.Length == 0)
                     {
                         return false;
                     }
                     try
                     {
-                        client.BaseAddress = new Uri(apiURL);
-                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.BaseAddress = new Uri(apiUrl);
                         client.DefaultRequestHeaders.Accept.Add(
                             new MediaTypeWithQualityHeaderValue("application/json"));
                         HttpResponseMessage response = client.PostAsync("configuration/repositories/", new StringContent("{\"name\":\"testconnectionwithapi2546987\",\"location\":\"testconnectionwithapi2546987\",\"description\":\"testconnectionwithapi2546987\"}", Encoding.UTF8, "application/json")).Result;
-                        DeleteRepository("testconnectionwithapi2546987", apiURL);
+                        DeleteRepository("testconnectionwithapi2546987", apiUrl);
                         return (response.IsSuccessStatusCode);
                     }catch(ArgumentException e)
                     {
@@ -110,13 +98,10 @@ namespace TDMtoTDSMigrator
                     }
                         
                     }
-                    
-                    
-                   
                 }
             }
 
-        public static async Task<HttpResponseMessage> PostObject(string jSon, string repositoryName, string apiURL)
+        public static async Task<HttpResponseMessage> PostObject(string jSon, string repositoryName, string apiUrl)
         {
             try
             {
@@ -126,8 +111,7 @@ namespace TDMtoTDSMigrator
                 using (HttpClient client = new HttpClient())
                 {
                     {
-                        client.BaseAddress = new Uri(apiURL);
-                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.BaseAddress = new Uri(apiUrl);
                         client.DefaultRequestHeaders.Accept.Add(
                             new MediaTypeWithQualityHeaderValue("application/json"));
                         Task<HttpResponseMessage> task =client.PostAsync(repositoryName, json);

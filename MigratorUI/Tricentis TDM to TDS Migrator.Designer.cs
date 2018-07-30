@@ -33,7 +33,7 @@
             this.TDDPathTextBox = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.label1 = new System.Windows.Forms.Label();
-            this.repositoryName = new System.Windows.Forms.TextBox();
+            this.repositoryNameTextBox = new System.Windows.Forms.TextBox();
             this.repositoryNameText = new System.Windows.Forms.Label();
             this.createRepositoryButton = new System.Windows.Forms.Button();
             this.clearRepositoryButton = new System.Windows.Forms.Button();
@@ -51,9 +51,9 @@
             this.logTextBox = new System.Windows.Forms.RichTextBox();
             this.verifyUrlButton = new System.Windows.Forms.Button();
             this.categoriesLabel = new System.Windows.Forms.Label();
-            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.tddFileProcessingProgressBar = new System.Windows.Forms.ProgressBar();
             this.GenerateButton = new System.Windows.Forms.Button();
-            this.progressBar2 = new System.Windows.Forms.ProgressBar();
+            this.migrationProgressBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
             // pickFileButton
@@ -94,13 +94,13 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "Select .tdd file ";
             // 
-            // repositoryName
+            // repositoryNameTextBox
             // 
-            this.repositoryName.Enabled = false;
-            this.repositoryName.Location = new System.Drawing.Point(822, 210);
-            this.repositoryName.Name = "repositoryName";
-            this.repositoryName.Size = new System.Drawing.Size(166, 22);
-            this.repositoryName.TabIndex = 10;
+            this.repositoryNameTextBox.Enabled = false;
+            this.repositoryNameTextBox.Location = new System.Drawing.Point(822, 210);
+            this.repositoryNameTextBox.Name = "repositoryNameTextBox";
+            this.repositoryNameTextBox.Size = new System.Drawing.Size(166, 22);
+            this.repositoryNameTextBox.TabIndex = 10;
             // 
             // repositoryNameText
             // 
@@ -280,15 +280,15 @@
             this.categoriesLabel.TabIndex = 26;
             this.categoriesLabel.Text = "Categories";
             // 
-            // progressBar
+            // tddFileProcessingProgressBar
             // 
-            this.progressBar.Location = new System.Drawing.Point(711, 293);
-            this.progressBar.MarqueeAnimationSpeed = 25;
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(277, 15);
-            this.progressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.progressBar.TabIndex = 27;
-            this.progressBar.Visible = false;
+            this.tddFileProcessingProgressBar.Location = new System.Drawing.Point(711, 293);
+            this.tddFileProcessingProgressBar.MarqueeAnimationSpeed = 25;
+            this.tddFileProcessingProgressBar.Name = "tddFileProcessingProgressBar";
+            this.tddFileProcessingProgressBar.Size = new System.Drawing.Size(277, 15);
+            this.tddFileProcessingProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.tddFileProcessingProgressBar.TabIndex = 27;
+            this.tddFileProcessingProgressBar.Visible = false;
             // 
             // GenerateButton
             // 
@@ -301,15 +301,15 @@
             this.GenerateButton.UseVisualStyleBackColor = true;
             this.GenerateButton.Click += new System.EventHandler(this.loadIntoRepositoryButton_Click);
             // 
-            // progressBar2
+            // migrationProgressBar
             // 
-            this.progressBar2.Location = new System.Drawing.Point(751, 641);
-            this.progressBar2.MarqueeAnimationSpeed = 25;
-            this.progressBar2.Name = "progressBar2";
-            this.progressBar2.Size = new System.Drawing.Size(273, 15);
-            this.progressBar2.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.progressBar2.TabIndex = 28;
-            this.progressBar2.Visible = false;
+            this.migrationProgressBar.Location = new System.Drawing.Point(751, 641);
+            this.migrationProgressBar.MarqueeAnimationSpeed = 25;
+            this.migrationProgressBar.Name = "migrationProgressBar";
+            this.migrationProgressBar.Size = new System.Drawing.Size(273, 15);
+            this.migrationProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.migrationProgressBar.TabIndex = 28;
+            this.migrationProgressBar.Visible = false;
             // 
             // TDSMigrator
             // 
@@ -317,8 +317,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(1192, 678);
-            this.Controls.Add(this.progressBar2);
-            this.Controls.Add(this.progressBar);
+            this.Controls.Add(this.migrationProgressBar);
+            this.Controls.Add(this.tddFileProcessingProgressBar);
             this.Controls.Add(this.categoriesLabel);
             this.Controls.Add(this.verifyUrlButton);
             this.Controls.Add(this.logTextBox);
@@ -336,7 +336,7 @@
             this.Controls.Add(this.clearRepositoryButton);
             this.Controls.Add(this.createRepositoryButton);
             this.Controls.Add(this.repositoryNameText);
-            this.Controls.Add(this.repositoryName);
+            this.Controls.Add(this.repositoryNameTextBox);
             this.Controls.Add(this.GenerateButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TDDPathTextBox);
@@ -359,7 +359,7 @@
         private System.Windows.Forms.TextBox TDDPathTextBox;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox repositoryName;
+        private System.Windows.Forms.TextBox repositoryNameTextBox;
         private System.Windows.Forms.Label repositoryNameText;
         private System.Windows.Forms.Button createRepositoryButton;
         private System.Windows.Forms.Button clearRepositoryButton;
@@ -377,9 +377,9 @@
         private System.Windows.Forms.RichTextBox logTextBox;
         private System.Windows.Forms.Button verifyUrlButton;
         private System.Windows.Forms.Label categoriesLabel;
-        private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.ProgressBar tddFileProcessingProgressBar;
         private System.Windows.Forms.Button GenerateButton;
-        private System.Windows.Forms.ProgressBar progressBar2;
+        private System.Windows.Forms.ProgressBar migrationProgressBar;
     }
 }
 
