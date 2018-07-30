@@ -63,7 +63,6 @@ namespace TDMtoTDSMigrator
             using (HttpClient client = new HttpClient())
             {
                 {
-                    Console.WriteLine(client.DefaultRequestHeaders.Accept.ToString()+"i");
                     client.BaseAddress = new Uri(apiUrl);
                     return client.GetStringAsync("").Result;
                 }

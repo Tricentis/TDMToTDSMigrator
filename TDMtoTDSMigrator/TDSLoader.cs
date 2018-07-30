@@ -46,7 +46,6 @@ namespace TDMtoTDSMigrator
         }
 
 
-
         public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithoutFilter(string xmlPath, List<TableObject> dataList, string repositoryName, string apiUrl)
         {
 
@@ -55,30 +54,25 @@ namespace TDMtoTDSMigrator
 
             Task<HttpResponseMessage> message = null;
 
-            for (int i = 0; i < dataList.Count; i++)
+            foreach (var t in dataList)
             {
-                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(dataList[i], metaInfoAttributes),repositoryName, apiUrl);
+                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(t, metaInfoAttributes),repositoryName, apiUrl);
             }
-
-            // returns the response of the last request
             return message;
         }
         public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithFilter(string xmlPath, List<TableObject> dataList, string repositoryName, List<string> filteredCategories, string apiUrl)
         {
             XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(xmlPath);
-            //XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(xmlPath);
 
             Task<HttpResponseMessage> message = null;
 
-            for (int i = 0; i < dataList.Count; i++)
+            foreach (var obj in dataList)
             {
-                if (filteredCategories.Contains(dataList[i].GetCategoryName()))
+                if (filteredCategories.Contains(obj.GetCategoryName()))
                 {
-                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(dataList[i], metaInfoAttributes), repositoryName, apiUrl);  
+                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj, metaInfoAttributes), repositoryName, apiUrl);  
                 }
             }
-
-            // returns the response of the last request
             return message;
         }
     }

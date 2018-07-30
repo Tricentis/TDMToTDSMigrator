@@ -212,7 +212,15 @@ namespace MigratorUI
         //logText message generation methoids
         private string CreatedRepositoryMessage(string name, string description)
         {
-            return "Repository Created : " + name +" , Description : "+description+"\n";
+            StringBuilder s = new StringBuilder();
+            s.Append("Repository Created : " + name);
+            if (description != "")
+            {
+                s.Append(" , Description : " + description);
+            }
+
+            s.Append("\n");
+            return  s.ToString();
         }
         private string DeletedRepositoryMessage(string name)
         {

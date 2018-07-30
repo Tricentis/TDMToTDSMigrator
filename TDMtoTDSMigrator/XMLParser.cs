@@ -21,8 +21,7 @@ namespace TDMtoTDSMigrator
         */
         
         public static List<TableObject> CreateDataList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes,List<string[]> typeIDs)
-        {
-            
+        {      
             List<TableObject> dataList = new List<TableObject>();
             string currentsurrogate = stringAttributes.ChildNodes[0].Attributes?[0].Value;
 
@@ -68,13 +67,10 @@ namespace TDMtoTDSMigrator
             currentDataObject.SetAttributeNames(metaInfoAttributes);
             dataList.Add(new TableObject(currentDataObject));
 
-
-
             return dataList;
         }       
         public static List<TableObject> CreateDataList(XmlDocument doc)
         {
-
             XmlNode metaInfoTypes = GetMetaInfoTypes(doc);
             XmlNode metaInfoAttributes = GetMetaInfoAttributes(doc);
             XmlNode stringAttributes = GetStringAttributes(doc);
