@@ -18,7 +18,7 @@ namespace TDMtoTDSMigrator
         
 
     }
-    public class JSONConverter
+    public class JsonConverter
     { 
         public static string ConvertObjectIntoJsonString(TableObject obj)
         {
@@ -51,12 +51,10 @@ namespace TDMtoTDSMigrator
                 list[i] = list[i] + "}";
             }
 
-            Repository repository = new Repository();
             for (int i = 0; i < list.Length; i++)
             {
-                repository = JsonConvert.DeserializeObject<Repository>(list[i]);
+                var repository = JsonConvert.DeserializeObject<Repository>(list[i]);
                 list[i] = repository.name;
-
             }
             
             return list;

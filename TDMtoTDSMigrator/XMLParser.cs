@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.Xml.Schema;
 
 namespace TDMtoTDSMigrator
 {
@@ -15,44 +16,40 @@ namespace TDMtoTDSMigrator
                     -MetaInfoAttributes (ex: Name, Adress ; Country, Population) --> each attribute is linked to a metaInfoType
                     -MetaStringAttributes (ex: surrogate=1 , attribute=1 , value = John) --> sets the value of each attribute of an object (each object has a unique surrogate)
                     -Associations (not supported by TDS, if there are any the user is warned that they will no longer be available in TDS)
-             
+               
              
         */
         
         public static List<TableObject> CreateDataList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes,List<string[]> typeIDs)
         {
-            //Create an empty list of data rows
-            List<TableObject> objects = new List<TableObject>();
-
-            string surrogate = stringAttributes.ChildNodes[0].Attributes?[0].Value;
+            
+            List<TableObject> dataList = new List<TableObject>();
             string currentsurrogate = stringAttributes.ChildNodes[0].Attributes?[0].Value;
 
-            TableObject obj = new TableObject();
+            TableObject currentDataObject = new TableObject();
 
-            //Reads the attributes and 
+            //Reads the attributes of each data object
             for (int i = 0; i < stringAttributes.ChildNodes.Count; i++)
             {
-                //Checks if the loop has switched to a different row (surrogate=surrogate+1).
-                //If yes, the current object is stored in the list and a new object is created
+                //Checks if the loop has switched to a different data object (surrogate=surrogate+1).                
                 if (currentsurrogate != stringAttributes.ChildNodes[i].Attributes?[0].Value)
                 {
-                    //Find and set the TypeID and type of the object
+                    //Finds and sets the category and attributes names of the object
                     for (int j = 0; j < typeIDs.Count; j++)
                     {
-                        if (obj.GetAttributes()[0][0] != typeIDs[j][0]) continue;
-                        obj.SetTypeId(typeIDs[j][2]);
+                        if (currentDataObject.GetAttributes()[0][0] != typeIDs[j][0]) continue;
+                        currentDataObject.SetTypeId(typeIDs[j][2]);
                         break;
                     }
 
+                    currentDataObject.SetCategoryName(currentDataObject.GetTypeId(), metaInfoTypes);
+                    currentDataObject.SetAttributeNames(metaInfoAttributes);
 
-                    obj.SetCategoryName(obj.GetTypeId(), metaInfoTypes);
-                    obj.SetAttributeNames(metaInfoAttributes);
-
-                    objects.Add(new TableObject(obj));
-                    obj = new TableObject();
+                    dataList.Add(new TableObject(currentDataObject));
+                    currentDataObject = new TableObject();
                 }
 
-                obj.AddAttribute(stringAttributes.ChildNodes[i].Attributes?[1].Value, stringAttributes.ChildNodes[i].Attributes?[2].Value);
+                currentDataObject.AddAttribute(stringAttributes.ChildNodes[i].Attributes?[1].Value, stringAttributes.ChildNodes[i].Attributes?[2].Value);
                 currentsurrogate = stringAttributes.ChildNodes[i].Attributes?[0].Value;
             }
 
@@ -61,52 +58,52 @@ namespace TDMtoTDSMigrator
             //Find and set the TypeID of the last object
             foreach (var typeId in typeIDs)
             {
-                if (obj.GetAttributes()[0][0] == typeId[0])
+                if (currentDataObject.GetAttributes()[0][0] == typeId[0])
                 {
-                    obj.SetTypeId(typeId[2]);
+                    currentDataObject.SetTypeId(typeId[2]);
                     break;
                 }
             }
-            obj.SetCategoryName(obj.GetTypeId(), metaInfoTypes);
-            obj.SetAttributeNames(metaInfoAttributes);
-            objects.Add(new TableObject(obj));
+            currentDataObject.SetCategoryName(currentDataObject.GetTypeId(), metaInfoTypes);
+            currentDataObject.SetAttributeNames(metaInfoAttributes);
+            dataList.Add(new TableObject(currentDataObject));
 
 
 
-            return objects;
-        }
-
-        
-        public static List<TableObject> ConvertXmlIntoDataList(string xmlPath)
+            return dataList;
+        }       
+        public static List<TableObject> CreateDataList(XmlDocument doc)
         {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(xmlPath);
-            return ConvertXmlIntoDataList(doc);
-        }
-        public static List<TableObject> ConvertXmlIntoDataList(XmlDocument doc)
-        {
-            XmlNode repositoryDump = GetRepositoryDump(doc);
 
-            XmlNode metaInfoTypes = GetMetaInfoTypes(repositoryDump);
-            XmlNode metaInfoAttributes = GetMetaInfoAttributes(repositoryDump);
-            XmlNode stringAttributes = GetStringAttributes(repositoryDump);
+            XmlNode metaInfoTypes = GetMetaInfoTypes(doc);
+            XmlNode metaInfoAttributes = GetMetaInfoAttributes(doc);
+            XmlNode stringAttributes = GetStringAttributes(doc);
 
             List<string[]> typeIDs = GetTypeIDs(metaInfoAttributes);
 
-            List<TableObject> objectList = CreateDataList(stringAttributes, metaInfoTypes, metaInfoAttributes, typeIDs);
+            List<TableObject> dataList = CreateDataList(stringAttributes, metaInfoTypes, metaInfoAttributes, typeIDs);
 
-            return objectList;
+            return dataList;
         }
+        public static List<TableObject> CreateDataList(string xmlPath)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xmlPath);
+            return CreateDataList(doc);
+        }
+
 
 
         public static XmlNode GetRepositoryDump(XmlDocument doc)
         {
-            XmlNode root = doc.FirstChild;
-            root = root.NextSibling; 
-            return root;
+            XmlNode repositoryDump = doc.FirstChild;
+            repositoryDump = repositoryDump.NextSibling; 
+            return repositoryDump;
         }
-        public static XmlNode GetMetaInfoTypes(XmlNode repositoryDump)
+
+        public static XmlNode GetMetaInfoTypes(XmlDocument doc)
         {
+            XmlNode repositoryDump = GetRepositoryDump(doc);
             XmlNode metaInfoType = null;
             for (int i = 0; i< repositoryDump.ChildNodes.Count; i++)
             {
@@ -122,20 +119,12 @@ namespace TDMtoTDSMigrator
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(xmlPath);
-            XmlNode repositoryDump = GetRepositoryDump(doc);
-            XmlNode metaInfoType = null;
-            for (int i = 0; i < repositoryDump.ChildNodes.Count; i++)
-            {
-                if (repositoryDump.ChildNodes[i].Name == "MetaInfoType")
-                {
-                    metaInfoType = repositoryDump.ChildNodes[i];
-                    break;
-                }
-            }
-            return metaInfoType;
+            return GetMetaInfoTypes(doc);
         }
-        public static XmlNode GetMetaInfoAttributes(XmlNode repositoryDump)
+
+        public static XmlNode GetMetaInfoAttributes(XmlDocument doc)
         {
+            XmlNode repositoryDump = GetRepositoryDump(doc);
             XmlNode metaInfoAttributes = null;
             for (int i = 0; i < repositoryDump.ChildNodes.Count; i++)
             {
@@ -147,8 +136,16 @@ namespace TDMtoTDSMigrator
             }
             return metaInfoAttributes;
         }
-        public static XmlNode GetStringAttributes(XmlNode repositoryDump)
+        public static XmlNode GetMetaInfoAttributes(string xmlPath)
         {
+            XmlDocument doc =new XmlDocument();
+            doc.Load(xmlPath);
+            return GetMetaInfoAttributes(doc);
+        }
+
+        public static XmlNode GetStringAttributes(XmlDocument doc)
+        {
+            XmlNode repositoryDump = GetRepositoryDump(doc);
             XmlNode stringAttributes = null;
             for (int i = 0; i < repositoryDump.ChildNodes.Count; i++)
             {               
@@ -160,22 +157,35 @@ namespace TDMtoTDSMigrator
             }
             return stringAttributes;
         }
-        public static List<string[]> GetTypes(XmlNode metaInfoTypes)
+        public static XmlNode GetStringAttributes(string xmlPath)
         {
-            List<string[]> types = new List<string[]>();
-            for (int i = 0; i < metaInfoTypes.ChildNodes.Count; i++)
-            {
-                types.Add(new string[] { metaInfoTypes.ChildNodes[i].Attributes?[0].Value, metaInfoTypes.ChildNodes[i].Attributes?[1].Value });
-            }
-            return types;
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xmlPath);
+            return GetStringAttributes(doc);
         }
-        public static List<string[]> GetTypes(XmlDocument doc)
+
+        public static XmlNode GetMetaInfoAssociations(XmlDocument doc)
         {
             XmlNode repositoryDump = GetRepositoryDump(doc);
-            XmlNode metaInfoTypes = GetMetaInfoTypes(repositoryDump);
-            List<string[]> types = GetTypes(metaInfoTypes);
-            return types;
+            XmlNode metaInfoAssoc = null;
+            for (int i = 0; i < repositoryDump.ChildNodes.Count; i++)
+            {
+                if (repositoryDump.ChildNodes[i].Name == "MetaInfoAssoc")
+                {
+                    metaInfoAssoc = repositoryDump.ChildNodes[i];
+                    break;
+                }
+            }
+            return metaInfoAssoc;
         }
+        public static XmlNode GetMetaInfoAssociations(string xmlPath)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xmlPath);
+            return GetMetaInfoAssociations(doc);
+        }
+
+        
         public static List<string[]> GetTypeIDs(XmlNode metaInfoAttributes)
         {
             List<string[]> typeIds = new List<string[]>();

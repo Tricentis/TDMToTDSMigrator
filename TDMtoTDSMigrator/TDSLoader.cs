@@ -49,18 +49,15 @@ namespace TDMtoTDSMigrator
 
         public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithoutFilter(string xmlPath, List<TableObject> dataList, string repositoryName, string apiUrl)
         {
-            
-            XmlDocument doc = new XmlDocument();
-            doc.Load(xmlPath);
 
-            XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(XmlParser.GetRepositoryDump(doc));
-            XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(XmlParser.GetRepositoryDump(doc));
+            XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(xmlPath);
+            XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(xmlPath);
 
             Task<HttpResponseMessage> message = null;
 
             for (int i = 0; i < dataList.Count; i++)
             {
-                message = HttpRequest.PostObject(JSONConverter.ConvertObjectIntoJsonPostRequest(dataList[i], metaInfoAttributes),repositoryName, apiUrl);
+                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(dataList[i], metaInfoAttributes),repositoryName, apiUrl);
             }
 
             // returns the response of the last request
@@ -68,11 +65,8 @@ namespace TDMtoTDSMigrator
         }
         public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithFilter(string xmlPath, List<TableObject> dataList, string repositoryName, List<string> filteredCategories, string apiUrl)
         {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(xmlPath);
-
-            XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(XmlParser.GetRepositoryDump(doc));
-            XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(XmlParser.GetRepositoryDump(doc));
+            XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(xmlPath);
+            //XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(xmlPath);
 
             Task<HttpResponseMessage> message = null;
 
@@ -80,7 +74,7 @@ namespace TDMtoTDSMigrator
             {
                 if (filteredCategories.Contains(dataList[i].GetCategoryName()))
                 {
-                    message = HttpRequest.PostObject(JSONConverter.ConvertObjectIntoJsonPostRequest(dataList[i], metaInfoAttributes), repositoryName, apiUrl);  
+                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(dataList[i], metaInfoAttributes), repositoryName, apiUrl);  
                 }
             }
 

@@ -12,9 +12,9 @@ using TDMtoTDSMigrator;
 
 namespace MigratorUI
 {
-    public partial class TDSMigrator : Form
+    public partial class TdsMigrator : Form
     {
-        public TDSMigrator()
+        public TdsMigrator()
         {
             InitializeComponent();
         }
@@ -47,32 +47,33 @@ namespace MigratorUI
             }
             return message;
         }
-        private void LoadCategories(XmlNode metaInfoType)
+        private void LoadCategoriesIntoListBox()
         {//Loads categories into categories box
-            var items = categoriesListBox.Items;
+
+            XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(_xmlPath);
             for (int i = 0; i < metaInfoType.ChildNodes.Count; i++)
             {
-                items.Add(metaInfoType.ChildNodes[i].Attributes?[1].Value ?? throw new InvalidOperationException(), true);
+                categoriesListBox.Items.Add(metaInfoType.ChildNodes[i].Attributes?[1].Value ?? throw new InvalidOperationException(), true);
             }
         }
 
 
         //Verification methods
-        private string ValidateUrl(string uri)
-        {
-            //checks for the last slash ("/") in the uri entered by the user. if not present, adds it.
-            if (uri.Length > 0 && uri[uri.Length - 1] != '/')
+        private string ValidateUrl(string url)
+        { 
+
+            //checks for the last slash ("/") in the url entered by the user. if not present, adds it.
+            if (url.Length > 0 && url[url.Length - 1] != '/')
             {
-                uri = uri + "/";
+                url = url + "/";
             }
-            return uri;
+            return url;
         }
         private void CheckForAssociations()
         {
             //checks if there were any associations in the TDM. If yes, warns the user that they will no longer be supported
-            XmlDocument doc = new XmlDocument();
-            doc.Load(_xmlPath);
-            XmlNode metaInfoAssoc = XmlParser.GetRepositoryDump(doc).ChildNodes[3];
+
+            XmlNode metaInfoAssoc = XmlParser.GetMetaInfoAssociations(_xmlPath);
             XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(_xmlPath);
             TableObject obj = new TableObject();
             StringBuilder s = new StringBuilder();
@@ -91,10 +92,13 @@ namespace MigratorUI
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-        private void CheckForEmptyCategories(XmlNode metaInfoTypes)
+        private void CheckForEmptyCategories()
         {
             //Checks for categories that have no object associated with them in the objectList
             //Adds the info "Empty" next to the category name in the categories box
+
+            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(_xmlPath);
+
             List<string> emptyType = new List<string>();
             var items = categoriesListBox.Items;
             for (int i = 0; i < metaInfoTypes.ChildNodes.Count; i++)
@@ -192,7 +196,7 @@ namespace MigratorUI
         {
             repositoriesBox.Items.Clear();
             string reposJson = HttpRequest.GetRepositories(ValidateUrl(apiUrlTextBox.Text));
-            string[] repoList = JSONConverter.ParseJsonIntoRepositoryList(reposJson);
+            string[] repoList = JsonConverter.ParseJsonIntoRepositoryList(reposJson);
 
             for (int i = 0; i < repoList.Length; i++)
             {
@@ -203,6 +207,7 @@ namespace MigratorUI
                 repositoriesBox.SelectedItem = repositoriesBox.Items[0];
             }
         }
+
 
         //logText message generation methoids
         private string CreatedRepositoryMessage(string name, string description)
@@ -281,31 +286,25 @@ namespace MigratorUI
             logTextBox.Refresh();
             TddFileProcessingInWork(true);
 
-            await Task.Delay(10); //small delay to set enabled status of UI components properly
-
-            
+            await Task.Delay(10); //small delay to set enabled status of UI components properly            
 
             this._xmlPath = TdsLoader.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text));
-            XmlDocument doc = new XmlDocument();
-            doc.Load(_xmlPath);
 
-            //Loads categories into categories box
-            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(XmlParser.GetRepositoryDump(doc));
-            LoadCategories(metaInfoTypes);
+            LoadCategoriesIntoListBox();
             
 
             //Asynchronously parses XML file and retrieves the TableObject list
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += (s, r) => {
-                r.Result = this._dataList = XmlParser.ConvertXmlIntoDataList(_xmlPath);
+                r.Result = this._dataList = XmlParser.CreateDataList(_xmlPath);
             };
             worker.RunWorkerCompleted += (s, r) => {
                 this._dataList =(List<TableObject>)r.Result;
 
-                logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + metaInfoTypes.ChildNodes.Count + " categories were found. \n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
+                logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + categoriesListBox.Items.Count + " categories were found. \n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
                 logTextBox.Refresh();
 
-                CheckForEmptyCategories(metaInfoTypes);    
+                CheckForEmptyCategories();    
                 TddFileProcessingInWork(false);
                 tddFileProcessingProgressBar.Visible = false;
                 CheckForAssociations();

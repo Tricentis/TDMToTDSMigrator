@@ -15,7 +15,7 @@ namespace MigratorUI
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TDSMigrator());
+            Application.Run(new TdsMigrator());
 
         }
     }

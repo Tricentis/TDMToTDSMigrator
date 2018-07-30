@@ -1,6 +1,6 @@
 ﻿namespace MigratorUI
 {
-    partial class TDSMigrator
+    partial class TdsMigrator
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TDSMigrator));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TdsMigrator));
             this.pickFileButton = new System.Windows.Forms.Button();
             this.TDDPathTextBox = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -345,7 +345,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "TDSMigrator";
+            this.Name = "TdsMigrator";
             this.Text = "Tricentis TDM to TDS Migrator";
             this.Load += new System.EventHandler(this.TDSMigrator_Load);
             this.ResumeLayout(false);
