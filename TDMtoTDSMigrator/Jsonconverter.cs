@@ -37,7 +37,7 @@ namespace TDMtoTDSMigrator
             return builder.ToString();
 
         }
-        public static string ConvertObjectIntoJsonPostRequest(TableObject obj, XmlNode metaInfoAttributes) => "{\"category\" : \"" +obj.GetCategoryName()+ "\" , \"consumed\" : false, \"data\" : " + ConvertObjectIntoJsonString(obj) + "}";
+        public static string ConvertObjectIntoJsonPostRequest(TableObject obj) => "{\"category\" : \"" +obj.GetCategoryName()+ "\" , \"consumed\" : false, \"data\" : " + ConvertObjectIntoJsonString(obj) + "}";
         public static string[] ParseJsonIntoRepositoryList(string json)
         {
             json = json.Remove(0,1);

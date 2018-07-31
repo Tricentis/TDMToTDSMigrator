@@ -45,7 +45,7 @@ namespace TDMtoTDSMigrator
 
         public string FindCategoryName(string typeId , XmlNode metaInfoTypes)
         {   
-            //Find the category name of the object corresponding to its typeId
+            
             for (int i =0; i < metaInfoTypes.ChildNodes.Count; i++)
             {
                 if (metaInfoTypes.ChildNodes[i].Attributes?[0].Value == typeId)
@@ -68,7 +68,7 @@ namespace TDMtoTDSMigrator
         }
 
         public void SetAttributeNames(XmlNode metaInfoAttributes)
-        {   //finds the name of each attribute id that is contained in the list and replaces id string by name string.
+        {   
             for(int i = 0; i < this._attributes.Count; i++)
             {
                 this._attributes[i][0] = FindAttributeName(this._attributes[i][0],metaInfoAttributes);

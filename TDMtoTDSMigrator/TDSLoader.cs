@@ -48,28 +48,23 @@ namespace TDMtoTDSMigrator
 
         public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithoutFilter(string xmlPath, List<TableObject> dataList, string repositoryName, string apiUrl)
         {
-
-            XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(xmlPath);
-
             Task<HttpResponseMessage> message = null;
 
             foreach (var obj in dataList)
             {
-                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj, metaInfoAttributes),repositoryName, apiUrl);
+                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj),repositoryName, apiUrl);
             }
             return message;
         }
         public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithFilter(string xmlPath, List<TableObject> dataList, string repositoryName, List<string> filteredCategories, string apiUrl)
         {
-            XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(xmlPath);
-
             Task<HttpResponseMessage> message = null;
 
             foreach (var obj in dataList)
             {
                 if (filteredCategories.Contains(obj.GetCategoryName()))
                 {
-                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj, metaInfoAttributes), repositoryName, apiUrl);  
+                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj), repositoryName, apiUrl);  
                 }
             }
             return message;
