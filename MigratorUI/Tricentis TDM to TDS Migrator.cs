@@ -34,7 +34,7 @@ namespace MigratorUI
 
         //Migration and tdd processing methods
         private async Task<HttpResponseMessage> LaunchMigration(List<string> authorizedTypes, Boolean applyFilter, string xmlPath, List<TableObject> objectList, string selectedRepository, string apiUrl)
-        {//Loads the selected categories into the selected repository in TDS
+        {
 
             HttpResponseMessage message = null;
             if (applyFilter)
@@ -48,7 +48,7 @@ namespace MigratorUI
             return message;
         }
         private void LoadCategoriesIntoListBox()
-        {//Loads categories into categories box
+        {
 
             XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(_xmlPath);
             for (int i = 0; i < metaInfoType.ChildNodes.Count; i++)
@@ -61,8 +61,6 @@ namespace MigratorUI
         //Verification methods
         private string ValidateUrl(string url)
         { 
-
-            //checks for the last slash ("/") in the url entered by the user. if not present, adds it.
             if (url.Length > 0 && url[url.Length - 1] != '/')
             {
                 url = url + "/";
@@ -71,7 +69,6 @@ namespace MigratorUI
         }
         private void CheckForAssociations()
         {
-            //checks if there were any associations in the TDM. If yes, warns the user that they will no longer be supported
 
             XmlNode metaInfoAssoc = XmlParser.GetMetaInfoAssociations(_xmlPath);
             XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(_xmlPath);
@@ -94,8 +91,6 @@ namespace MigratorUI
         }
         private void CheckForEmptyCategories()
         {
-            //Checks for categories that have no object associated with them in the objectList
-            //Adds the info "Empty" next to the category name in the categories box
 
             XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(_xmlPath);
 
@@ -132,7 +127,7 @@ namespace MigratorUI
 
         //UI element attributes and logText methods 
         private void TddFileProcessingInWork(Boolean processingInWork)
-        {//sets the enabled state of ui elements depending on whether a .tdd file is being processed
+        {
 
             GenerateButton.Enabled = !processingInWork;
             categoriesListBox.Enabled = !processingInWork;
@@ -143,7 +138,7 @@ namespace MigratorUI
             tddFileProcessingProgressBar.Visible = processingInWork;
         }
         private void MigrationInWork(Boolean migrationInWork)
-        {// sets the enabled state of ui elements depending on whether data is currently being fed to the api
+        {
            
             migrationProgressBar.Visible = migrationInWork;
             deleteRepositoryButton.Enabled = !migrationInWork;
@@ -152,7 +147,7 @@ namespace MigratorUI
             loadRefreshRepositories.Enabled = !migrationInWork;
         }
         private void ApiConnectionOk(Boolean apiConnectionOk, object sender, EventArgs e)
-        {//sets the enabled state of ui elements depending on the success of api url verification
+        {
             Boolean tddFilePicked = TDDPathTextBox.Text != "";
 
             createRepositoryButton.Enabled = apiConnectionOk;
@@ -185,12 +180,10 @@ namespace MigratorUI
 
         }
         private int EstimatedWaitTime()
-        {
-            // returns the waiting time for processing the tdd after the file was picked
+        {            
             FileInfo tdd = new FileInfo(TDDPathTextBox.Text);
-
-            int scaleLength = 611797; // length of the tdd file that is the scale for processing time estimation (~35 seconds for this file)
-            return (int)((float)tdd.Length / (float)scaleLength * 35);
+            int scaleLength = 611797; // length of the tdd file that is the scale for processing time estimation (~45 seconds for this file)
+            return (int)((float)tdd.Length / (float)scaleLength * 45);
         }
         private void RefreshRepositoriesList()
         {
@@ -294,14 +287,12 @@ namespace MigratorUI
             logTextBox.Refresh();
             TddFileProcessingInWork(true);
 
-            await Task.Delay(10); //small delay to set enabled status of UI components properly            
+            await Task.Delay(10);          
 
             this._xmlPath = TdsLoader.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text));
 
             LoadCategoriesIntoListBox();
             
-
-            //Asynchronously parses XML file and retrieves the TableObject list
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += (s, r) => {
                 r.Result = this._dataList = XmlParser.CreateDataList(_xmlPath);
@@ -380,7 +371,7 @@ namespace MigratorUI
         }
         private void deleteRepositoryButton_Click(object sender, EventArgs e) 
         {
-            //Clears repository then deletes repository reference
+            
             if (repositoriesBox.SelectedItem != null)
             {
                 var confirmResult = MessageBox.Show("All the data contained in this repository will be erased",

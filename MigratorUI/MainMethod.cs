@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace MigratorUI
@@ -17,6 +18,8 @@ namespace MigratorUI
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new TdsMigrator());
 
+
         }
+
     }
 }
