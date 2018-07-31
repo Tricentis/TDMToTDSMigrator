@@ -50,13 +50,12 @@ namespace TDMtoTDSMigrator
         {
 
             XmlNode metaInfoAttributes = XmlParser.GetMetaInfoAttributes(xmlPath);
-            XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(xmlPath);
 
             Task<HttpResponseMessage> message = null;
 
-            foreach (var t in dataList)
+            foreach (var obj in dataList)
             {
-                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(t, metaInfoAttributes),repositoryName, apiUrl);
+                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj, metaInfoAttributes),repositoryName, apiUrl);
             }
             return message;
         }
