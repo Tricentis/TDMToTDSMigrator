@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Text;
+
 using Newtonsoft.Json;
 
-namespace TDMtoTDSMigrator
-{
-    public class Repository
-    {
+namespace TDMtoTDSMigrator {
+    public class Repository {
         public string Name { get; set; }
     }
 
@@ -47,9 +46,4 @@ namespace TDMtoTDSMigrator
             return repositoryList;
         }
     }
-
-    
-
-
-     
 }
