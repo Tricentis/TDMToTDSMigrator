@@ -1,93 +1,71 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
-using System.Xml.Schema;
 
 namespace TDMtoTDSMigrator
 {
     public class XmlParser
     {
-        /*
-            Decompressed XML File attributes :
-                
-                -RepositoryDump (parent node of contained data)
-
-                    -MetaInfoTypes (ex: Person, City)
-                    -MetaInfoAttributes (ex: Name, Adress ; Country, Population) --> each attribute is linked to a metaInfoType
-                    -MetaStringAttributes (ex: surrogate=1 , attribute=1 , value = John) --> sets the value of each attribute of an object (each object has a unique surrogate)
-                    -Associations (not supported by TDS, if there are any the user is warned that they will no longer be available in TDS)
+            // Decompressed XML File attributes :
+            //     
+            //     -RepositoryDump (parent node)
+            //
+            //         -MetaInfoTypes (ex: Person, City)
+            //         -MetaInfoAttributes (ex: Name, Adress ; Country, Population) --> each attribute is linked to a metaInfoType
+            //         -MetaStringAttributes (ex: surrogate=1 , attribute=1 , value = John) --> sets the value of each attribute of an object (each object has a unique rowId)
+            //         -Associations (not supported by TDS, if there are any the user is warned that they will no longer be available in TDS)
                
              
-        */
         
-        public static List<TableObject> CreateDataList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes,List<string[]> typeIDs)
-        {      
-            List<TableObject> dataList = new List<TableObject>();
-            string currentsurrogate = stringAttributes.ChildNodes[0].Attributes?[0].Value;
+        public static List<DataRow> CreateDataList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
+           
+            List<DataRow> dataList = new List<DataRow>();
 
-            TableObject currentDataObject = new TableObject();
+            string formerRowId = GetCurrentRowId(stringAttributes.ChildNodes[0]);
+            DataRow currentDataRow = new DataRow();
 
-            //Reads the attributes of each data object
-            for (int i = 0; i < stringAttributes.ChildNodes.Count; i++)
-            {
-                //Checks if the loop has switched to a different data object (surrogate=surrogate+1).                
-                if (currentsurrogate != stringAttributes.ChildNodes[i].Attributes?[0].Value)
-                {
-                    //Finds and sets the category and attributes names of the object
-                    for (int j = 0; j < typeIDs.Count; j++)
-                    {
-                        if (currentDataObject.GetAttributes()[0][0] != typeIDs[j][0]) continue;
-                        currentDataObject.SetTypeId(typeIDs[j][2]);
-                        break;
-                    }
-
-                    currentDataObject.SetCategoryName(currentDataObject.GetTypeId(), metaInfoTypes);
-                    currentDataObject.SetAttributeNames(metaInfoAttributes);
-
-                    dataList.Add(new TableObject(currentDataObject));
-                    currentDataObject = new TableObject();
+            foreach (XmlNode stringAttribute in stringAttributes.ChildNodes)
+            {   
+                if (formerRowId != GetCurrentRowId(stringAttribute))
+                {                                       
+                    dataList.Add(new DataRow(SetDataAttributes(currentDataRow, stringAttributes, metaInfoTypes, metaInfoAttributes)));
+                    currentDataRow = new DataRow();
                 }
 
-                currentDataObject.AddAttribute(stringAttributes.ChildNodes[i].Attributes?[1].Value, stringAttributes.ChildNodes[i].Attributes?[2].Value);
-                currentsurrogate = stringAttributes.ChildNodes[i].Attributes?[0].Value;
+                currentDataRow.AddAttribute(stringAttribute.Attributes?[1].Value, stringAttribute.Attributes?[2].Value);
+                formerRowId = GetCurrentRowId(stringAttribute);
             }
 
-
-            //Store the last object into the list
-            //Find and set the TypeID of the last object
-            foreach (var typeId in typeIDs)
-            {
-                if (currentDataObject.GetAttributes()[0][0] == typeId[0])
-                {
-                    currentDataObject.SetTypeId(typeId[2]);
-                    break;
-                }
-            }
-            currentDataObject.SetCategoryName(currentDataObject.GetTypeId(), metaInfoTypes);
-            currentDataObject.SetAttributeNames(metaInfoAttributes);
-            dataList.Add(new TableObject(currentDataObject));
-
+            dataList.Add(new DataRow(SetDataAttributes(currentDataRow, stringAttributes, metaInfoTypes, metaInfoAttributes)));
             return dataList;
         }       
-        public static List<TableObject> CreateDataList(XmlDocument doc)
+        public static List<DataRow> CreateDataList(XmlDocument doc)
         {
-            XmlNode metaInfoTypes = GetMetaInfoTypes(doc);
-            XmlNode metaInfoAttributes = GetMetaInfoAttributes(doc);
-            XmlNode stringAttributes = GetStringAttributes(doc);
-
-            List<string[]> typeIDs = GetTypeIDs(metaInfoAttributes);
-
-            List<TableObject> dataList = CreateDataList(stringAttributes, metaInfoTypes, metaInfoAttributes, typeIDs);
-
-            return dataList;
+            return CreateDataList(GetStringAttributes(doc), GetMetaInfoTypes(doc), GetMetaInfoAttributes(doc));
         }
-        public static List<TableObject> CreateDataList(string xmlPath)
+        public static List<DataRow> CreateDataList(string xmlPath)
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(xmlPath);
             return CreateDataList(doc);
         }
 
+
+        public static DataRow SetDataAttributes (DataRow row, XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
+            List<string[]> categoryInfos = GetCategoryInfos(metaInfoAttributes);
+            foreach (string[] categoryInfo in categoryInfos)
+            {
+                if (row.GetAttributes()[0][0] != categoryInfo[0]) continue;
+                row.SetTypeId(categoryInfo[2]);
+                break;
+            }
+            row.SetCategoryName(metaInfoTypes);
+            row.SetAttributeNames(metaInfoAttributes);
+            return row;
+        }
+        public static string GetCurrentRowId(XmlNode stringAttribute)
+        {
+            return stringAttribute.Attributes?[0].Value;
+        }
 
 
         public static XmlNode GetRepositoryDump(XmlDocument doc)
@@ -96,7 +74,6 @@ namespace TDMtoTDSMigrator
             repositoryDump = repositoryDump.NextSibling; 
             return repositoryDump;
         }
-
         public static XmlNode GetMetaInfoTypes(XmlDocument doc)
         {
             XmlNode repositoryDump = GetRepositoryDump(doc);
@@ -117,7 +94,6 @@ namespace TDMtoTDSMigrator
             doc.Load(xmlPath);
             return GetMetaInfoTypes(doc);
         }
-
         public static XmlNode GetMetaInfoAttributes(XmlDocument doc)
         {
             XmlNode repositoryDump = GetRepositoryDump(doc);
@@ -138,7 +114,6 @@ namespace TDMtoTDSMigrator
             doc.Load(xmlPath);
             return GetMetaInfoAttributes(doc);
         }
-
         public static XmlNode GetStringAttributes(XmlDocument doc)
         {
             XmlNode repositoryDump = GetRepositoryDump(doc);
@@ -159,7 +134,6 @@ namespace TDMtoTDSMigrator
             doc.Load(xmlPath);
             return GetStringAttributes(doc);
         }
-
         public static XmlNode GetMetaInfoAssociations(XmlDocument doc)
         {
             XmlNode repositoryDump = GetRepositoryDump(doc);
@@ -180,14 +154,12 @@ namespace TDMtoTDSMigrator
             doc.Load(xmlPath);
             return GetMetaInfoAssociations(doc);
         }
-
-        
-        public static List<string[]> GetTypeIDs(XmlNode metaInfoAttributes)
+        public static List<string[]> GetCategoryInfos(XmlNode metaInfoAttributes)
         {
             List<string[]> typeIds = new List<string[]>();
             for (int i = 0; i < metaInfoAttributes.ChildNodes.Count; i++)
             {
-                typeIds.Add(new string[] { metaInfoAttributes.ChildNodes[i].Attributes?[0].Value, metaInfoAttributes.ChildNodes[i].Attributes?[1].Value, metaInfoAttributes.ChildNodes[i].Attributes?[2].Value });
+                typeIds.Add(new [] { metaInfoAttributes.ChildNodes[i].Attributes?[0].Value, metaInfoAttributes.ChildNodes[i].Attributes?[1].Value, metaInfoAttributes.ChildNodes[i].Attributes?[2].Value });
             }
             return typeIds;
         }

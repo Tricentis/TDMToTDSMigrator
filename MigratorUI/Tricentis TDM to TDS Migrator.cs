@@ -20,12 +20,12 @@ namespace MigratorUI
         }
 
 
-        private List<TableObject> _dataList; // List of TableObjects each corresponding to one row of data 
-        private string _xmlPath; 
-        private Boolean _migrationInWork=false;
+        private List<DataRow> dataList; // List of TableObjects each corresponding to one row of data 
+        private string xmlPath; 
+        private Boolean migrationInWork=false;
 
         //Initialization 
-        private void TDSMigrator_Load(object sender, EventArgs e)
+        private void TdsMigrator_Load(object sender, EventArgs e)
         {
             logTextBox.AppendText("Welcome to Tricentis TDM to TDS Migrator.\nPlease enter a valid API URL and click on \"Verify Url\". \nExample : http://localhost:80/testdataservice \n");
             verifyUrlButton.Select();
@@ -33,35 +33,23 @@ namespace MigratorUI
 
 
         //Migration and tdd processing methods
-        private async Task<HttpResponseMessage> LaunchMigration(List<string> authorizedTypes, Boolean applyFilter, string xmlPath, List<TableObject> objectList, string selectedRepository, string apiUrl)
-
-        {
-
-
-
-            if (applyFilter)
-
-            {
-
+        private async Task<HttpResponseMessage> LaunchMigration(List<string> authorizedTypes,
+                                                                Boolean applyFilter,
+                                                                List<DataRow> objectList,
+                                                                string selectedRepository,
+                                                                string apiUrl) {
+            if (applyFilter) {
                 HttpResponseMessage message = await TdsLoader.MigrateXmlDataIntoTdsWithFilter(xmlPath, objectList, selectedRepository, authorizedTypes, apiUrl);
                 return message;
-            }
-
-            else
-
-            {
-
+            } else {
                 HttpResponseMessage message = await TdsLoader.MigrateXmlDataIntoTdsWithoutFilter(xmlPath, objectList, selectedRepository, apiUrl);
                 return message;
             }
-
-           
-
         }
         private void LoadCategoriesIntoListBox()
         {
 
-            XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(_xmlPath);
+            XmlNode metaInfoType = XmlParser.GetMetaInfoTypes(xmlPath);
             for (int i = 0; i < metaInfoType.ChildNodes.Count; i++)
             {
                 categoriesListBox.Items.Add(metaInfoType.ChildNodes[i].Attributes?[1].Value ?? throw new InvalidOperationException(), true);
@@ -81,9 +69,9 @@ namespace MigratorUI
         private void CheckForAssociations()
         {
 
-            XmlNode metaInfoAssoc = XmlParser.GetMetaInfoAssociations(_xmlPath);
-            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(_xmlPath);
-            TableObject obj = new TableObject();
+            XmlNode metaInfoAssoc = XmlParser.GetMetaInfoAssociations(xmlPath);
+            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(xmlPath);
+            DataRow obj = new DataRow();
             StringBuilder s = new StringBuilder();
 
             if (metaInfoAssoc.HasChildNodes)
@@ -95,44 +83,53 @@ namespace MigratorUI
                     
                     s.Append(node.Attributes?[1].Value + " and " + obj.FindCategoryName(node.Attributes?[2].Value,metaInfoTypes) + "\n");
                 }
-                System.Windows.Forms.MessageBox.Show(s.ToString(),
+                MessageBox.Show(s.ToString(),
                                     "Associations not supported",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
-        private void CheckForEmptyCategories()
+        private string CheckForEmptyCategories()
         {
 
-            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(_xmlPath);
+            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(xmlPath);
 
-            List<string> emptyType = new List<string>();
-            var items = categoriesListBox.Items;
-            for (int i = 0; i < metaInfoTypes.ChildNodes.Count; i++)
+            List<string> emptyCategories = new List<string>();
+
+            foreach (XmlNode metaInfoType in metaInfoTypes.ChildNodes)
             {
-                emptyType.Add(metaInfoTypes.ChildNodes[i].Attributes?[1].Value);
+                emptyCategories.Add(metaInfoType.Attributes?[1].Value);
             }
 
-            for (int i = 0; i < _dataList.Count; i++)
-            {
-                for (int j = 0; j < emptyType.Count; j++)
+            foreach (DataRow row in dataList) {
+                for (int j = 0; j < emptyCategories.Count; j++)
                 {
-                    if (_dataList[i].GetCategoryName() == emptyType[j])
+                    if (row.GetCategoryName() == emptyCategories[j])
                     {
-                        emptyType.RemoveAt(j);
+                        emptyCategories.RemoveAt(j);
                     }
                 }
             }
 
-            foreach (string s in emptyType)
+            
+            StringBuilder sb = new StringBuilder();
+
+            if (emptyCategories.Count > 0)
+            {
+                sb.Append(", including " + emptyCategories.Count + " empty : \n");
+            }
+            
+            foreach (string s in emptyCategories)
             {
                 for (int i = 0; i < categoriesListBox.Items.Count; i++)
                 {
-                    if (categoriesListBox.Items[i].ToString() == s)
-                    {
-                        categoriesListBox.Items[i] = categoriesListBox.Items[i].ToString() + " (Empty)";
+                    if (categoriesListBox.Items[i].ToString() == s) {
+                        sb.Append(categoriesListBox.Items[i] + " ");
+                        categoriesListBox.Items.RemoveAt(i);
                     }
                 }
             }
+
+            return sb.ToString();
         }
 
 
@@ -148,8 +145,10 @@ namespace MigratorUI
             pickFileButton.Enabled = !processingInWork;
             tddFileProcessingProgressBar.Visible = processingInWork;
         }
-        private void MigrationInWork(Boolean migrationInWork)
-        {
+        private void MigrationInWork(Boolean inWork) {
+
+            migrationInWork = inWork;
+
             verifyUrlButton.Enabled = !migrationInWork;
             pickFileButton.Enabled = !migrationInWork;
             migrationProgressBar.Visible = migrationInWork;
@@ -165,21 +164,21 @@ namespace MigratorUI
             createRepositoryButton.Enabled = apiConnectionOk;
             deleteRepositoryButton.Enabled = apiConnectionOk;
             clearRepositoryButton.Enabled = apiConnectionOk;
-            GenerateButton.Enabled = apiConnectionOk & tddFilePicked & !_migrationInWork;
+            GenerateButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             loadRefreshRepositories.Enabled = apiConnectionOk;
             repositoriesBox.Enabled = apiConnectionOk;
             repositoryDescriptionTextbox.Enabled = apiConnectionOk;
             repositoryNameTextBox.Enabled = apiConnectionOk;
-            categoriesListBox.Enabled = apiConnectionOk & tddFilePicked & !_migrationInWork;
-            selectAllButton.Enabled = apiConnectionOk & tddFilePicked & !_migrationInWork;
-            deselectAllButton.Enabled = apiConnectionOk & tddFilePicked & !_migrationInWork;
-            apiUrlTextBox.Enabled = !apiConnectionOk & !_migrationInWork;
-            pickFileButton.Enabled = apiConnectionOk & !_migrationInWork;
+            categoriesListBox.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
+            selectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
+            deselectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
+            apiUrlTextBox.Enabled = !apiConnectionOk & !migrationInWork;
+            pickFileButton.Enabled = apiConnectionOk & !migrationInWork;
 
             if (apiConnectionOk)
             {
                 pickFileButton.Text = "Browse...";
-                loadRefreshRepositories_Click(sender, e);
+                LoadRefreshRepositories_Click(sender, e);
                 pickFileButton.Select();
             }
             else
@@ -194,18 +193,17 @@ namespace MigratorUI
         private int EstimatedWaitTime()
         {            
             FileInfo tdd = new FileInfo(TDDPathTextBox.Text);
-            int scaleLength = 611797; // length of the tdd file that is the scale for processing time estimation (~45 seconds for this file)
-            return (int)((float)tdd.Length / (float)scaleLength * 45);
+            float scaleLength = 611797; // length of the tdd file that is the scale for processing time estimation (~30 seconds for this file)
+            return (int)(tdd.Length / scaleLength * 30);
         }
         private void RefreshRepositoriesList()
         {
             repositoriesBox.Items.Clear();
             string reposJson = HttpRequest.GetRepositories(ValidateUrl(apiUrlTextBox.Text));
-            string[] repoList = JsonConverter.ParseJsonIntoRepositoryList(reposJson);
+            string[] repoList = JsonConverter.ConvertJsonIntoRepositoryList(reposJson);
 
-            for (int i = 0; i < repoList.Length; i++)
-            {
-                repositoriesBox.Items.Add(repoList[i]);
+            foreach (string repository in repoList) {
+                repositoriesBox.Items.Add(repository);
             }
             if (repoList.Length > 0)
             {
@@ -242,33 +240,26 @@ namespace MigratorUI
 
 
         //Event methods
-        private async void loadIntoRepositoryButton_Click(object sender, EventArgs e)
-{   
+        private async void LoadIntoRepositoryButton_Click(object sender, EventArgs e)
+        {   
             Boolean applyFilter = false;
-            Boolean atLeastOneCategorySelected = false;
-            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(_xmlPath);
             List<string> filteredCategories = new List<string>();
 
-            for (int i = 0; i < categoriesListBox.Items.Count; i++)
-            {
-                if (categoriesListBox.GetItemChecked(i))
-                {
-                     atLeastOneCategorySelected = true;
-                     filteredCategories.Add(categoriesListBox.Items[i].ToString());
-                }
-                else
-                {
-                    applyFilter = true;
-                }
+            foreach (var category in categoriesListBox.CheckedItems) {
+                filteredCategories.Add(category.ToString());
             }
+
+            applyFilter = filteredCategories.Count < categoriesListBox.Items.Count;
+                
+
             if (repositoriesBox.SelectedItem == null)
             {
                 logTextBox.AppendText("Please pick a repository, or create one\n");
 
             }
-            else if (!atLeastOneCategorySelected)
+            else if (filteredCategories.Count == 0)
                 {
-                logTextBox.AppendText("Please pick a category\n");
+                logTextBox.AppendText("Please pick at least one category\n");
             }
             else
             {
@@ -277,7 +268,7 @@ namespace MigratorUI
                 MigrationInWork(true);
                 await Task.Delay(10);
 
-                await LaunchMigration(filteredCategories, applyFilter, _xmlPath, _dataList, repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
+                await LaunchMigration(filteredCategories, applyFilter, dataList, repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
 
                 logTextBox.AppendText(MigrationFinishedMessage(filteredCategories.Count, repositoriesBox.SelectedItem.ToString()));
                 logTextBox.Refresh();
@@ -286,7 +277,7 @@ namespace MigratorUI
             }
 
         }
-        private async void TDDPathTextBox_TextChanged(object sender, EventArgs e)
+        private async void TddPathTextBox_TextChanged(object sender, EventArgs e)
         {
             int estimatedWait = EstimatedWaitTime();
             logTextBox.Select();
@@ -295,28 +286,29 @@ namespace MigratorUI
             if (estimatedWait > 5)
             {
                 logTextBox.AppendText("Estimated waiting time : " + estimatedWait + " seconds \n");
-            }
-            
+            }            
             logTextBox.Refresh();
-            TddFileProcessingInWork(true);
 
+            TddFileProcessingInWork(true);
             await Task.Delay(10);          
 
-            this._xmlPath = TdsLoader.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text));
+            xmlPath = TdsLoader.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text));
 
             LoadCategoriesIntoListBox();
             
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += (s, r) => {
-                r.Result = this._dataList = XmlParser.CreateDataList(_xmlPath);
+                r.Result = dataList = XmlParser.CreateDataList(xmlPath);
             };
             worker.RunWorkerCompleted += (s, r) => {
-                this._dataList =(List<TableObject>)r.Result;
+                dataList =(List<DataRow>)r.Result;
 
-                logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + categoriesListBox.Items.Count + " categories were found. \n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
+                logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + categoriesListBox.Items.Count + " categories were found");
+                logTextBox.AppendText(CheckForEmptyCategories());
+                logTextBox.AppendText("\n");                             
+                logTextBox.AppendText("\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
                 logTextBox.Refresh();
-
-                CheckForEmptyCategories();    
+   
                 TddFileProcessingInWork(false);
                 tddFileProcessingProgressBar.Visible = false;
                 CheckForAssociations();
@@ -325,19 +317,19 @@ namespace MigratorUI
 
 
         }
-        private void pickFileButton_Click(object sender, EventArgs e)
+        private void PickFileButton_Click(object sender, EventArgs e)
         {
 
             openFileDialog.ShowDialog();
 
         }
-        private void openFileDialog_FileOk(object sender, CancelEventArgs e)
+        private void OpenFileDialog_FileOk(object sender, CancelEventArgs e)
         {
             categoriesListBox.Items.Clear();
             TDDPathTextBox.Text = openFileDialog.FileName;
             
         }
-        private void createRepositoryButton_Click(object sender, EventArgs e)
+        private void CreateRepositoryButton_Click(object sender, EventArgs e)
         {
             if (repositoryNameTextBox.Text != "")
             {
@@ -362,12 +354,12 @@ namespace MigratorUI
 
             
         }
-        private void clearRepositoryButton_Click(object sender, EventArgs e)
+        private void ClearRepositoryButton_Click(object sender, EventArgs e)
         {
             if (repositoriesBox.SelectedItem != null)
             {
                 var confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
-                                     "Clear " + repositoriesBox.SelectedItem.ToString() + " repository",
+                                     "Clear " + repositoriesBox.SelectedItem + " repository",
                                      MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                 if (confirmResult == DialogResult.OK)
                 {
@@ -382,13 +374,13 @@ namespace MigratorUI
 
             }
         }
-        private void deleteRepositoryButton_Click(object sender, EventArgs e) 
+        private void DeleteRepositoryButton_Click(object sender, EventArgs e) 
         {
             
             if (repositoriesBox.SelectedItem != null)
             {
                 var confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
-                                     "Clear " + repositoriesBox.SelectedItem.ToString() + " repository",
+                                     "Clear " + repositoriesBox.SelectedItem + " repository",
                                      MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
 
                 if (confirmResult == DialogResult.OK)
@@ -416,7 +408,7 @@ namespace MigratorUI
 
 
         }
-        private void selectAllButton_Click(object sender, EventArgs e)
+        private void SelectAllButton_Click(object sender, EventArgs e)
         {
             for(int  i = 0; i<categoriesListBox.Items.Count; i++)
             {
@@ -424,18 +416,18 @@ namespace MigratorUI
             }
             
         }
-        private void deselectAllButton_Click(object sender, EventArgs e)
+        private void DeselectAllButton_Click(object sender, EventArgs e)
         {
             for (int i = 0; i < categoriesListBox.Items.Count; i++)
             {
                 categoriesListBox.SetItemChecked(i, false);
             }
         }
-        private void loadRefreshRepositories_Click(object sender, EventArgs e)
+        private void LoadRefreshRepositories_Click(object sender, EventArgs e)
         {
             RefreshRepositoriesList();
         }
-        private void verifyUrlButton_Click_1(object sender, EventArgs e)
+        private void VerifyUrlButton_Click_1(object sender, EventArgs e)
         {
             if(verifyUrlButton.Text == "Change URL")
             {
@@ -473,7 +465,7 @@ namespace MigratorUI
 
 
         }
-        private void logTextBox_TextChanged(object sender, EventArgs e)
+        private void LogTextBox_TextChanged(object sender, EventArgs e)
         {
             logTextBox.SelectionStart = logTextBox.Text.Length;
             logTextBox.ScrollToCaret();

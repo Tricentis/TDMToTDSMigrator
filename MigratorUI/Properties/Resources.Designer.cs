@@ -59,5 +59,14 @@ namespace MigratorUI.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Browse....
+        /// </summary>
+        internal static string TdsMigrator_ApiConnectionOk_Browse___ {
+            get {
+                return ResourceManager.GetString("TdsMigrator_ApiConnectionOk_Browse___", resourceCulture);
+            }
+        }
     }
 }

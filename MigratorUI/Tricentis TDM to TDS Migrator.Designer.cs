@@ -66,7 +66,7 @@
             this.pickFileButton.TabIndex = 4;
             this.pickFileButton.Text = "...";
             this.pickFileButton.UseVisualStyleBackColor = true;
-            this.pickFileButton.Click += new System.EventHandler(this.pickFileButton_Click);
+            this.pickFileButton.Click += new System.EventHandler(this.PickFileButton_Click);
             // 
             // TDDPathTextBox
             // 
@@ -75,14 +75,14 @@
             this.TDDPathTextBox.Name = "TDDPathTextBox";
             this.TDDPathTextBox.Size = new System.Drawing.Size(248, 22);
             this.TDDPathTextBox.TabIndex = 3;
-            this.TDDPathTextBox.TextChanged += new System.EventHandler(this.TDDPathTextBox_TextChanged);
+            this.TDDPathTextBox.TextChanged += new System.EventHandler(this.TddPathTextBox_TextChanged);
             // 
             // openFileDialog
             // 
             this.openFileDialog.DefaultExt = "tdd";
             this.openFileDialog.Filter = "tdd files|*.tdd";
             this.openFileDialog.InitialDirectory = "C:\\Users\\";
-            this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
+            this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.OpenFileDialog_FileOk);
             // 
             // label1
             // 
@@ -121,7 +121,7 @@
             this.createRepositoryButton.TabIndex = 12;
             this.createRepositoryButton.Text = "Create repository";
             this.createRepositoryButton.UseVisualStyleBackColor = true;
-            this.createRepositoryButton.Click += new System.EventHandler(this.createRepositoryButton_Click);
+            this.createRepositoryButton.Click += new System.EventHandler(this.CreateRepositoryButton_Click);
             // 
             // clearRepositoryButton
             // 
@@ -132,7 +132,7 @@
             this.clearRepositoryButton.TabIndex = 7;
             this.clearRepositoryButton.Text = "Clear repository";
             this.clearRepositoryButton.UseVisualStyleBackColor = true;
-            this.clearRepositoryButton.Click += new System.EventHandler(this.clearRepositoryButton_Click);
+            this.clearRepositoryButton.Click += new System.EventHandler(this.ClearRepositoryButton_Click);
             // 
             // categoriesListBox
             // 
@@ -157,7 +157,7 @@
             this.deselectAllButton.TabIndex = 6;
             this.deselectAllButton.Text = "Deselect All";
             this.deselectAllButton.UseVisualStyleBackColor = true;
-            this.deselectAllButton.Click += new System.EventHandler(this.deselectAllButton_Click);
+            this.deselectAllButton.Click += new System.EventHandler(this.DeselectAllButton_Click);
             // 
             // selectAllButton
             // 
@@ -168,7 +168,7 @@
             this.selectAllButton.TabIndex = 5;
             this.selectAllButton.Text = "Select All";
             this.selectAllButton.UseVisualStyleBackColor = true;
-            this.selectAllButton.Click += new System.EventHandler(this.selectAllButton_Click);
+            this.selectAllButton.Click += new System.EventHandler(this.SelectAllButton_Click);
             // 
             // apiURL
             // 
@@ -198,7 +198,7 @@
             this.deleteRepositoryButton.TabIndex = 8;
             this.deleteRepositoryButton.Text = "Delete repository";
             this.deleteRepositoryButton.UseVisualStyleBackColor = true;
-            this.deleteRepositoryButton.Click += new System.EventHandler(this.deleteRepositoryButton_Click);
+            this.deleteRepositoryButton.Click += new System.EventHandler(this.DeleteRepositoryButton_Click);
             // 
             // label3
             // 
@@ -219,7 +219,7 @@
             this.loadRefreshRepositories.TabIndex = 9;
             this.loadRefreshRepositories.Text = "Refresh";
             this.loadRefreshRepositories.UseVisualStyleBackColor = true;
-            this.loadRefreshRepositories.Click += new System.EventHandler(this.loadRefreshRepositories_Click);
+            this.loadRefreshRepositories.Click += new System.EventHandler(this.LoadRefreshRepositories_Click);
             // 
             // repositoriesBox
             // 
@@ -258,7 +258,7 @@
             this.logTextBox.Size = new System.Drawing.Size(512, 535);
             this.logTextBox.TabIndex = 14;
             this.logTextBox.Text = "";
-            this.logTextBox.TextChanged += new System.EventHandler(this.logTextBox_TextChanged);
+            this.logTextBox.TextChanged += new System.EventHandler(this.LogTextBox_TextChanged);
             // 
             // verifyUrlButton
             // 
@@ -268,7 +268,7 @@
             this.verifyUrlButton.TabIndex = 2;
             this.verifyUrlButton.Text = "Verify Url";
             this.verifyUrlButton.UseVisualStyleBackColor = true;
-            this.verifyUrlButton.Click += new System.EventHandler(this.verifyUrlButton_Click_1);
+            this.verifyUrlButton.Click += new System.EventHandler(this.VerifyUrlButton_Click_1);
             // 
             // categoriesLabel
             // 
@@ -299,7 +299,7 @@
             this.GenerateButton.TabIndex = 13;
             this.GenerateButton.Text = "Load categories into repository";
             this.GenerateButton.UseVisualStyleBackColor = true;
-            this.GenerateButton.Click += new System.EventHandler(this.loadIntoRepositoryButton_Click);
+            this.GenerateButton.Click += new System.EventHandler(this.LoadIntoRepositoryButton_Click);
             // 
             // migrationProgressBar
             // 
@@ -347,7 +347,7 @@
             this.MaximizeBox = false;
             this.Name = "TdsMigrator";
             this.Text = "Tricentis TDM to TDS Migrator";
-            this.Load += new System.EventHandler(this.TDSMigrator_Load);
+            this.Load += new System.EventHandler(this.TdsMigrator_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
