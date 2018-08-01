@@ -36,18 +36,19 @@ namespace TDMtoTDSMigrator {
         }
 
         public string FindCategoryName(string typeId, XmlNode metaInfoTypes) {
-            for (int i = 0; i < metaInfoTypes.ChildNodes.Count; i++) {
-                if (metaInfoTypes.ChildNodes[i].Attributes?[0].Value == typeId) {
-                    return metaInfoTypes.ChildNodes[i].Attributes?[1].Value;
+            foreach (XmlNode metaInfoType in metaInfoTypes.ChildNodes) {
+                if (metaInfoType.Attributes?[0].Value == typeId) {
+                    return metaInfoType.Attributes?[1].Value;
                 }
             }
             return "Category not found";
         }
 
         public string FindAttributeName(string attributeId, XmlNode metaInfoAttributes) {
-            for (int i = 0; i < metaInfoAttributes.ChildNodes.Count; i++) {
-                if (metaInfoAttributes.ChildNodes[i].Attributes?[0].Value == attributeId) {
-                    return metaInfoAttributes.ChildNodes[i].Attributes?[1].Value;
+            foreach (XmlNode metaInfoAttribute in metaInfoAttributes.ChildNodes)
+            {
+                if (metaInfoAttribute.Attributes?[0].Value == attributeId) {
+                    return metaInfoAttribute.Attributes?[1].Value;
                 }
             }
             return "Attribute not found";

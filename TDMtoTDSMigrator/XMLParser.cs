@@ -7,10 +7,10 @@ namespace TDMtoTDSMigrator {
         //     
         //     -RepositoryDump (parent node)
         //
-        //         -MetaInfoTypes (ex: Person, City)
-        //         -MetaInfoAttributes (ex: Name, Adress ; Country, Population) --> each attribute is linked to a metaInfoType
-        //         -MetaStringAttributes (ex: surrogate=1 , attribute=1 , value = John) --> sets the value of each attribute of an object (each object has a unique rowId)
-        //         -Associations (not supported by TDS, if there are any the user is warned that they will no longer be available in TDS)
+        //     -MetaInfoTypes (ex: Person, City) corresponds to categories in TDS
+        //     -MetaInfoAttributes (ex: Name, Adress ; Country, Population) --> each attribute is linked to a unique metaInfoType
+        //     -MetaStringAttributes (ex: surrogate=1 , attribute=1 , value = John) --> sets the value of each attribute of an object (each object has a unique surrogate)
+        //     -Associations (not supported by TDS, if there are any the user is warned that they will no longer be available in TDS)
 
         public static List<DataRow> CreateDataList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
             List<DataRow> dataList = new List<DataRow>();
@@ -61,21 +61,21 @@ namespace TDMtoTDSMigrator {
         }
 
         public static XmlNode GetRepositoryDump(XmlDocument doc) {
-            XmlNode repositoryDump = doc.FirstChild;
-            repositoryDump = repositoryDump.NextSibling;
-            return repositoryDump;
+            foreach (XmlNode node in doc.ChildNodes) {
+                if (node.Name == "RepositoryDump") {
+                    return node;
+                }
+            }
+            return null;
         }
 
         public static XmlNode GetMetaInfoTypes(XmlDocument doc) {
-            XmlNode repositoryDump = GetRepositoryDump(doc);
-            XmlNode metaInfoType = null;
-            for (int i = 0; i < repositoryDump.ChildNodes.Count; i++) {
-                if (repositoryDump.ChildNodes[i].Name == "MetaInfoType") {
-                    metaInfoType = repositoryDump.ChildNodes[i];
-                    break;
+            foreach (XmlNode node in GetRepositoryDump(doc).ChildNodes) {
+                if (node.Name == "MetaInfoType") {
+                    return node;
                 }
             }
-            return metaInfoType;
+            return null;
         }
 
         public static XmlNode GetMetaInfoTypes(string xmlPath) {
@@ -85,15 +85,12 @@ namespace TDMtoTDSMigrator {
         }
 
         public static XmlNode GetMetaInfoAttributes(XmlDocument doc) {
-            XmlNode repositoryDump = GetRepositoryDump(doc);
-            XmlNode metaInfoAttributes = null;
-            for (int i = 0; i < repositoryDump.ChildNodes.Count; i++) {
-                if (repositoryDump.ChildNodes[i].Name == "MetaInfoAttribute") {
-                    metaInfoAttributes = repositoryDump.ChildNodes[i];
-                    break;
+            foreach (XmlNode node in GetRepositoryDump(doc).ChildNodes) {
+                if (node.Name == "MetaInfoAttribute") {
+                    return node;
                 }
             }
-            return metaInfoAttributes;
+            return null;
         }
 
         public static XmlNode GetMetaInfoAttributes(string xmlPath) {
@@ -103,15 +100,12 @@ namespace TDMtoTDSMigrator {
         }
 
         public static XmlNode GetStringAttributes(XmlDocument doc) {
-            XmlNode repositoryDump = GetRepositoryDump(doc);
-            XmlNode stringAttributes = null;
-            for (int i = 0; i < repositoryDump.ChildNodes.Count; i++) {
-                if (repositoryDump.ChildNodes[i].Name == "StringAttribute") {
-                    stringAttributes = repositoryDump.ChildNodes[i];
-                    break;
+            foreach (XmlNode node in GetRepositoryDump(doc).ChildNodes) {
+                if (node.Name == "StringAttribute") {
+                    return node;
                 }
             }
-            return stringAttributes;
+            return null;
         }
 
         public static XmlNode GetStringAttributes(string xmlPath) {
@@ -121,15 +115,12 @@ namespace TDMtoTDSMigrator {
         }
 
         public static XmlNode GetMetaInfoAssociations(XmlDocument doc) {
-            XmlNode repositoryDump = GetRepositoryDump(doc);
-            XmlNode metaInfoAssoc = null;
-            for (int i = 0; i < repositoryDump.ChildNodes.Count; i++) {
-                if (repositoryDump.ChildNodes[i].Name == "MetaInfoAssoc") {
-                    metaInfoAssoc = repositoryDump.ChildNodes[i];
-                    break;
+            foreach (XmlNode node in GetRepositoryDump(doc).ChildNodes) {
+                if (node.Name == "MetaInfoAssoc") {
+                    return node;
                 }
             }
-            return metaInfoAssoc;
+            return null;
         }
 
         public static XmlNode GetMetaInfoAssociations(string xmlPath) {
@@ -140,12 +131,8 @@ namespace TDMtoTDSMigrator {
 
         public static List<string[]> GetCategoryInfos(XmlNode metaInfoAttributes) {
             List<string[]> typeIds = new List<string[]>();
-            for (int i = 0; i < metaInfoAttributes.ChildNodes.Count; i++) {
-                typeIds.Add(new[] {
-                        metaInfoAttributes.ChildNodes[i].Attributes?[0].Value,
-                        metaInfoAttributes.ChildNodes[i].Attributes?[1].Value,
-                        metaInfoAttributes.ChildNodes[i].Attributes?[2].Value
-                });
+            foreach (XmlNode node in metaInfoAttributes.ChildNodes) {
+                typeIds.Add(new[] { node.Attributes?[0].Value, node.Attributes?[1].Value, node.Attributes?[2].Value });
             }
             return typeIds;
         }

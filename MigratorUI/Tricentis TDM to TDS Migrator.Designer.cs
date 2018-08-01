@@ -147,6 +147,7 @@
             this.categoriesListBox.Sorted = true;
             this.categoriesListBox.TabIndex = 15;
             this.categoriesListBox.ThreeDCheckBoxes = true;
+            this.categoriesListBox.EnabledChanged += new System.EventHandler(this.CategoriesListBox_EnabledChanged);
             // 
             // deselectAllButton
             // 
@@ -311,7 +312,7 @@
             this.migrationProgressBar.TabIndex = 28;
             this.migrationProgressBar.Visible = false;
             // 
-            // TDSMigrator
+            // TdsMigrator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

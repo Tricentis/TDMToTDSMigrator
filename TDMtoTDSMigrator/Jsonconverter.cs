@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Text;
-
 using Newtonsoft.Json;
 
-namespace TDMtoTDSMigrator {
-    public class Repository {
-        public string Name { get; set; }
+namespace TDMtoTDSMigrator
+{
+    public class Repository
+    {
+        public string name { get; set; }
+       
+
     }
 
     public class JsonConverter {
@@ -40,10 +43,15 @@ namespace TDMtoTDSMigrator {
 
             for (int i = 0; i < repositoryList.Length; i++) {
                 var repository = JsonConvert.DeserializeObject<Repository>(repositoryList[i]);
-                repositoryList[i] = repository.Name;
+                repositoryList[i] = repository.name;
             }
 
             return repositoryList;
         }
     }
+
+    
+
+
+     
 }

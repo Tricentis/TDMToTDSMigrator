@@ -7,29 +7,35 @@ using System.Threading.Tasks;
 
 namespace TDMtoTDSMigrator {
     public class HttpRequest {
+
         private static HttpClient client;
 
-        private static string _version = "v1.1";
+        private static readonly string version = "v1.1";
+
+        private static HttpClient Client {
+            get {
+                if (client == null) {
+                    InitializeHttpClient();
+                }
+                return client;
+            }
+        }
 
         public static void InitializeHttpClient() {
             ServicePointManager.DefaultConnectionLimit = int.MaxValue;
-
-            HttpClientHandler clientHandler = new HttpClientHandler() { MaxRequestContentBufferSize = 2147483647 };
-
-            client = new HttpClient(clientHandler);
+            client = new HttpClient();
         }
 
-        public static Boolean SetAndVerifyConnection(string apiUrl) {
-            InitializeHttpClient();
+        public static Boolean SetConnection(string apiUrl) {
 
             if (apiUrl.Length == 0) {
                 return false;
             }
             try {
-                client.BaseAddress = new Uri(apiUrl + "/" + _version);
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                Client.BaseAddress = new Uri(apiUrl + "/" + version);
+                Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                return client.GetAsync("").Result.IsSuccessStatusCode;
+                return Client.GetAsync("").Result.IsSuccessStatusCode;
             } catch (ArgumentException) {
                 return false;
             } catch (UriFormatException) {
@@ -38,7 +44,7 @@ namespace TDMtoTDSMigrator {
         }
 
         public static void CreateRepository(string repositoryName, string repositoryDescription, string apiUrl) {
-            client.PostAsync("configuration/repositories/",
+            Client.PostAsync("configuration/repositories/",
                              new StringContent("{\"description\":\"" + repositoryDescription + "\"," + "\"location\":\"%PROGRAMDATA%\\\\Tricentis\\\\TestDataService\\\\"
                                                + repositoryName + ".db\"," + "\"name\":\"" + repositoryName + "\"," + "\"type\":1," + "\"link\": \"" + apiUrl
                                                + "configuration/repositories/" + repositoryName + "\"}",
@@ -47,19 +53,19 @@ namespace TDMtoTDSMigrator {
         }
 
         public static void ClearRepository(string repositoryName, string apiUrl) {
-            client.DeleteAsync(repositoryName);
+            Client.DeleteAsync(repositoryName);
         }
 
         public static void DeleteRepository(string repositoryName, string apiUrl) {
-            client.DeleteAsync("configuration/repositories/" + repositoryName);
+            Client.DeleteAsync("configuration/repositories/" + repositoryName);
         }
 
         public static string GetRepositories(string apiUrl) {
-            return client.GetStringAsync("").Result;
+            return Client.GetStringAsync("").Result;
         }
 
         public static async Task<HttpResponseMessage> PostObject(string jSon, string repositoryName, string apiUrl) {
-            return await client.PostAsync(repositoryName, new StringContent(jSon, Encoding.UTF8, "application/json"));
+            return await Client.PostAsync(repositoryName, new StringContent(jSon, Encoding.UTF8, "application/json"));
         }
     }
 }
