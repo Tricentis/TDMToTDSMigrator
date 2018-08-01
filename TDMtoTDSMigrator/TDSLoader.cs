@@ -1,16 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
-using System.Windows.Forms;
-using System.Xml;
-using TDMtoTDSMigrator;
-using System.Diagnostics;
+
 
 namespace TDMtoTDSMigrator
 {
@@ -49,13 +42,15 @@ namespace TDMtoTDSMigrator
         public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithoutFilter(string xmlPath, List<TableObject> dataList, string repositoryName, string apiUrl)
         {
             Task<HttpResponseMessage> message = null;
-
             foreach (var obj in dataList)
             {
-                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj),repositoryName, apiUrl);
+                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj), repositoryName, apiUrl);
             }
             return message;
         }
+
+
+
         public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithFilter(string xmlPath, List<TableObject> dataList, string repositoryName, List<string> filteredCategories, string apiUrl)
         {
             Task<HttpResponseMessage> message = null;
@@ -64,7 +59,7 @@ namespace TDMtoTDSMigrator
             {
                 if (filteredCategories.Contains(obj.GetCategoryName()))
                 {
-                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj), repositoryName, apiUrl);  
+                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj), repositoryName, apiUrl);
                 }
             }
             return message;

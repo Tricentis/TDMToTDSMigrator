@@ -34,18 +34,29 @@ namespace MigratorUI
 
         //Migration and tdd processing methods
         private async Task<HttpResponseMessage> LaunchMigration(List<string> authorizedTypes, Boolean applyFilter, string xmlPath, List<TableObject> objectList, string selectedRepository, string apiUrl)
+
         {
 
-            HttpResponseMessage message = null;
+
+
             if (applyFilter)
+
             {
-                message = await TdsLoader.MigrateXmlDataIntoTdsWithFilter(xmlPath, objectList, selectedRepository, authorizedTypes, apiUrl);
+
+                HttpResponseMessage message = await TdsLoader.MigrateXmlDataIntoTdsWithFilter(xmlPath, objectList, selectedRepository, authorizedTypes, apiUrl);
+                return message;
             }
+
             else
+
             {
-                message = await TdsLoader.MigrateXmlDataIntoTdsWithoutFilter(xmlPath, objectList, selectedRepository, apiUrl);
+
+                HttpResponseMessage message = await TdsLoader.MigrateXmlDataIntoTdsWithoutFilter(xmlPath, objectList, selectedRepository, apiUrl);
+                return message;
             }
-            return message;
+
+           
+
         }
         private void LoadCategoriesIntoListBox()
         {
@@ -139,7 +150,8 @@ namespace MigratorUI
         }
         private void MigrationInWork(Boolean migrationInWork)
         {
-           
+            verifyUrlButton.Enabled = !migrationInWork;
+            pickFileButton.Enabled = !migrationInWork;
             migrationProgressBar.Visible = migrationInWork;
             deleteRepositoryButton.Enabled = !migrationInWork;
             clearRepositoryButton.Enabled = !migrationInWork;
@@ -264,6 +276,7 @@ namespace MigratorUI
 
                 MigrationInWork(true);
                 await Task.Delay(10);
+
                 await LaunchMigration(filteredCategories, applyFilter, _xmlPath, _dataList, repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
 
                 logTextBox.AppendText(MigrationFinishedMessage(filteredCategories.Count, repositoriesBox.SelectedItem.ToString()));
@@ -432,7 +445,8 @@ namespace MigratorUI
             }
             else
             {
-                if (HttpRequest.VerifyApiUrl(ValidateUrl(apiUrlTextBox.Text)))
+
+                if (HttpRequest.SetAndVerifyConnection(ValidateUrl(apiUrlTextBox.Text)))
                 {
                     apiUrlTextBox.BackColor = Color.Lime;
                     ApiConnectionOk(true, sender, e);
