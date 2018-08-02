@@ -1,19 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
 
+using Newtonsoft.Json.Linq;
+
+using TestDataContract.TestData;
+using System.Text;
+
 namespace TDMtoTDSMigrator {
-    public class DataRow {
+    public class RawDataObject {
+
         private string categoryId;
 
         private string categoryName;
 
         private readonly List<string[]> attributes;
 
-        public DataRow() {
+        public RawDataObject() {
             attributes = new List<string[]>();
         }
 
-        public DataRow(DataRow obj) {
+        public RawDataObject(RawDataObject obj) {
             attributes = obj.GetAttributes();
             categoryId = obj.GetTypeId();
             categoryName = obj.GetCategoryName();
@@ -67,5 +73,26 @@ namespace TDMtoTDSMigrator {
         public void SetTypeId(string typeId) {
             categoryId = typeId;
         }
+
+        public TestDataObject ConvertIntoTestDataObject() {
+            return new TestDataObject() { Data = JObject.Parse(ConvertAttributesIntoJsonString()), Category = categoryName, Consumed = false};
+        }
+
+
+        public string ConvertAttributesIntoJsonString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append("{ ");
+
+            for (int i = 0; i < attributes.Count - 1; i++)
+            {
+                builder.Append("\"" + attributes[i][0] + "\":\"" + attributes[i][1] + "\" , ");
+            }
+            builder.Append("\"" + attributes[attributes.Count - 1][0] + "\":\"" + attributes[attributes.Count - 1][1] + "\"");
+            builder.Append("}\n");
+
+            return builder.ToString();
+        }
+
     }
 }

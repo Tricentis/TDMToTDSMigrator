@@ -4,6 +4,10 @@ using System.IO.Compression;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json;
+
+using TestDataContract.TestData;
+
 namespace TDMtoTDSMigrator {
     public class TdsLoader {
         public static string DecompressTddFileIntoXml(FileInfo fi) {
@@ -25,14 +29,14 @@ namespace TDMtoTDSMigrator {
             }
         }
 
-        public static Task<HttpResponseMessage> MigrateXmlDataIntoTds(Dictionary<string, List<DataRow>> dataList, string repositoryName, string apiUrl) {
+        public static Task<HttpResponseMessage> MigrateXmlDataIntoTds(Dictionary<string, List<TestDataObject>> dataList, string repositoryName, string apiUrl) {
             Task<HttpResponseMessage> message = null;
 
             foreach (string category in dataList.Keys)
             {
-                foreach (DataRow row in dataList[category])
+                foreach (TestDataObject row in dataList[category])
                 {
-                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(row), repositoryName, apiUrl);
+                    message = HttpRequest.PostObject(JsonConvert.SerializeObject(row), repositoryName, apiUrl);
                 }
             }
             return message;

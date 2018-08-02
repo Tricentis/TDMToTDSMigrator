@@ -5,12 +5,16 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
+using Newtonsoft.Json;
+
+using TestDataContract.Configuration;
+
 namespace TDMtoTDSMigrator {
     public class HttpRequest {
 
         private static HttpClient client;
 
-        private static readonly string version = "v1.1";
+        public static readonly string version = "v1.1";
 
         private static HttpClient Client {
             get {
@@ -27,7 +31,7 @@ namespace TDMtoTDSMigrator {
         }
 
         public static Boolean SetConnection(string apiUrl) {
-
+            InitializeHttpClient();
             if (apiUrl.Length == 0) {
                 return false;
             }
@@ -36,31 +40,25 @@ namespace TDMtoTDSMigrator {
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 return Client.GetAsync("").Result.IsSuccessStatusCode;
-            } catch (ArgumentException) {
-                return false;
-            } catch (UriFormatException) {
+            } catch (Exception) {
                 return false;
             }
         }
 
-        public static void CreateRepository(string repositoryName, string repositoryDescription, string apiUrl) {
-            Client.PostAsync("configuration/repositories/",
-                             new StringContent("{\"description\":\"" + repositoryDescription + "\"," + "\"location\":\"%PROGRAMDATA%\\\\Tricentis\\\\TestDataService\\\\"
-                                               + repositoryName + ".db\"," + "\"name\":\"" + repositoryName + "\"," + "\"type\":1," + "\"link\": \"" + apiUrl
-                                               + "configuration/repositories/" + repositoryName + "\"}",
-                                               Encoding.UTF8,
-                                               "application/json"));
+        public static HttpResponseMessage CreateRepository(TestDataRepository repository) {
+            return Client.PostAsync("configuration/repositories/",
+                                    new StringContent(JsonConvert.SerializeObject(repository),Encoding.UTF8,"application/json")).Result;
         }
 
-        public static void ClearRepository(string repositoryName, string apiUrl) {
-            Client.DeleteAsync(repositoryName);
+        public static HttpResponseMessage ClearRepository(string repositoryName) {
+            return Client.DeleteAsync(repositoryName).Result;
         }
 
-        public static void DeleteRepository(string repositoryName, string apiUrl) {
-            Client.DeleteAsync("configuration/repositories/" + repositoryName);
+        public static HttpResponseMessage DeleteRepository(string repositoryName) {
+            return Client.DeleteAsync("configuration/repositories/" + repositoryName).Result;
         }
 
-        public static string GetRepositories(string apiUrl) {
+        public static string GetRepositories() {
             return Client.GetStringAsync("").Result;
         }
 

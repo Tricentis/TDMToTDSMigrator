@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
 
+using Newtonsoft.Json.Linq;
+
+using TestDataContract.TestData;
+
 namespace TDMtoTDSMigrator {
     public class XmlParser {
         // Decompressed XML File attributes :
@@ -12,31 +16,40 @@ namespace TDMtoTDSMigrator {
         //     -MetaStringAttributes (ex: surrogate=1 , attribute=1 , value = John) --> sets the value of each attribute of an object (each object has a unique surrogate)
         //     -Associations (not supported by TDS, if there are any the user is warned that they will no longer be available in TDS)
 
-        public static List<DataRow> CreateDataList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
-            List<DataRow> dataList = new List<DataRow>();
+        public static List<TestDataObject> CreateDataList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
+            
+            List<TestDataObject> dataList = new List<TestDataObject>();
 
             string formerRowId = GetCurrentRowId(stringAttributes.ChildNodes[0]);
-            DataRow currentDataRow = new DataRow();
+            RawDataObject currentDataObject = new RawDataObject();
 
             foreach (XmlNode stringAttribute in stringAttributes.ChildNodes) {
                 if (formerRowId != GetCurrentRowId(stringAttribute)) {
-                    dataList.Add(new DataRow(SetDataAttributes(currentDataRow, stringAttributes, metaInfoTypes, metaInfoAttributes)));
-                    currentDataRow = new DataRow();
+                    currentDataObject = SetDataAttributes(currentDataObject, stringAttributes, metaInfoTypes, metaInfoAttributes);
+                    dataList.Add(currentDataObject.ConvertIntoTestDataObject());
+                    currentDataObject = new RawDataObject();
                 }
-
-                currentDataRow.AddAttribute(stringAttribute.Attributes?[1].Value, stringAttribute.Attributes?[2].Value);
+                currentDataObject.AddAttribute(stringAttribute.Attributes?[1].Value, stringAttribute.Attributes?[2].Value);
                 formerRowId = GetCurrentRowId(stringAttribute);
             }
 
-            dataList.Add(new DataRow(SetDataAttributes(currentDataRow, stringAttributes, metaInfoTypes, metaInfoAttributes)));
+            currentDataObject = SetDataAttributes(currentDataObject, stringAttributes, metaInfoTypes, metaInfoAttributes);
+
+            dataList.Add(new TestDataObject()
+            {
+                    Data = JObject.Parse(currentDataObject.ConvertAttributesIntoJsonString()),
+                    Category = currentDataObject.GetCategoryName(),
+                    Consumed = false,
+
+            });
             return dataList;
         }
 
-        public static List<DataRow> CreateDataList(XmlDocument doc) {
+        public static List<TestDataObject> CreateDataList(XmlDocument doc) {
             return CreateDataList(GetStringAttributes(doc), GetMetaInfoTypes(doc), GetMetaInfoAttributes(doc));
         }
 
-        public static List<DataRow> CreateDataList(string xmlPath) {
+        public static List<TestDataObject> CreateDataList(string xmlPath) {
             XmlDocument doc = new XmlDocument();
             doc.Load(xmlPath);
             return CreateDataList(doc);
@@ -46,7 +59,7 @@ namespace TDMtoTDSMigrator {
         
 
 
-        public static DataRow SetDataAttributes(DataRow row, XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
+        public static RawDataObject SetDataAttributes(RawDataObject row, XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
             List<string[]> categoryInfos = GetCategoryInfos(metaInfoAttributes);
             foreach (string[] categoryInfo in categoryInfos) {
                 if (row.GetAttributes()[0][0] != categoryInfo[0]) {
