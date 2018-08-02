@@ -25,27 +25,18 @@ namespace TDMtoTDSMigrator {
             }
         }
 
-        public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithoutFilter(string xmlPath, List<DataRow> dataList, string repositoryName, string apiUrl) {
-            Task<HttpResponseMessage> message = null;
-            foreach (var obj in dataList) {
-                message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj), repositoryName, apiUrl);
-            }
-            return message;
-        }
-
-        public static Task<HttpResponseMessage> MigrateXmlDataIntoTdsWithFilter(string xmlPath,
-                                                                                List<DataRow> dataList,
-                                                                                string repositoryName,
-                                                                                List<string> filteredCategories,
-                                                                                string apiUrl) {
+        public static Task<HttpResponseMessage> MigrateXmlDataIntoTds(Dictionary<string, List<DataRow>> dataList, string repositoryName, string apiUrl) {
             Task<HttpResponseMessage> message = null;
 
-            foreach (var obj in dataList) {
-                if (filteredCategories.Contains(obj.GetCategoryName())) {
-                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(obj), repositoryName, apiUrl);
+            foreach (string category in dataList.Keys)
+            {
+                foreach (DataRow row in dataList[category])
+                {
+                    message = HttpRequest.PostObject(JsonConverter.ConvertObjectIntoJsonPostRequest(row), repositoryName, apiUrl);
                 }
             }
             return message;
+
         }
     }
 }

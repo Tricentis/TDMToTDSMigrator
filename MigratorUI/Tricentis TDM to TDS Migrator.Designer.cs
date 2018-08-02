@@ -147,7 +147,6 @@
             this.categoriesListBox.Sorted = true;
             this.categoriesListBox.TabIndex = 15;
             this.categoriesListBox.ThreeDCheckBoxes = true;
-            this.categoriesListBox.EnabledChanged += new System.EventHandler(this.CategoriesListBox_EnabledChanged);
             // 
             // deselectAllButton
             // 

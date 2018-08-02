@@ -42,6 +42,10 @@ namespace TDMtoTDSMigrator {
             return CreateDataList(doc);
         }
 
+
+        
+
+
         public static DataRow SetDataAttributes(DataRow row, XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
             List<string[]> categoryInfos = GetCategoryInfos(metaInfoAttributes);
             foreach (string[] categoryInfo in categoryInfos) {

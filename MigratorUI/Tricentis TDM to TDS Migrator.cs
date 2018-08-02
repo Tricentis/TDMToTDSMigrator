@@ -5,20 +5,20 @@ using System.Drawing;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
 
 using TDMtoTDSMigrator;
 
-namespace MigratorUI
-{
+namespace MigratorUI {
     public partial class TdsMigrator : Form {
         public TdsMigrator() {
             InitializeComponent();
         }
 
-        private List<DataRow> dataList;
+        private readonly Dictionary<string, List<DataRow>> testData = new Dictionary<string, List<DataRow>>();
 
         private string xmlPath;
 
@@ -32,16 +32,18 @@ namespace MigratorUI
         }
 
         //Migration and tdd processing methods
-        private async Task<HttpResponseMessage> LaunchMigration(List<string> authorizedTypes,
-                                                                Boolean applyFilter,
-                                                                List<DataRow> objectList,
-                                                                string selectedRepository,
-                                                                string apiUrl) {
-            if (applyFilter) {
-                HttpResponseMessage message = await TdsLoader.MigrateXmlDataIntoTdsWithFilter(xmlPath, objectList, selectedRepository, authorizedTypes, apiUrl);
+        private async Task<HttpResponseMessage> LaunchMigration() {
+            if (categoriesListBox.SelectedItems.Count < categoriesListBox.Items.Count) {
+                Dictionary<string, List<DataRow>> filteredTestData = new Dictionary<string, List<DataRow>>();
+                foreach (string category in categoriesListBox.CheckedItems) {
+                    string categoryNameWithoutNumberOfInstances = Regex.Replace(category, "  [(]\\d+[)]", "");
+                    filteredTestData.Add(categoryNameWithoutNumberOfInstances, testData[categoryNameWithoutNumberOfInstances]);
+                }
+                HttpResponseMessage message =
+                        await TdsLoader.MigrateXmlDataIntoTds(filteredTestData, repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
                 return message;
             } else {
-                HttpResponseMessage message = await TdsLoader.MigrateXmlDataIntoTdsWithoutFilter(xmlPath, objectList, selectedRepository, apiUrl);
+                HttpResponseMessage message = await TdsLoader.MigrateXmlDataIntoTds(testData, repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
                 return message;
             }
         }
@@ -51,8 +53,6 @@ namespace MigratorUI
                 categoriesListBox.Items.Add(metaInfoType.Attributes?[1].Value ?? throw new InvalidOperationException(), true);
             }
         }
-
-
 
         //Verification methods
         private string ValidateUrl(string url) {
@@ -77,75 +77,38 @@ namespace MigratorUI
             }
         }
 
-        /*private string CheckForEmptyCategories() {
-            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(xmlPath);
-            List<string> emptyCategories = new List<string>();
-
-            foreach (XmlNode metaInfoType in metaInfoTypes.ChildNodes) {
-                emptyCategories.Add(metaInfoType.Attributes?[1].Value);
+        private void SortDataList(List<DataRow> dataList) {
+            foreach (string category in categoriesListBox.Items) {
+                testData.Add(category, new List<DataRow>());
             }
-
             foreach (DataRow row in dataList) {
-                foreach (string category in emptyCategories) {
-                    if (row.GetCategoryName() == category) {
-                        emptyCategories.Remove(category);
-                        break;
-                    }
-                }
+                testData[row.GetCategoryName()].Add(row);
             }
+        }
 
-            if (emptyCategories.Count == 0) {
-                return ".";
-            }
-
-            StringBuilder builder = new StringBuilder();
-            builder.Append(", including " + emptyCategories.Count + " empty : \n");
-
-            foreach (string emptyCategory in emptyCategories) {
-                foreach (string category in categoriesListBox.Items) {
-                    if (category == emptyCategory) {
-                        builder.Append(category + " , ");
-                        categoriesListBox.Items.Remove(category);
-                        break;
-                    }
-                }
-            }
-            builder = builder.Remove(builder.Length - 3, 2);
-            return builder.ToString();
-        }*/
-
-        private void CountCategoryMembersAndRemoveEmptyCategories() {
-            Dictionary<string,int> categoriesMembersCount = new Dictionary<string, int>();
-            foreach (var category in categoriesListBox.Items) {
-                categoriesMembersCount.Add(category.ToString(),0);
-            }
-            foreach (var row in dataList) {
-                categoriesMembersCount[row.GetCategoryName()]++;
-            }
-
+        private void RemoveEmptyCategories() {
             int numberOfEmptyCategories = 0;
             StringBuilder emptyCategoriesStringBuilder = new StringBuilder();
-            for (int i = 0 ; i < categoriesListBox.Items.Count ; i++) {
-                Console.WriteLine(i + "  " + categoriesListBox.Items[i]);
-                if (categoriesMembersCount[categoriesListBox.Items[i].ToString()] == 0) {
-                    emptyCategoriesStringBuilder.Append(categoriesListBox.Items[i] +" , ");
+            for (int i = 0; i < categoriesListBox.Items.Count; i++) {
+                if (testData[categoriesListBox.Items[i].ToString()].Count == 0) {
+                    emptyCategoriesStringBuilder.Append(categoriesListBox.Items[i] + " , ");
                     categoriesListBox.Items.RemoveAt(i);
-                    if (i != 0) { i--; }
+                    if (i != 0) {
+                        i--;
+                    }
                     numberOfEmptyCategories++;
-
                 } else {
-                    categoriesListBox.Items[i] = categoriesListBox.Items[i] + "  (" + categoriesMembersCount[categoriesListBox.Items[i].ToString()] + ")";
+                    categoriesListBox.Items[i] = categoriesListBox.Items[i] + "  (" + testData[categoriesListBox.Items[i].ToString()].Count + ")";
                 }
-                
             }
-            if (numberOfEmptyCategories>0) {
+            if (numberOfEmptyCategories > 0) {
                 emptyCategoriesStringBuilder.Remove(emptyCategoriesStringBuilder.Length - 3, 3);
             }
             emptyCategoriesStringBuilder.Append(".");
-            if (numberOfEmptyCategories == 1 ) {
-                logTextBox.AppendText("1 category was empty and has been deleted: " + emptyCategoriesStringBuilder); 
-            }else if (numberOfEmptyCategories>1) {
-                logTextBox.AppendText(numberOfEmptyCategories + " categories were empty and have been deleted: " + emptyCategoriesStringBuilder);
+            if (numberOfEmptyCategories == 1) {
+                logTextBox.AppendText("1 category was empty and has been deleted: " + emptyCategoriesStringBuilder);
+            } else if (numberOfEmptyCategories > 1) {
+                logTextBox.AppendText(numberOfEmptyCategories + " categories were empty and have been removed from the list: " + emptyCategoriesStringBuilder);
             }
             logTextBox.Refresh();
         }
@@ -199,8 +162,6 @@ namespace MigratorUI
             }
         }
 
-
-
         private void RefreshRepositoriesList() {
             repositoriesBox.Items.Clear();
             string reposJson = HttpRequest.GetRepositories(ValidateUrl(apiUrlTextBox.Text));
@@ -241,28 +202,19 @@ namespace MigratorUI
 
         //Event methods
         private async void LoadIntoRepositoryButton_Click(object sender, EventArgs e) {
-            Boolean applyFilter = false;
-            List<string> filteredCategories = new List<string>();
-
-            foreach (var category in categoriesListBox.CheckedItems) {
-                filteredCategories.Add(category.ToString());
-            }
-
-            applyFilter = filteredCategories.Count < categoriesListBox.Items.Count;
-
             if (repositoriesBox.SelectedItem == null) {
                 logTextBox.AppendText("Please pick a repository, or create one\n");
-            } else if (filteredCategories.Count == 0) {
+            } else if (categoriesListBox.SelectedItems.Count == 0) {
                 logTextBox.AppendText("Please pick at least one category\n");
             } else {
-                logTextBox.AppendText("Migrating " + filteredCategories.Count + " categories into \"" + repositoriesBox.SelectedItem + "\". Please wait...\n");
+                logTextBox.AppendText("Migrating " + categoriesListBox.SelectedItems.Count + " categories into \"" + repositoriesBox.SelectedItem + "\". Please wait...\n");
 
                 MigrationInWork(true);
                 await Task.Delay(10);
 
-                await LaunchMigration(filteredCategories, applyFilter, dataList, repositoriesBox.SelectedItem.ToString(), ValidateUrl(apiUrlTextBox.Text));
+                await LaunchMigration();
 
-                logTextBox.AppendText(MigrationFinishedMessage(filteredCategories.Count, repositoriesBox.SelectedItem.ToString()));
+                logTextBox.AppendText(MigrationFinishedMessage(categoriesListBox.SelectedItems.Count, repositoriesBox.SelectedItem.ToString()));
                 logTextBox.Refresh();
 
                 MigrationInWork(false);
@@ -280,28 +232,23 @@ namespace MigratorUI
             LoadCategoriesIntoListBox();
 
             BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (s, r) => { r.Result = dataList = XmlParser.CreateDataList(xmlPath); };
+            worker.DoWork += (s, r) => { r.Result = XmlParser.CreateDataList(xmlPath); };
             worker.RunWorkerCompleted += (s, r) => {
-                                             dataList = (List<DataRow>)r.Result;
-                                             
+                                             SortDataList((List<DataRow>)r.Result);
+
                                              TddFileProcessingInWork(false);
                                              tddFileProcessingProgressBar.Visible = false;
                                              CheckForAssociations();
-                                             logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + dataList.Count + " objects among " + categoriesListBox.Items.Count
-                                                                   + " categories were found.");
+                                             logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + testData.Count + " categories were found.");
                                              logTextBox.AppendText("\n");
-                                             CountCategoryMembersAndRemoveEmptyCategories();
+
+                                             RemoveEmptyCategories();
+
                                              logTextBox.AppendText(
                                                      "\n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
                                              logTextBox.Refresh();
-                                             
-            };
+                                         };
             worker.RunWorkerAsync();
-
-            
-
-
-
         }
 
         private void PickFileButton_Click(object sender, EventArgs e) {
@@ -409,10 +356,6 @@ namespace MigratorUI
         private void LogTextBox_TextChanged(object sender, EventArgs e) {
             logTextBox.SelectionStart = logTextBox.Text.Length;
             logTextBox.ScrollToCaret();
-        }
-
-        private async void CategoriesListBox_EnabledChanged(object sender, EventArgs e) {
-
         }
     }
 }
