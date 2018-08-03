@@ -13,7 +13,6 @@ using TestDataContract.TestData;
 
 namespace TDMtoTDSMigrator {
     public class HttpRequest {
-
         private static HttpClient client;
 
         public static readonly string Version = "v1.1";
@@ -48,16 +47,14 @@ namespace TDMtoTDSMigrator {
         }
 
         public static HttpResponseMessage CreateRepository(string repositoryName, string repositoryDescription, string apiUrl) {
-            TestDataRepository repository = new TestDataRepository()
-            {
+            TestDataRepository repository = new TestDataRepository() {
                     Description = repositoryDescription,
                     Name = repositoryName,
                     Type = DataBaseType.Sqlite,
                     Location = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryName + ".db",
-                    Link = apiUrl + "" + HttpRequest.Version + "/configuration/repositories/" + repositoryName
+                    Link = apiUrl + "" + Version + "/configuration/repositories/" + repositoryName
             };
-            return Client.PostAsync("configuration/repositories/",
-                                    new StringContent(JsonConvert.SerializeObject(repository),Encoding.UTF8,"application/json")).Result;
+            return Client.PostAsync("configuration/repositories/", new StringContent(JsonConvert.SerializeObject(repository), Encoding.UTF8, "application/json")).Result;
         }
 
         public static HttpResponseMessage ClearRepository(string repositoryName) {
@@ -76,15 +73,11 @@ namespace TDMtoTDSMigrator {
             return await Client.PostAsync(repositoryName, new StringContent(jSon, Encoding.UTF8, "application/json"));
         }
 
-        public static Task<HttpResponseMessage> Migrate(Dictionary<string, List<TestDataObject>> testData, string repositoryName, string apiUrl)
-        {
-
+        public static Task<HttpResponseMessage> Migrate(Dictionary<string, List<TestDataObject>> testData, string repositoryName, string apiUrl) {
             Task<HttpResponseMessage> message = null;
 
-            foreach (string category in testData.Keys)
-            {
-                foreach (TestDataObject obj in testData[category])
-                {
+            foreach (string category in testData.Keys) {
+                foreach (TestDataObject obj in testData[category]) {
                     message = PostObject(JsonConvert.SerializeObject(obj), repositoryName, apiUrl);
                 }
             }
@@ -92,6 +85,5 @@ namespace TDMtoTDSMigrator {
             //The response message of the last request will be returned 
             return message;
         }
-
     }
 }
