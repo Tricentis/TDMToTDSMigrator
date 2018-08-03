@@ -66,7 +66,6 @@ namespace TDMtoTDSMigrator {
             foreach (XmlNode metaInfoType in metaInfoTypes) {
                 sortedTestData.Add(Category(metaInfoType), new List<TestDataObject>());
             }
-
             foreach (TestDataObject obj in dataList) {
                 sortedTestData[obj.Category].Add(obj);
             }

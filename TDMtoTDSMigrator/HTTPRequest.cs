@@ -39,7 +39,6 @@ namespace TDMtoTDSMigrator {
             try {
                 Client.BaseAddress = new Uri(apiUrl + "/" + Version);
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
                 return Client.GetAsync("").Result.IsSuccessStatusCode;
             } catch (Exception) {
                 return false;
@@ -75,13 +74,11 @@ namespace TDMtoTDSMigrator {
 
         public static Task<HttpResponseMessage> Migrate(Dictionary<string, List<TestDataObject>> testData, string repositoryName, string apiUrl) {
             Task<HttpResponseMessage> message = null;
-
             foreach (string category in testData.Keys) {
                 foreach (TestDataObject obj in testData[category]) {
                     message = PostObject(JsonConvert.SerializeObject(obj), repositoryName, apiUrl);
                 }
             }
-
             //The response message of the last request will be returned 
             return message;
         }

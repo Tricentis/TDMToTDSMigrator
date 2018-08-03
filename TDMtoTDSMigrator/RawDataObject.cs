@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 
 using Newtonsoft.Json.Linq;
 
 using TestDataContract.TestData;
-using System.Text;
 
 namespace TDMtoTDSMigrator {
     public class RawDataObject {
-
         private string categoryId;
 
         private string categoryName;
@@ -23,9 +22,9 @@ namespace TDMtoTDSMigrator {
             attributes.Add(new[] { attributeId, attributeValue });
         }
 
-        public string FindCategoryName(string typeId, XmlNode metaInfoTypes) {
+        public string FindCategoryName(string categoryId, XmlNode metaInfoTypes) {
             foreach (XmlNode metaInfoType in metaInfoTypes.ChildNodes) {
-                if (metaInfoType.Attributes?[0].Value == typeId) {
+                if (metaInfoType.Attributes?[0].Value == categoryId) {
                     return metaInfoType.Attributes?[1].Value;
                 }
             }
@@ -33,8 +32,7 @@ namespace TDMtoTDSMigrator {
         }
 
         public string FindAttributeName(string attributeId, XmlNode metaInfoAttributes) {
-            foreach (XmlNode metaInfoAttribute in metaInfoAttributes.ChildNodes)
-            {
+            foreach (XmlNode metaInfoAttribute in metaInfoAttributes.ChildNodes) {
                 if (metaInfoAttribute.Attributes?[0].Value == attributeId) {
                     return metaInfoAttribute.Attributes?[1].Value;
                 }
@@ -52,13 +50,10 @@ namespace TDMtoTDSMigrator {
             categoryName = FindCategoryName(categoryId, metaInfoTypes);
         }
 
-        public void SetAllAttributes(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes)
-        {
+        public void SetAllAttributes(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
             List<string[]> categoryInfos = XmlParser.GetCategoriesInfos(metaInfoAttributes);
-            foreach (string[] categoryInfo in categoryInfos)
-            {
-                if (attributes[0][0] != categoryInfo[0])
-                {
+            foreach (string[] categoryInfo in categoryInfos) {
+                if (attributes[0][0] != categoryInfo[0]) {
                     continue;
                 }
                 categoryId = categoryInfo[2];
@@ -69,11 +64,10 @@ namespace TDMtoTDSMigrator {
         }
 
         public TestDataObject ConvertIntoTestDataObject() {
-            return new TestDataObject { Data = JObject.Parse(ConvertAttributesIntoJsonString()), Category = categoryName, Consumed = false};
+            return new TestDataObject { Data = JObject.Parse(ConvertAttributesIntoJsonString()), Category = categoryName, Consumed = false };
         }
 
-        public string ConvertAttributesIntoJsonString()
-        {
+        public string ConvertAttributesIntoJsonString() {
             StringBuilder builder = new StringBuilder();
             builder.Append("{");
             foreach (string[] attribute in attributes) {
@@ -83,6 +77,5 @@ namespace TDMtoTDSMigrator {
             builder.Append("}");
             return builder.ToString();
         }
-
     }
 }
