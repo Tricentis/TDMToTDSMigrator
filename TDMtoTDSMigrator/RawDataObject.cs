@@ -52,10 +52,6 @@ namespace TDMtoTDSMigrator {
             categoryName = FindCategoryName(categoryId, metaInfoTypes);
         }
 
-        public void SetTypeId(string typeId) {
-            categoryId = typeId;
-        }
-
         public void SetAllAttributes(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes)
         {
             List<string[]> categoryInfos = XmlParser.GetCategoriesInfos(metaInfoAttributes);
@@ -65,7 +61,7 @@ namespace TDMtoTDSMigrator {
                 {
                     continue;
                 }
-                SetTypeId(categoryInfo[2]);
+                categoryId = categoryInfo[2];
                 break;
             }
             SetCategoryName(metaInfoTypes);
@@ -73,7 +69,7 @@ namespace TDMtoTDSMigrator {
         }
 
         public TestDataObject ConvertIntoTestDataObject() {
-            return new TestDataObject() { Data = JObject.Parse(ConvertAttributesIntoJsonString()), Category = categoryName, Consumed = false};
+            return new TestDataObject { Data = JObject.Parse(ConvertAttributesIntoJsonString()), Category = categoryName, Consumed = false};
         }
 
         public string ConvertAttributesIntoJsonString()

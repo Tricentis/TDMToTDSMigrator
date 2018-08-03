@@ -14,7 +14,7 @@ namespace TDMtoTDSMigrator {
 
         private static HttpClient client;
 
-        public static readonly string version = "v1.1";
+        public static readonly string Version = "v1.1";
 
         private static HttpClient Client {
             get {
@@ -36,7 +36,7 @@ namespace TDMtoTDSMigrator {
                 return false;
             }
             try {
-                Client.BaseAddress = new Uri(apiUrl + "/" + version);
+                Client.BaseAddress = new Uri(apiUrl + "/" + Version);
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 return Client.GetAsync("").Result.IsSuccessStatusCode;

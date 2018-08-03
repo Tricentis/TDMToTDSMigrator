@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using System.Xml;
-
-using Newtonsoft.Json.Linq;
 
 using TestDataContract.TestData;
 
@@ -84,12 +81,6 @@ namespace TDMtoTDSMigrator {
             return null;
         }
 
-        public static XmlNode GetMetaInfoAttributes(string xmlPath) {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(xmlPath);
-            return GetMetaInfoAttributes(doc);
-        }
-
         public static XmlNode GetStringAttributes(XmlDocument doc) {
             foreach (XmlNode node in GetRepositoryDump(doc).ChildNodes) {
                 if (node.Name == "StringAttribute") {
@@ -97,12 +88,6 @@ namespace TDMtoTDSMigrator {
                 }
             }
             return null;
-        }
-
-        public static XmlNode GetStringAttributes(string xmlPath) {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(xmlPath);
-            return GetStringAttributes(doc);
         }
 
         public static XmlNode GetMetaInfoAssociations(XmlDocument doc) {

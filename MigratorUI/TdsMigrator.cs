@@ -120,7 +120,7 @@ namespace MigratorUI {
                     Name = repositoryName,
                     Type = DataBaseType.Sqlite,
                     Location = "%PROGRAMDATA%\\Tricentis\\TestDataService\\" + repositoryName + ".db",
-                    Link = apiUrlTextBox.Text+""+HttpRequest.version+"/configuration/repositories/"+repositoryName
+                    Link = apiUrlTextBox.Text+""+HttpRequest.Version+"/configuration/repositories/"+repositoryName
             };
             Console.WriteLine(repository.Link);
             Boolean creationSuccessful = HttpRequest.CreateRepository(repository).IsSuccessStatusCode;
