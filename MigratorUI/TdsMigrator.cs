@@ -5,15 +5,11 @@ using System.Drawing;
 using System.IO;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-
 using Newtonsoft.Json;
-
 using TDMtoTDSMigrator;
-
 using TestDataContract.Configuration;
 using TestDataContract.TestData;
 
@@ -29,7 +25,7 @@ namespace MigratorUI {
 
         private string xmlPath;
 
-        private Boolean migrationInWork = false;
+        private Boolean migrationInWork;
 
 
         //Initialization 
@@ -42,26 +38,22 @@ namespace MigratorUI {
 
         //Migration and API related methods
         private async Task<HttpResponseMessage> LaunchMigration() {
-            if (categoriesListBox.SelectedItems.Count < categoriesListBox.Items.Count) {
-                Dictionary<string, List<TestDataObject>> filteredTestData = new Dictionary<string, List<TestDataObject>>();
+            Dictionary<string, List<TestDataObject>> filteredTestData = new Dictionary<string, List<TestDataObject>>();
+
+            if (ApplyFilter()) {
                 foreach (string category in categoriesListBox.CheckedItems) {
-                    string categoryNameWithoutNumberOfInstances = Regex.Replace(category, "  [(]\\d+[)]", "");
-                    filteredTestData.Add(categoryNameWithoutNumberOfInstances, testData[categoryNameWithoutNumberOfInstances]);
+                    filteredTestData.Add(RemoveCategorySizeFromString(category), testData[RemoveCategorySizeFromString(category)]);
                 }
-                EstimatedWaitTimeMessage(filteredTestData);
-                HttpResponseMessage message =
-                        await TdsLoader.MigrateXmlDataIntoTds(filteredTestData, repositoriesBox.SelectedItem.ToString(), apiUrlTextBox.Text);
-                return message;
             } else {
-                EstimatedWaitTimeMessage(testData);
-                HttpResponseMessage message = await TdsLoader.MigrateXmlDataIntoTds(testData, repositoriesBox.SelectedItem.ToString(), apiUrlTextBox.Text);
-                return message;
+                filteredTestData = testData;
             }
+             PrintEstimatedWaitTimeMessage(filteredTestData);
+             return await HttpRequest.Migrate(filteredTestData, repositoriesBox.SelectedItem.ToString(), apiUrlTextBox.Text);  
         }
 
         private void ClearRepository(string repositoryName)
         {
-            var confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
+            DialogResult confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
                                                 "Clear " + repositoriesBox.SelectedItem + " repository",
                                                 MessageBoxButtons.OKCancel,
                                                 MessageBoxIcon.Warning);
@@ -70,7 +62,7 @@ namespace MigratorUI {
                 Boolean clearanceSuccessful = HttpRequest.ClearRepository(repositoryName).IsSuccessStatusCode;
                 if (clearanceSuccessful)
                 {
-                    logTextBox.AppendText(ClearedRepositoryMessage(repositoryName));
+                     PrintClearedRepositoryMessage(repositoryName);
                 }
                 else
                 {
@@ -81,7 +73,7 @@ namespace MigratorUI {
 
         private void DeleteRepository(string repositoryName)
         {
-            var confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
+            DialogResult confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
                                                 "Clear " + repositoriesBox.SelectedItem + " repository",
                                                 MessageBoxButtons.OKCancel,
                                                 MessageBoxIcon.Warning);
@@ -93,7 +85,7 @@ namespace MigratorUI {
 
                 if (deletionSuccessful)
                 {
-                    logTextBox.AppendText(DeletedRepositoryMessage(repositoryName));
+                    PrintDeletedRepositoryMessage(repositoryName);
                     repositoriesBox.Items.Remove(repositoryName);
                 }
                 else
@@ -109,23 +101,9 @@ namespace MigratorUI {
         }
 
         private void CreateRepository(string repositoryName, string repositoryDescription) {
-            
-
-
-
-            RefreshRepositoriesList();
-            TestDataRepository repository = new TestDataRepository()
-            {
-                    Description = repositoryDescription,
-                    Name = repositoryName,
-                    Type = DataBaseType.Sqlite,
-                    Location = "%PROGRAMDATA%\\Tricentis\\TestDataService\\" + repositoryName + ".db",
-                    Link = apiUrlTextBox.Text+""+HttpRequest.Version+"/configuration/repositories/"+repositoryName
-            };
-            Console.WriteLine(repository.Link);
-            Boolean creationSuccessful = HttpRequest.CreateRepository(repository).IsSuccessStatusCode;
+            Boolean creationSuccessful = HttpRequest.CreateRepository(repositoryName, repositoryDescription, apiUrlTextBox.Text).IsSuccessStatusCode;
             if (creationSuccessful) {
-                logTextBox.AppendText(CreatedRepositoryMessage(repositoryName, repositoryDescriptionTextbox.Text));
+                logTextBox.AppendText(PrintCreatedRepositoryMessage(repositoryName, repositoryDescriptionTextbox.Text));
                 repositoriesBox.Items.Add(repositoryName);
                 repositoriesBox.SelectedItem = repositoryName;
             } else {
@@ -158,19 +136,32 @@ namespace MigratorUI {
             }
         }
 
-        private void SortDataList(List<TestDataObject> dataList) {
-            testData= new Dictionary<string, List<TestDataObject>>();
-            foreach (XmlNode metaInfoType in XmlParser.GetMetaInfoTypes(xmlPath))
-            {
-                testData.Add(metaInfoType.Attributes?[1].Value ?? throw new InvalidOperationException(), new List<TestDataObject>());
-            }
+        private async void ProcessTddFile()
+        {
+            logTextBox.AppendText("The .tdd file is being processed. Please wait...\n");
+            TddFileProcessingInWork(true);
+            await Task.Delay(10);
+            xmlPath = XmlParser.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text));
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.DoWork += (s, r) => { r.Result = XmlParser.CreateDataList(xmlPath); };
+            worker.RunWorkerCompleted += (s, r) => {
+                                             testData = (Dictionary<string, List<TestDataObject>>)r.Result;
 
-            foreach (TestDataObject row in dataList) {
-                testData[row.Category].Add(row);
-            }
+                                             TddFileProcessingInWork(false);
+                                             tddFileProcessingProgressBar.Visible = false;
+
+                                             logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + CountNumberOfObjects(testData) + " records among " + testData.Count + " categories were found.");
+                                             logTextBox.AppendText("\n");
+                                             LoadCategoriesIntoListBox();
+                                             CheckForAssociations();
+                                             logTextBox.AppendText(
+                                                     "\n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
+
+                                         };
+            worker.RunWorkerAsync();
         }
 
-        private int CountNumberOfRows(Dictionary<string, List<TestDataObject>> data)
+        private int CountNumberOfObjects(Dictionary<string, List<TestDataObject>> data)
         {
             int totalNumberOfRows = 0;
             foreach (string category in data.Keys)
@@ -182,8 +173,19 @@ namespace MigratorUI {
 
         private int EstimatedWaitTime(Dictionary<string, List<TestDataObject>> data)
         {
-            //in seconds, based on the number of rows
-            return (int)(35 * CountNumberOfRows(data) / (float)2713)+1;
+            //in seconds, based on the number of objects
+            return (int)(35 * CountNumberOfObjects(data) / (float)2713)+1;
+        }
+
+        private string RemoveCategorySizeFromString(string category)
+        {
+            //ex : "People (5)" ---> "People"
+            return category.Remove(category.LastIndexOf(" ", StringComparison.Ordinal));
+        }
+
+        private Boolean ApplyFilter()
+        {
+            return categoriesListBox.SelectedItems.Count < categoriesListBox.Items.Count;
         }
 
 
@@ -202,7 +204,7 @@ namespace MigratorUI {
                 }
                 else
                 {
-                    categoriesListBox.Items.Add(category + "  (" + testData[category].Count + ")", true);
+                    categoriesListBox.Items.Add(category + " (" + testData[category].Count + ")", true);
                 }
             }
             if (numberOfEmptyCategories > 0)
@@ -218,7 +220,6 @@ namespace MigratorUI {
             {
                 logTextBox.AppendText(numberOfEmptyCategories + " categories were empty and have been removed from the list: " + emptyCategoriesStringBuilder);
             }
-            logTextBox.Refresh();
         }
 
         private void TddFileProcessingInWork(Boolean processingInWork) {
@@ -239,6 +240,7 @@ namespace MigratorUI {
             migrationProgressBar.Visible = migrationInWork;
             deleteRepositoryButton.Enabled = !migrationInWork;
             clearRepositoryButton.Enabled = !migrationInWork;
+            createRepositoryButton.Enabled = !migrationInWork;
             GenerateButton.Enabled = !migrationInWork;
             loadRefreshRepositories.Enabled = !migrationInWork;
         }
@@ -283,7 +285,7 @@ namespace MigratorUI {
 
 
         //logText message generation methoids
-        private string CreatedRepositoryMessage(string name, string description) {
+        private string PrintCreatedRepositoryMessage(string name, string description) {
             StringBuilder s = new StringBuilder();
             s.Append("Repository Created : " + name);
             if (description != "") {
@@ -294,20 +296,20 @@ namespace MigratorUI {
             return s.ToString();
         }
 
-        private string DeletedRepositoryMessage(string name) {
-            return "Repository Deleted : " + name + "\n";
+        private void PrintDeletedRepositoryMessage(string name) {
+            logTextBox.AppendText("Repository Deleted : " + name + "\n");
         }
 
-        private string ClearedRepositoryMessage(string name) {
-            return "Repository Cleared : " + name + "\n";
+        private void PrintClearedRepositoryMessage(string name) {
+            logTextBox.AppendText("Repository Cleared : " + name + "\n");
         }
 
-        private string MigrationFinishedMessage(int numberOfCategories, string repositoryName) {
-            return "Successfully migrated " + numberOfCategories + " out of " + categoriesListBox.Items.Count + " available categories into the repository : \""
-                   + repositoryName + "\".\n";
+        private void PrintMigrationFinishedMessage(int numberOfCategories, string repositoryName) {
+            logTextBox.AppendText("Successfully migrated " + numberOfCategories + " out of " + categoriesListBox.Items.Count + " available categories into the repository : \""
+                                  + repositoryName + "\".\n"); ;
         }
 
-        private void EstimatedWaitTimeMessage(Dictionary<string, List<TestDataObject>> data) {
+        private void PrintEstimatedWaitTimeMessage(Dictionary<string, List<TestDataObject>> data) {
             if (EstimatedWaitTime(data)>5) {
                 logTextBox.AppendText("Estimated waiting time : " +EstimatedWaitTime(data)+" seconds\n");
             }
@@ -323,40 +325,16 @@ namespace MigratorUI {
             } else {
                 logTextBox.AppendText("Migrating " + categoriesListBox.CheckedItems.Count + " categories into \"" + repositoriesBox.SelectedItem + "\". Please wait...\n");
                 MigrationInWork(true);
-                await Task.Delay(10);
+
                 await LaunchMigration();
-                logTextBox.AppendText(MigrationFinishedMessage(categoriesListBox.CheckedItems.Count, repositoriesBox.SelectedItem.ToString()));
-                logTextBox.Refresh();
+
+                PrintMigrationFinishedMessage(categoriesListBox.CheckedItems.Count, repositoriesBox.SelectedItem.ToString());
                 MigrationInWork(false);
             }
         }
 
-        private async void TddPathTextBox_TextChanged(object sender, EventArgs e) {
-            logTextBox.Select();
-            logTextBox.AppendText("The .tdd file is being processed. Please wait...\n");
-            logTextBox.Refresh();
-            TddFileProcessingInWork(true);
-            await Task.Delay(10);
-            xmlPath = TdsLoader.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text));
-            LoadCategoriesIntoListBox();
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (s, r) => { r.Result = XmlParser.CreateDataList(xmlPath); };
-            worker.RunWorkerCompleted += (s, r) => {
-                                             SortDataList((List<TestDataObject>)r.Result);
-
-                                             TddFileProcessingInWork(false);
-                                             tddFileProcessingProgressBar.Visible = false;
-                                             CheckForAssociations();
-                                             logTextBox.AppendText("\nThe .tdd file was successfully processed. \n"+CountNumberOfRows(testData)+" records among " + testData.Count + " categories were found.");
-                                             logTextBox.AppendText("\n");
-
-                                             LoadCategoriesIntoListBox();
-
-                                             logTextBox.AppendText(
-                                                     "\n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
-                                             logTextBox.Refresh();
-                                         };
-            worker.RunWorkerAsync();
+        private void TddPathTextBox_TextChanged(object sender, EventArgs e) {
+            ProcessTddFile();
         }
 
         private void PickFileButton_Click(object sender, EventArgs e) {
@@ -369,13 +347,22 @@ namespace MigratorUI {
         }
 
         private void CreateRepositoryButton_Click(object sender, EventArgs e) {
+            RefreshRepositoriesList();
             if (repositoryNameTextBox.Text != "") {
-                
-                if (!repositoriesBox.Items.Contains(repositoryNameTextBox.Text)) {
-                    CreateRepository(repositoryNameTextBox.Text, repositoryDescriptionTextbox.Text);
+                if (repositoryNameTextBox.Text.Contains("/"))
+                {
+                    logTextBox.AppendText("The special character '/' is not allowed in a repository name\n");
                 } else {
-                    logTextBox.AppendText("Repository \"" + repositoryNameTextBox.Text + "\" already exists \n");
+                    if (!repositoriesBox.Items.Contains(repositoryNameTextBox.Text))
+                    {
+                        CreateRepository(repositoryNameTextBox.Text, repositoryDescriptionTextbox.Text);
+                    }
+                    else
+                    {
+                        logTextBox.AppendText("Repository \"" + repositoryNameTextBox.Text + "\" already exists \n");
+                    }
                 }
+
             } else {
                 logTextBox.AppendText("Please enter a repository name\n");
             }
@@ -428,13 +415,12 @@ namespace MigratorUI {
                     if (TDDPathTextBox.Text == "") {
                         logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
                     }
-                    logTextBox.Refresh();
+
                 } else {
                     apiUrlTextBox.BackColor = Color.PaleVioletRed;
                     ApiConnectionOk(false, sender, e);
                     repositoriesBox.Items.Clear();
                     logTextBox.AppendText("Not a valid URL.\n");
-                    logTextBox.Refresh();
                 }
             }
         }

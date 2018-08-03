@@ -65,7 +65,7 @@
             this.pickFileButton.Size = new System.Drawing.Size(130, 27);
             this.pickFileButton.TabIndex = 4;
             this.pickFileButton.Text = "...";
-            this.pickFileButton.UseVisualStyleBackColor = true;
+            this.pickFileButton.UseVisualStyleBackColor = false;
             this.pickFileButton.Click += new System.EventHandler(this.PickFileButton_Click);
             // 
             // TDDPathTextBox
@@ -343,7 +343,6 @@
             this.Controls.Add(this.pickFileButton);
             this.Cursor = System.Windows.Forms.Cursors.Default;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "TdsMigrator";
             this.Text = "Tricentis TDM to TDS Migrator";
