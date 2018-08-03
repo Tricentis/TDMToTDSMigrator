@@ -78,3 +78,4 @@ MigratorUI/obj/
 TDMtoTDSMigrator/bin/
 TDMtoTDSMigrator/obj/
 packages/
+*.user

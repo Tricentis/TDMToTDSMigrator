@@ -11,14 +11,13 @@ using System.Windows.Forms;
 using System.Xml;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using TDMtoTDSMigrator;
 
 using TestDataContract.Configuration;
 using TestDataContract.TestData;
 
-using JsonConverter = TDMtoTDSMigrator.JsonConverter;
+
 
 namespace MigratorUI {
     public partial class TdsMigrator : Form {

@@ -19,26 +19,8 @@ namespace TDMtoTDSMigrator {
             attributes = new List<string[]>();
         }
 
-        public RawDataObject(RawDataObject obj) {
-            attributes = obj.GetAttributes();
-            categoryId = obj.GetTypeId();
-            categoryName = obj.GetCategoryName();
-        }
-
         public void AddAttribute(string attributeId, string attributeValue) {
             attributes.Add(new[] { attributeId, attributeValue });
-        }
-
-        public string GetTypeId() {
-            return categoryId;
-        }
-
-        public string GetCategoryName() {
-            return categoryName;
-        }
-
-        public List<string[]> GetAttributes() {
-            return attributes;
         }
 
         public string FindCategoryName(string typeId, XmlNode metaInfoTypes) {
@@ -61,8 +43,8 @@ namespace TDMtoTDSMigrator {
         }
 
         public void SetAttributeNames(XmlNode metaInfoAttributes) {
-            foreach (string[] attributeInfo in attributes) {
-                attributeInfo[0] = FindAttributeName(attributeInfo[0], metaInfoAttributes);
+            foreach (string[] attribute in attributes) {
+                attribute[0] = FindAttributeName(attribute[0], metaInfoAttributes);
             }
         }
 
@@ -74,23 +56,35 @@ namespace TDMtoTDSMigrator {
             categoryId = typeId;
         }
 
+        public void SetAllAttributes(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes)
+        {
+            List<string[]> categoryInfos = XmlParser.GetCategoriesInfos(metaInfoAttributes);
+            foreach (string[] categoryInfo in categoryInfos)
+            {
+                if (attributes[0][0] != categoryInfo[0])
+                {
+                    continue;
+                }
+                SetTypeId(categoryInfo[2]);
+                break;
+            }
+            SetCategoryName(metaInfoTypes);
+            SetAttributeNames(metaInfoAttributes);
+        }
+
         public TestDataObject ConvertIntoTestDataObject() {
             return new TestDataObject() { Data = JObject.Parse(ConvertAttributesIntoJsonString()), Category = categoryName, Consumed = false};
         }
 
-
         public string ConvertAttributesIntoJsonString()
         {
             StringBuilder builder = new StringBuilder();
-            builder.Append("{ ");
-
-            for (int i = 0; i < attributes.Count - 1; i++)
-            {
-                builder.Append("\"" + attributes[i][0] + "\":\"" + attributes[i][1] + "\" , ");
+            builder.Append("{");
+            foreach (string[] attribute in attributes) {
+                builder.Append("\"" + attribute[0] + "\":\"" + attribute[1] + "\",");
             }
-            builder.Append("\"" + attributes[attributes.Count - 1][0] + "\":\"" + attributes[attributes.Count - 1][1] + "\"");
-            builder.Append("}\n");
-
+            builder.Remove(builder.Length - 1, 1);
+            builder.Append("}");
             return builder.ToString();
         }
 

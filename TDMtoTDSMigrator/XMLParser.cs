@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using System.Xml;
 
 using Newtonsoft.Json.Linq;
@@ -19,30 +20,20 @@ namespace TDMtoTDSMigrator {
         public static List<TestDataObject> CreateDataList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
             
             List<TestDataObject> dataList = new List<TestDataObject>();
-
-            string formerRowId = GetCurrentRowId(stringAttributes.ChildNodes[0]);
-            RawDataObject currentDataObject = new RawDataObject();
+            RawDataObject currentObject = new RawDataObject();
 
             foreach (XmlNode stringAttribute in stringAttributes.ChildNodes) {
-                if (formerRowId != GetCurrentRowId(stringAttribute)) {
-                    currentDataObject = SetDataAttributes(currentDataObject, stringAttributes, metaInfoTypes, metaInfoAttributes);
-                    dataList.Add(currentDataObject.ConvertIntoTestDataObject());
-                    currentDataObject = new RawDataObject();
+                currentObject.AddAttribute(stringAttribute.Attributes?[1].Value, stringAttribute.Attributes?[2].Value);
+
+                if (stringAttribute.NextSibling==null || ObjectId(stringAttribute.NextSibling)!=ObjectId(stringAttribute)) {
+                    currentObject.SetAllAttributes(stringAttributes, metaInfoTypes, metaInfoAttributes);
+                    dataList.Add(currentObject.ConvertIntoTestDataObject());
+                    currentObject = new RawDataObject();
                 }
-                currentDataObject.AddAttribute(stringAttribute.Attributes?[1].Value, stringAttribute.Attributes?[2].Value);
-                formerRowId = GetCurrentRowId(stringAttribute);
             }
 
-            currentDataObject = SetDataAttributes(currentDataObject, stringAttributes, metaInfoTypes, metaInfoAttributes);
-
-            dataList.Add(new TestDataObject()
-            {
-                    Data = JObject.Parse(currentDataObject.ConvertAttributesIntoJsonString()),
-                    Category = currentDataObject.GetCategoryName(),
-                    Consumed = false,
-
-            });
             return dataList;
+            
         }
 
         public static List<TestDataObject> CreateDataList(XmlDocument doc) {
@@ -56,24 +47,7 @@ namespace TDMtoTDSMigrator {
         }
 
 
-        
-
-
-        public static RawDataObject SetDataAttributes(RawDataObject row, XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
-            List<string[]> categoryInfos = GetCategoryInfos(metaInfoAttributes);
-            foreach (string[] categoryInfo in categoryInfos) {
-                if (row.GetAttributes()[0][0] != categoryInfo[0]) {
-                    continue;
-                }
-                row.SetTypeId(categoryInfo[2]);
-                break;
-            }
-            row.SetCategoryName(metaInfoTypes);
-            row.SetAttributeNames(metaInfoAttributes);
-            return row;
-        }
-
-        public static string GetCurrentRowId(XmlNode stringAttribute) {
+        public static string ObjectId(XmlNode stringAttribute) {
             return stringAttribute.Attributes?[0].Value;
         }
 
@@ -146,12 +120,12 @@ namespace TDMtoTDSMigrator {
             return GetMetaInfoAssociations(doc);
         }
 
-        public static List<string[]> GetCategoryInfos(XmlNode metaInfoAttributes) {
-            List<string[]> typeIds = new List<string[]>();
+        public static List<string[]> GetCategoriesInfos(XmlNode metaInfoAttributes) {
+            List<string[]> categoriesInfo = new List<string[]>();
             foreach (XmlNode node in metaInfoAttributes.ChildNodes) {
-                typeIds.Add(new[] { node.Attributes?[0].Value, node.Attributes?[1].Value, node.Attributes?[2].Value });
+                categoriesInfo.Add(new[] { node.Attributes?[0].Value, node.Attributes?[1].Value, node.Attributes?[2].Value });
             }
-            return typeIds;
+            return categoriesInfo;
         }
     }
 }
