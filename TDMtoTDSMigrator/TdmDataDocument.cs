@@ -139,12 +139,12 @@ namespace TDMtoTDSMigrator {
         public string AssociatedCategoryId;
         public string PartnerName;
 
-        public MetaInfoAssociation(XmlNode metaInfoType) {
-            AssociationId = metaInfoType.Attributes?[0].Value;
-            CategoryName = metaInfoType.Attributes?[1].Value;
-            CategoryId = metaInfoType.Attributes?[2].Value;
-            AssociatedCategoryId = metaInfoType.Attributes?[3].Value;
-            PartnerName = metaInfoType.Attributes?[4].Value;
+        public MetaInfoAssociation(XmlNode metaInfoAssociation) {
+            AssociationId = metaInfoAssociation.Attributes?[0].Value;
+            CategoryName = metaInfoAssociation.Attributes?[1].Value;
+            CategoryId = metaInfoAssociation.Attributes?[2].Value;
+            AssociatedCategoryId = metaInfoAssociation.Attributes?[3].Value;
+            PartnerName = metaInfoAssociation.Attributes?[4].Value;
         }
     }
 }
