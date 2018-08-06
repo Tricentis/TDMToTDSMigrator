@@ -22,9 +22,9 @@ namespace MigratorUI {
             InitializeComponent();
         }
 
-        private Dictionary<string, List<TestDataObject>> testData = new Dictionary<string, List<TestDataObject>>();
+        private Dictionary<string, List<TestDataObject>> testData;
 
-        private string xmlPath;
+        private TdmDataDocument tdmDataSheet;
 
         private string apiUrl;
 
@@ -107,11 +107,11 @@ namespace MigratorUI {
         private void CheckForAssociations() {
             RawDataObject obj = new RawDataObject();
             StringBuilder stringBuilder = new StringBuilder();
-            if (XmlParser.GetMetaInfoAssociations(xmlPath).HasChildNodes) {
+            if (tdmDataSheet.MetaInfoAssociations.Count != 0) {
                 stringBuilder.Append("Please note that the following associations will no longer be supported by Tricentis TDS :\n\n");
-                foreach (XmlNode metaInfoAssociation in XmlParser.GetMetaInfoAssociations(xmlPath).ChildNodes) {
-                    obj.SetCategoryId(metaInfoAssociation.Attributes?[2].Value);
-                    stringBuilder.Append(metaInfoAssociation.Attributes?[1].Value + " and " + obj.FindCategoryName(XmlParser.GetMetaInfoTypes(xmlPath)) + "\n");
+                foreach (MetaInfoAssociation metaInfoAssociation in tdmDataSheet.MetaInfoAssociations) {
+                    obj.SetCategoryId(metaInfoAssociation.AssociatedCategoryId);
+                    stringBuilder.Append(metaInfoAssociation.CategoryName + " and " + obj.FindCategoryName(tdmDataSheet) + "\n");
                 }
                 MessageBox.Show(stringBuilder.ToString(), "Associations not supported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
@@ -121,9 +121,9 @@ namespace MigratorUI {
 
             TddFileProcessingInWork();
             await Task.Delay(10);
-            xmlPath = XmlParser.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text));
+            tdmDataSheet = new TdmDataDocument(XmlParser.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text)));
             BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (s, r) => { r.Result = XmlParser.CreateDataList(xmlPath); };
+            worker.DoWork += (s, r) => { r.Result = XmlParser.CreateDataList(tdmDataSheet); };
             worker.RunWorkerCompleted += (s, r) => {
                                              testData = (Dictionary<string, List<TestDataObject>>)r.Result;
                                              TddFileProcessingFinished();
