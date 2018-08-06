@@ -2,14 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Xml;
 
 using TestDataContract.TestData;
 
 namespace TDMtoTDSMigrator {
     public class XmlParser {
-
-        #region Public Methods and Operators
+        #region Constructors and Destructors
 
         public static Dictionary<string, List<TestDataObject>> CreateDataList(TdmDataDocument tdmDataSheet) {
             Dictionary<string, RawDataObject> rawDataObjects = new Dictionary<string, RawDataObject>();
@@ -23,6 +21,10 @@ namespace TDMtoTDSMigrator {
             }
             return ArrangeData(rawDataObjects, tdmDataSheet);
         }
+
+        #endregion
+
+        #region Public Methods and Operators
 
         public static string DecompressTddFileIntoXml(FileInfo fi) {
             using (FileStream inFile = fi.OpenRead()) {
@@ -42,7 +44,6 @@ namespace TDMtoTDSMigrator {
                 return pathOfOutput;
             }
         }
-
 
         #endregion
 
