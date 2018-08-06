@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Xml;
@@ -36,19 +37,20 @@ namespace TDMtoTDSMigrator {
         }
 
         public static Dictionary<string, List<TestDataObject>> CreateDataList(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
-            List<TestDataObject> dataList = new List<TestDataObject>();
-            RawDataObject currentObject = new RawDataObject();
-
+            Dictionary<string, RawDataObject> rawDataObjects = new Dictionary<string, RawDataObject>();
             foreach (XmlNode stringAttribute in stringAttributes.ChildNodes) {
-                currentObject.AddAttribute(AttributeId(stringAttribute), AttributeValue(stringAttribute));
-
-                if (stringAttribute.NextSibling == null || ObjectId(stringAttribute.NextSibling) != ObjectId(stringAttribute)) {
-                    currentObject.SetAllAttributes(metaInfoTypes, metaInfoAttributes);
-                    dataList.Add(currentObject.ConvertIntoTestDataObject());
-                    currentObject = new RawDataObject();
+                string id = ObjectId(stringAttribute);
+                try
+                {
+                    rawDataObjects.Add(id, new RawDataObject());
+                    rawDataObjects[id].AddAttribute(AttributeId(stringAttribute), AttributeValue(stringAttribute));
+                }
+                catch (ArgumentException)
+                { 
+                    rawDataObjects[id].AddAttribute(AttributeId(stringAttribute), AttributeValue(stringAttribute));
                 }
             }
-            return SortDataList(dataList, metaInfoTypes);
+            return ArrangeData(rawDataObjects, metaInfoTypes, metaInfoAttributes);
         }
 
         public static Dictionary<string, List<TestDataObject>> CreateDataList(XmlDocument doc) {
@@ -61,15 +63,21 @@ namespace TDMtoTDSMigrator {
             return CreateDataList(doc);
         }
 
-        private static Dictionary<string, List<TestDataObject>> SortDataList(List<TestDataObject> dataList, XmlNode metaInfoTypes) {
-            Dictionary<string, List<TestDataObject>> sortedTestData = new Dictionary<string, List<TestDataObject>>();
-            foreach (XmlNode metaInfoType in metaInfoTypes) {
-                sortedTestData.Add(Category(metaInfoType), new List<TestDataObject>());
+        private static Dictionary<string, List<TestDataObject>> ArrangeData(Dictionary<string,RawDataObject> rawDataObjects, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
+            Dictionary<string, List<TestDataObject>> sortedData = new Dictionary<string, List<TestDataObject>>();
+            foreach (RawDataObject obj in rawDataObjects.Values) {
+                obj.SetAllAttributes(metaInfoTypes, metaInfoAttributes);
+                try
+                {
+                    sortedData.Add(obj.categoryName, new List<TestDataObject>());
+                    sortedData[obj.categoryName].Add(obj.ConvertIntoTestDataObject());
+                }
+                catch (ArgumentException)
+                {
+                    sortedData[obj.categoryName].Add(obj.ConvertIntoTestDataObject());
+                }
             }
-            foreach (TestDataObject obj in dataList) {
-                sortedTestData[obj.Category].Add(obj);
-            }
-            return sortedTestData;
+            return sortedData;
         }
 
         public static string ObjectId(XmlNode stringAttribute) {

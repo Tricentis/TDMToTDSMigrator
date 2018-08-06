@@ -30,11 +30,14 @@ namespace MigratorUI {
 
         private Boolean migrationInWork;
 
+
         //Initialization 
         private void TdsMigrator_Load(object sender, EventArgs e) {
             logTextBox.AppendText(
                     "Welcome to Tricentis TDM to TDS Migrator.\nPlease enter a valid API URL and click on \"Verify Url\". \nExample : http://localhost:80/testdataservice \n");
             verifyUrlButton.Select();
+
+
         }
 
         //Migration and API related methods
@@ -102,41 +105,29 @@ namespace MigratorUI {
         }
 
         private void CheckForAssociations() {
-            XmlNode metaInfoAssoc = XmlParser.GetMetaInfoAssociations(xmlPath);
-            XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(xmlPath);
             RawDataObject obj = new RawDataObject();
             StringBuilder stringBuilder = new StringBuilder();
-
-            if (metaInfoAssoc.HasChildNodes) {
+            if (XmlParser.GetMetaInfoAssociations(xmlPath).HasChildNodes) {
                 stringBuilder.Append("Please note that the following associations will no longer be supported by Tricentis TDS :\n\n");
-                foreach (XmlNode node in metaInfoAssoc.ChildNodes) {
-                    obj.SetCategoryId(node.Attributes?[2].Value);
-                    stringBuilder.Append(node.Attributes?[1].Value + " and " + obj.FindCategoryName(metaInfoTypes) + "\n");
+                foreach (XmlNode metaInfoAssociation in XmlParser.GetMetaInfoAssociations(xmlPath).ChildNodes) {
+                    obj.SetCategoryId(metaInfoAssociation.Attributes?[2].Value);
+                    stringBuilder.Append(metaInfoAssociation.Attributes?[1].Value + " and " + obj.FindCategoryName(XmlParser.GetMetaInfoTypes(xmlPath)) + "\n");
                 }
                 MessageBox.Show(stringBuilder.ToString(), "Associations not supported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         private async void ProcessTddFile() {
-            logTextBox.AppendText("The .tdd file is being processed. Please wait...\n");
-            TddFileProcessingInWork(true);
+
+            TddFileProcessingInWork();
             await Task.Delay(10);
             xmlPath = XmlParser.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text));
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += (s, r) => { r.Result = XmlParser.CreateDataList(xmlPath); };
             worker.RunWorkerCompleted += (s, r) => {
                                              testData = (Dictionary<string, List<TestDataObject>>)r.Result;
+                                             TddFileProcessingFinished();
 
-                                             TddFileProcessingInWork(false);
-                                             tddFileProcessingProgressBar.Visible = false;
-
-                                             logTextBox.AppendText("\nThe .tdd file was successfully processed. \n" + CountNumberOfObjects(testData) + " records among "
-                                                                   + testData.Count + " categories were found.");
-                                             logTextBox.AppendText("\n");
-                                             LoadCategoriesIntoListBox();
-                                             CheckForAssociations();
-                                             logTextBox.AppendText(
-                                                     "\n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
                                          };
             worker.RunWorkerAsync();
         }
@@ -159,6 +150,29 @@ namespace MigratorUI {
             return category.Remove(category.LastIndexOf(" ", StringComparison.Ordinal));
         }
 
+        private Boolean IsValidRepositoryName(string repositoryName) {
+            if (repositoryName == "") {
+                logTextBox.AppendText("Please enter a repository name");
+                return false;
+            }
+            if (repositoriesBox.Items.Contains(repositoryNameTextBox.Text))
+            {
+                logTextBox.AppendText("Repository \"" + repositoryNameTextBox.Text + "\" already exists \n");
+                return false;
+            }
+            char[] unallowedRepositoryCharacters = { '/', '|', '\\', '<', '>', '#', '*', '+', ':', ';', '"', '.', ',', '?' };
+            foreach (char unallowedCharacter in unallowedRepositoryCharacters) {
+                if (repositoryName.Contains(unallowedCharacter.ToString())) {
+                    logTextBox.AppendText("A repository name cannot contain the following characters :\n");
+                    foreach (char character in unallowedRepositoryCharacters) {
+                           logTextBox.AppendText(character+ " ");
+                    }
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private Boolean ApplyFilter() {
             return categoriesListBox.SelectedItems.Count < categoriesListBox.Items.Count;
         }
@@ -166,35 +180,35 @@ namespace MigratorUI {
         //UI element attributes and logText methods 
         private void LoadCategoriesIntoListBox() {
             categoriesListBox.Items.Clear();
-            int numberOfEmptyCategories = 0;
-            StringBuilder emptyCategoriesStringBuilder = new StringBuilder();
             foreach (string category in testData.Keys) {
-                if (testData[category].Count == 0) {
-                    emptyCategoriesStringBuilder.Append(category + " , ");
-                    numberOfEmptyCategories++;
-                } else {
-                    categoriesListBox.Items.Add(category + " (" + testData[category].Count + ")", true);
-                }
-            }
-            if (numberOfEmptyCategories > 0) {
-                emptyCategoriesStringBuilder.Remove(emptyCategoriesStringBuilder.Length - 3, 3);
-            }
-            emptyCategoriesStringBuilder.Append(".");
-            if (numberOfEmptyCategories == 1) {
-                logTextBox.AppendText("1 category was empty and has been removed from the list: " + emptyCategoriesStringBuilder);
-            } else if (numberOfEmptyCategories > 1) {
-                logTextBox.AppendText(numberOfEmptyCategories + " categories were empty and have been removed from the list: " + emptyCategoriesStringBuilder);
+                categoriesListBox.Items.Add(category + " (" + testData[category].Count + ")", true);
             }
         }
 
-        private void TddFileProcessingInWork(Boolean processingInWork) {
-            loadIntoRepositoryButton.Enabled = !processingInWork;
-            categoriesListBox.Enabled = !processingInWork;
-            selectAllButton.Enabled = !processingInWork;
-            deselectAllButton.Enabled = !processingInWork;
-            verifyUrlButton.Enabled = !processingInWork;
-            pickFileButton.Enabled = !processingInWork;
-            tddFileProcessingProgressBar.Visible = processingInWork;
+        private void TddFileProcessingInWork() {
+            logTextBox.AppendText("The .tdd file is being processed. Please wait...\n");
+            loadIntoRepositoryButton.Enabled = false;
+            categoriesListBox.Enabled = false;
+            selectAllButton.Enabled = false;
+            deselectAllButton.Enabled = false;
+            verifyUrlButton.Enabled = false;
+            pickFileButton.Enabled = false;
+            tddFileProcessingProgressBar.Visible = true;
+        }
+
+        private void TddFileProcessingFinished() {
+            logTextBox.AppendText(CountNumberOfObjects(testData) + " records among " + testData.Count + " categories were found.");
+            LoadCategoriesIntoListBox();
+            CheckForAssociations();
+            logTextBox.AppendText(
+                    "\n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
+            loadIntoRepositoryButton.Enabled = true;
+            categoriesListBox.Enabled = true;
+            selectAllButton.Enabled = true;
+            deselectAllButton.Enabled = true;
+            verifyUrlButton.Enabled = true;
+            pickFileButton.Enabled = true;
+            tddFileProcessingProgressBar.Visible = false;
         }
 
         private void MigrationInWork(Boolean inWork) {
@@ -271,7 +285,6 @@ namespace MigratorUI {
         private void PrintMigrationFinishedMessage(int numberOfCategories, string repositoryName) {
             logTextBox.AppendText("Successfully migrated " + numberOfCategories + " out of " + categoriesListBox.Items.Count + " available categories into the repository : \""
                                   + repositoryName + "\".\n");
-            ;
         }
 
         private void PrintEstimatedWaitTimeMessage(Dictionary<string, List<TestDataObject>> data) {
@@ -312,19 +325,9 @@ namespace MigratorUI {
 
         private void CreateRepositoryButton_Click(object sender, EventArgs e) {
             RefreshRepositoriesList();
-            if (repositoryNameTextBox.Text != "") {
-                if (repositoryNameTextBox.Text.Contains("/")) {
-                    logTextBox.AppendText("The special character '/' is not allowed in a repository name\n");
-                } else {
-                    if (!repositoriesBox.Items.Contains(repositoryNameTextBox.Text)) {
-                        CreateRepository(repositoryNameTextBox.Text, repositoryDescriptionTextbox.Text);
-                    } else {
-                        logTextBox.AppendText("Repository \"" + repositoryNameTextBox.Text + "\" already exists \n");
-                    }
-                }
-            } else {
-                logTextBox.AppendText("Please enter a repository name\n");
-            }
+            if (IsValidRepositoryName(repositoryNameTextBox.Text)) {
+                CreateRepository(repositoryNameTextBox.Text, repositoryDescriptionTextbox.Text);
+            } 
         }
 
         private void ClearRepositoryButton_Click(object sender, EventArgs e) {
@@ -374,6 +377,8 @@ namespace MigratorUI {
                     if (TDDPathTextBox.Text == "") {
                         logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
                     }
+                                //for testing purposes, delete for release
+            repositoriesBox.SelectedItem = "data";
                 } else {
                     apiUrlTextBox.BackColor = Color.PaleVioletRed;
                     ApiConnectionOk(false, sender, e);
@@ -388,10 +393,9 @@ namespace MigratorUI {
             logTextBox.ScrollToCaret();
         }
 
-
-        private void repositoriesBox_SelectedValueChanged(object sender, EventArgs e)
+        private void RepositoriesBox_SelectedValueChanged(object sender, EventArgs e)
         {
-            loadIntoRepositoryButton.Text = "Load categories into repository : \"" + repositoriesBox.SelectedItem + "\"";
+            loadIntoRepositoryButton.Text = "Load categories into repository : \" " + repositoriesBox.SelectedItem + " \"";
         }
     }
 }

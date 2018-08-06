@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
@@ -9,9 +8,9 @@ using TestDataContract.TestData;
 
 namespace TDMtoTDSMigrator {
     public class RawDataObject {
-        private string categoryId;
+        public string categoryId;
 
-        private string categoryName;
+        public string categoryName;
 
         private readonly List<string[]> attributes;
 

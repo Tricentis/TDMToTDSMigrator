@@ -231,7 +231,7 @@
             this.repositoriesBox.Size = new System.Drawing.Size(356, 132);
             this.repositoriesBox.Sorted = true;
             this.repositoriesBox.TabIndex = 16;
-            this.repositoriesBox.SelectedValueChanged += new System.EventHandler(this.repositoriesBox_SelectedValueChanged);
+            this.repositoriesBox.SelectedValueChanged += new System.EventHandler(this.RepositoriesBox_SelectedValueChanged);
             // 
             // repositoryDescriptionText
             // 
