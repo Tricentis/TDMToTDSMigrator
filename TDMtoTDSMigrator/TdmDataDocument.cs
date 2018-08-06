@@ -121,8 +121,8 @@ namespace TDMtoTDSMigrator {
     }
 
     public class MetaInfoType {
-        public string CategoryId;
 
+        public string CategoryId;
         public string CategoryName;
 
         public MetaInfoType(XmlNode metaInfoType) {
