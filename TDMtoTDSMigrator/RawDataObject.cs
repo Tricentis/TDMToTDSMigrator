@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
@@ -22,7 +23,7 @@ namespace TDMtoTDSMigrator {
             attributes.Add(new[] { attributeId, attributeValue });
         }
 
-        public string FindCategoryName(string categoryId, XmlNode metaInfoTypes) {
+        public string FindCategoryName(XmlNode metaInfoTypes) {
             foreach (XmlNode metaInfoType in metaInfoTypes.ChildNodes) {
                 if (metaInfoType.Attributes?[0].Value == categoryId) {
                     return metaInfoType.Attributes?[1].Value;
@@ -46,20 +47,30 @@ namespace TDMtoTDSMigrator {
             }
         }
 
-        public void SetCategoryName(XmlNode metaInfoTypes) {
-            categoryName = FindCategoryName(categoryId, metaInfoTypes);
+        public void SetCategoryName(XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
+            SetCategoryId(metaInfoAttributes);
+            categoryName = FindCategoryName(metaInfoTypes);
         }
 
-        public void SetAllAttributes(XmlNode stringAttributes, XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
+        public void SetCategoryId(XmlNode metaInfoAttributes) {
             List<string[]> categoryInfos = XmlParser.GetCategoriesInfos(metaInfoAttributes);
-            foreach (string[] categoryInfo in categoryInfos) {
-                if (attributes[0][0] != categoryInfo[0]) {
+            foreach (string[] categoryInfo in categoryInfos)
+            {
+                if (attributes[0][0] != categoryInfo[0])
+                {
                     continue;
                 }
                 categoryId = categoryInfo[2];
                 break;
             }
-            SetCategoryName(metaInfoTypes);
+        }
+
+        public void SetCategoryId(string id) {
+            categoryId = id;
+        }
+
+        public void SetAllAttributes(XmlNode metaInfoTypes, XmlNode metaInfoAttributes) {
+            SetCategoryName(metaInfoTypes, metaInfoAttributes);
             SetAttributeNames(metaInfoAttributes);
         }
 
@@ -68,14 +79,16 @@ namespace TDMtoTDSMigrator {
         }
 
         public string ConvertAttributesIntoJsonString() {
-            StringBuilder builder = new StringBuilder();
-            builder.Append("{");
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.Append("{");
             foreach (string[] attribute in attributes) {
-                builder.Append("\"" + attribute[0] + "\":\"" + attribute[1] + "\",");
+                stringBuilder.Append("\"" + attribute[0] + "\":\"" + attribute[1] + "\",");
             }
-            builder.Remove(builder.Length - 1, 1);
-            builder.Append("}");
-            return builder.ToString();
+            stringBuilder.Remove(stringBuilder.Length - 1, 1);
+            stringBuilder.Append("}");
+            return stringBuilder.ToString();
         }
+
+
     }
 }

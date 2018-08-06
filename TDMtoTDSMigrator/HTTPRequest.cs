@@ -51,7 +51,6 @@ namespace TDMtoTDSMigrator {
                     Name = repositoryName,
                     Type = DataBaseType.Sqlite,
                     Location = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryName + ".db",
-                    Link = apiUrl + "" + Version + "/configuration/repositories/" + repositoryName
             };
             return Client.PostAsync("configuration/repositories/", new StringContent(JsonConvert.SerializeObject(repository), Encoding.UTF8, "application/json")).Result;
         }
@@ -79,7 +78,7 @@ namespace TDMtoTDSMigrator {
                     message = PostObject(JsonConvert.SerializeObject(obj), repositoryName, apiUrl);
                 }
             }
-            //The response message of the last request will be returned 
+            //The response message of the last request is returned 
             return message;
         }
     }

@@ -52,7 +52,7 @@
             this.verifyUrlButton = new System.Windows.Forms.Button();
             this.categoriesLabel = new System.Windows.Forms.Label();
             this.tddFileProcessingProgressBar = new System.Windows.Forms.ProgressBar();
-            this.GenerateButton = new System.Windows.Forms.Button();
+            this.loadIntoRepositoryButton = new System.Windows.Forms.Button();
             this.migrationProgressBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
             // 
@@ -291,16 +291,16 @@
             this.tddFileProcessingProgressBar.TabIndex = 27;
             this.tddFileProcessingProgressBar.Visible = false;
             // 
-            // GenerateButton
+            // loadIntoRepositoryButton
             // 
-            this.GenerateButton.Enabled = false;
-            this.GenerateButton.Location = new System.Drawing.Point(632, 576);
-            this.GenerateButton.Name = "GenerateButton";
-            this.GenerateButton.Size = new System.Drawing.Size(508, 59);
-            this.GenerateButton.TabIndex = 13;
-            this.GenerateButton.Text = "Load categories into repository";
-            this.GenerateButton.UseVisualStyleBackColor = true;
-            this.GenerateButton.Click += new System.EventHandler(this.LoadIntoRepositoryButton_Click);
+            this.loadIntoRepositoryButton.Enabled = false;
+            this.loadIntoRepositoryButton.Location = new System.Drawing.Point(632, 576);
+            this.loadIntoRepositoryButton.Name = "loadIntoRepositoryButton";
+            this.loadIntoRepositoryButton.Size = new System.Drawing.Size(508, 59);
+            this.loadIntoRepositoryButton.TabIndex = 13;
+            this.loadIntoRepositoryButton.Text = "Load categories into repository";
+            this.loadIntoRepositoryButton.UseVisualStyleBackColor = true;
+            this.loadIntoRepositoryButton.Click += new System.EventHandler(this.LoadIntoRepositoryButton_Click);
             // 
             // migrationProgressBar
             // 
@@ -338,12 +338,13 @@
             this.Controls.Add(this.createRepositoryButton);
             this.Controls.Add(this.repositoryNameText);
             this.Controls.Add(this.repositoryNameTextBox);
-            this.Controls.Add(this.GenerateButton);
+            this.Controls.Add(this.loadIntoRepositoryButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TDDPathTextBox);
             this.Controls.Add(this.pickFileButton);
             this.Cursor = System.Windows.Forms.Cursors.Default;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "TdsMigrator";
             this.Text = "Tricentis TDM to TDS Migrator";
@@ -378,7 +379,7 @@
         private System.Windows.Forms.Button verifyUrlButton;
         private System.Windows.Forms.Label categoriesLabel;
         private System.Windows.Forms.ProgressBar tddFileProcessingProgressBar;
-        private System.Windows.Forms.Button GenerateButton;
+        private System.Windows.Forms.Button loadIntoRepositoryButton;
         private System.Windows.Forms.ProgressBar migrationProgressBar;
     }
 }

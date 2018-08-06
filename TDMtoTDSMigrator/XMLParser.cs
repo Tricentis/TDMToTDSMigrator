@@ -43,7 +43,7 @@ namespace TDMtoTDSMigrator {
                 currentObject.AddAttribute(AttributeId(stringAttribute), AttributeValue(stringAttribute));
 
                 if (stringAttribute.NextSibling == null || ObjectId(stringAttribute.NextSibling) != ObjectId(stringAttribute)) {
-                    currentObject.SetAllAttributes(stringAttributes, metaInfoTypes, metaInfoAttributes);
+                    currentObject.SetAllAttributes(metaInfoTypes, metaInfoAttributes);
                     dataList.Add(currentObject.ConvertIntoTestDataObject());
                     currentObject = new RawDataObject();
                 }
@@ -147,8 +147,8 @@ namespace TDMtoTDSMigrator {
 
         public static List<string[]> GetCategoriesInfos(XmlNode metaInfoAttributes) {
             List<string[]> categoriesInfo = new List<string[]>();
-            foreach (XmlNode node in metaInfoAttributes.ChildNodes) {
-                categoriesInfo.Add(new[] { node.Attributes?[0].Value, node.Attributes?[1].Value, node.Attributes?[2].Value });
+            foreach (XmlNode metaInfoAttribute in metaInfoAttributes.ChildNodes) {
+                categoriesInfo.Add(new[] { metaInfoAttribute.Attributes?[0].Value, metaInfoAttribute.Attributes?[1].Value, metaInfoAttribute.Attributes?[2].Value });
             }
             return categoriesInfo;
         }

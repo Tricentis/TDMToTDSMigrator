@@ -105,14 +105,15 @@ namespace MigratorUI {
             XmlNode metaInfoAssoc = XmlParser.GetMetaInfoAssociations(xmlPath);
             XmlNode metaInfoTypes = XmlParser.GetMetaInfoTypes(xmlPath);
             RawDataObject obj = new RawDataObject();
-            StringBuilder s = new StringBuilder();
+            StringBuilder stringBuilder = new StringBuilder();
 
             if (metaInfoAssoc.HasChildNodes) {
-                s.Append("Please note that the following associations will no longer be supported by Tricentis TDS :\n\n");
+                stringBuilder.Append("Please note that the following associations will no longer be supported by Tricentis TDS :\n\n");
                 foreach (XmlNode node in metaInfoAssoc.ChildNodes) {
-                    s.Append(node.Attributes?[1].Value + " and " + obj.FindCategoryName(node.Attributes?[2].Value, metaInfoTypes) + "\n");
+                    obj.SetCategoryId(node.Attributes?[2].Value);
+                    stringBuilder.Append(node.Attributes?[1].Value + " and " + obj.FindCategoryName(metaInfoTypes) + "\n");
                 }
-                MessageBox.Show(s.ToString(), "Associations not supported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(stringBuilder.ToString(), "Associations not supported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -180,14 +181,14 @@ namespace MigratorUI {
             }
             emptyCategoriesStringBuilder.Append(".");
             if (numberOfEmptyCategories == 1) {
-                logTextBox.AppendText("1 category was empty and has been deleted: " + emptyCategoriesStringBuilder);
+                logTextBox.AppendText("1 category was empty and has been removed from the list: " + emptyCategoriesStringBuilder);
             } else if (numberOfEmptyCategories > 1) {
                 logTextBox.AppendText(numberOfEmptyCategories + " categories were empty and have been removed from the list: " + emptyCategoriesStringBuilder);
             }
         }
 
         private void TddFileProcessingInWork(Boolean processingInWork) {
-            GenerateButton.Enabled = !processingInWork;
+            loadIntoRepositoryButton.Enabled = !processingInWork;
             categoriesListBox.Enabled = !processingInWork;
             selectAllButton.Enabled = !processingInWork;
             deselectAllButton.Enabled = !processingInWork;
@@ -205,7 +206,7 @@ namespace MigratorUI {
             deleteRepositoryButton.Enabled = !migrationInWork;
             clearRepositoryButton.Enabled = !migrationInWork;
             createRepositoryButton.Enabled = !migrationInWork;
-            GenerateButton.Enabled = !migrationInWork;
+            loadIntoRepositoryButton.Enabled = !migrationInWork;
             loadRefreshRepositories.Enabled = !migrationInWork;
         }
 
@@ -215,7 +216,7 @@ namespace MigratorUI {
             createRepositoryButton.Enabled = apiConnectionOk;
             deleteRepositoryButton.Enabled = apiConnectionOk;
             clearRepositoryButton.Enabled = apiConnectionOk;
-            GenerateButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
+            loadIntoRepositoryButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             loadRefreshRepositories.Enabled = apiConnectionOk;
             repositoriesBox.Enabled = apiConnectionOk;
             repositoryDescriptionTextbox.Enabled = apiConnectionOk;
@@ -390,7 +391,7 @@ namespace MigratorUI {
 
         private void repositoriesBox_SelectedValueChanged(object sender, EventArgs e)
         {
-            GenerateButton.Text = "Load categories into repository : \"" + repositoriesBox.SelectedItem + "\"";
+            loadIntoRepositoryButton.Text = "Load categories into repository : \"" + repositoriesBox.SelectedItem + "\"";
         }
     }
 }
