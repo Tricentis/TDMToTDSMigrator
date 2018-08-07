@@ -71,10 +71,10 @@ namespace TDMtoTDSMigrator {
             return await Client.PostAsync(repositoryName, new StringContent(jSon, Encoding.UTF8, "application/json"));
         }
 
-        public static Task<HttpResponseMessage> Migrate(Dictionary<string, List<TestDataObject>> testData, string repositoryName, string apiUrl) {
+        public static Task<HttpResponseMessage> Migrate(Dictionary<string, TestDataCategory> testData, string repositoryName, string apiUrl) {
             Task<HttpResponseMessage> message = null;
             foreach (string category in testData.Keys) {
-                foreach (TestDataObject obj in testData[category]) {
+                foreach (TestDataObject obj in testData[category].Elements) {
                     message = PostObject(JsonConvert.SerializeObject(obj), repositoryName, apiUrl);
                 }
             }

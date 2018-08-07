@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 
 using Newtonsoft.Json;
 
@@ -22,7 +20,7 @@ namespace MigratorUI {
             InitializeComponent();
         }
 
-        private Dictionary<string, List<TestDataObject>> testData;
+        private Dictionary<string, TestDataCategory> testData;
 
         private TdmDataDocument tdmDataSheet;
 
@@ -40,11 +38,11 @@ namespace MigratorUI {
 
         //Migration and API related methods
         private async Task<HttpResponseMessage> LaunchMigration() {
-            Dictionary<string, List<TestDataObject>> filteredTestData = new Dictionary<string, List<TestDataObject>>();
+            Dictionary<string, TestDataCategory> filteredTestData = new Dictionary<string, TestDataCategory>();
 
             if (ApplyFilter()) {
-                foreach (string category in categoriesListBox.CheckedItems) {
-                    filteredTestData.Add(RemoveCategorySizeFromString(category), testData[RemoveCategorySizeFromString(category)]);
+                foreach (TestDataCategory category in categoriesListBox.CheckedItems) {
+                    filteredTestData.Add(category.Name,category);
                 }
             } else {
                 filteredTestData = testData;
@@ -121,21 +119,21 @@ namespace MigratorUI {
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += (s, r) => { r.Result = tdmDataSheet.CreateDataList(); };
             worker.RunWorkerCompleted += (s, r) => {
-                                             testData = (Dictionary<string, List<TestDataObject>>)r.Result;
+                                             testData = (Dictionary<string, TestDataCategory>)r.Result;
                                              TddFileProcessingFinished();
                                          };
             worker.RunWorkerAsync();
         }
 
-        private int CountNumberOfObjects(Dictionary<string, List<TestDataObject>> data) {
-            int totalNumberOfRows = 0;
+        private int CountNumberOfObjects(Dictionary<string, TestDataCategory> data) {
+            int numberOfObjects = 0;
             foreach (string category in data.Keys) {
-                totalNumberOfRows += data[category].Count;
+                numberOfObjects += data[category].ElementCount;
             }
-            return totalNumberOfRows;
+            return numberOfObjects;
         }
 
-        private int EstimatedWaitTime(Dictionary<string, List<TestDataObject>> data) {
+        private int EstimatedWaitTime(Dictionary<string, TestDataCategory> data) {
             //in seconds, based on the number of objects
             return (int)(35 * CountNumberOfObjects(data) / (float)2713) + 1;
         }
@@ -175,12 +173,13 @@ namespace MigratorUI {
         //UI element attributes and logText methods 
         private void LoadCategoriesIntoListBox() {
             categoriesListBox.Items.Clear();
+            categoriesListBox.ValueMember = "Name";
             Boolean oneCategoryIsEmpty=false;
             StringBuilder emptyCategoriesStringBuilder = new StringBuilder();
             emptyCategoriesStringBuilder.Append("\nThe following categories were empty and have been removed from the list :\n");
             foreach (string category in testData.Keys) {
-                if (testData[category].Count!=0) {
-                    categoriesListBox.Items.Add(category + " (" + testData[category].Count + ")", true);
+                if (testData[category].ElementCount!=0) {
+                    categoriesListBox.Items.Add(testData[category],true);
                 } else {
                     oneCategoryIsEmpty = true;
                     emptyCategoriesStringBuilder.Append(category + ", ");
@@ -293,7 +292,7 @@ namespace MigratorUI {
                                   + repositoryName + "\".\n");
         }
 
-        private void PrintEstimatedWaitTimeMessage(Dictionary<string, List<TestDataObject>> data) {
+        private void PrintEstimatedWaitTimeMessage(Dictionary<string, TestDataCategory> data) {
             if (EstimatedWaitTime(data) > 5) {
                 logTextBox.AppendText("Estimated waiting time : " + EstimatedWaitTime(data) + " seconds\n");
             }
@@ -401,6 +400,11 @@ namespace MigratorUI {
         private void RepositoriesBox_SelectedValueChanged(object sender, EventArgs e)
         {
             loadIntoRepositoryButton.Text = "Load categories into repository : \" " + repositoriesBox.SelectedItem + " \"";
+        }
+
+        private void CategoriesListBox_Format(object sender, ListControlConvertEventArgs e)
+        {
+            e.Value = ((TestDataCategory)e.ListItem).Name + " (" + ((TestDataCategory)e.ListItem).ElementCount+")";
         }
     }
 }

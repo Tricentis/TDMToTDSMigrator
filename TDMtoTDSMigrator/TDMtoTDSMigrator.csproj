@@ -53,6 +53,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MetaInfoAssociation.cs" />
+    <Compile Include="MetaInfoAttribute.cs" />
+    <Compile Include="MetaInfoType.cs" />
+    <Compile Include="StringAttribute.cs" />
     <Compile Include="TdmDataDocument.cs" />
     <Compile Include="HttpRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
