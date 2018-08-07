@@ -61,11 +61,12 @@ namespace MigratorUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Browse....
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static string TdsMigrator_ApiConnectionOk_Browse___ {
+        internal static System.Drawing.Bitmap fonmdappd {
             get {
-                return ResourceManager.GetString("TdsMigrator_ApiConnectionOk_Browse___", resourceCulture);
+                object obj = ResourceManager.GetObject("fonmdappd", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

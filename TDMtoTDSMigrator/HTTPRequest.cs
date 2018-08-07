@@ -45,37 +45,31 @@ namespace TDMtoTDSMigrator {
             }
         }
 
-        public static HttpResponseMessage CreateRepository(string repositoryName, string repositoryDescription, string apiUrl) {
-            TestDataRepository repository = new TestDataRepository() {
-                    Description = repositoryDescription,
-                    Name = repositoryName,
-                    Type = DataBaseType.Sqlite,
-                    Location = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryName + ".db",
-            };
+        public static HttpResponseMessage CreateRepository(TestDataRepository repository) {
             return Client.PostAsync("configuration/repositories/", new StringContent(JsonConvert.SerializeObject(repository), Encoding.UTF8, "application/json")).Result;
         }
 
-        public static HttpResponseMessage ClearRepository(string repositoryName) {
-            return Client.DeleteAsync(repositoryName).Result;
+        public static HttpResponseMessage ClearRepository(TestDataRepository repository) {
+            return Client.DeleteAsync(repository.Name).Result;
         }
 
-        public static HttpResponseMessage DeleteRepository(string repositoryName) {
-            return Client.DeleteAsync("configuration/repositories/" + repositoryName).Result;
+        public static HttpResponseMessage DeleteRepository(TestDataRepository repository) {
+            return Client.DeleteAsync("configuration/repositories/" + repository.Name).Result;
         }
 
-        public static string GetRepositories() {
-            return Client.GetStringAsync("").Result;
+        public static List<TestDataRepository> GetRepositories() {
+            return JsonConvert.DeserializeObject<List<TestDataRepository>>(Client.GetStringAsync("configuration/repositories").Result);
         }
 
-        public static async Task<HttpResponseMessage> PostObject(string jSon, string repositoryName, string apiUrl) {
-            return await Client.PostAsync(repositoryName, new StringContent(jSon, Encoding.UTF8, "application/json"));
+        public static async Task<HttpResponseMessage> PostObject(string jSon, TestDataRepository repository, string apiUrl) {
+            return await Client.PostAsync(repository.Name, new StringContent(jSon, Encoding.UTF8, "application/json"));
         }
 
-        public static Task<HttpResponseMessage> Migrate(Dictionary<string, TestDataCategory> testData, string repositoryName, string apiUrl) {
+        public static Task<HttpResponseMessage> Migrate(Dictionary<string, TestDataCategory> testData, TestDataRepository repository, string apiUrl) {
             Task<HttpResponseMessage> message = null;
             foreach (string category in testData.Keys) {
                 foreach (TestDataObject obj in testData[category].Elements) {
-                    message = PostObject(JsonConvert.SerializeObject(obj), repositoryName, apiUrl);
+                    message = PostObject(JsonConvert.SerializeObject(obj), repository, apiUrl);
                 }
             }
             //The response message of the last request is returned 

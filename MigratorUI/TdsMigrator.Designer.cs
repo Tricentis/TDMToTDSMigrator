@@ -33,8 +33,6 @@
             this.TDDPathTextBox = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.label1 = new System.Windows.Forms.Label();
-            this.repositoryNameTextBox = new System.Windows.Forms.TextBox();
-            this.repositoryNameText = new System.Windows.Forms.Label();
             this.createRepositoryButton = new System.Windows.Forms.Button();
             this.clearRepositoryButton = new System.Windows.Forms.Button();
             this.categoriesListBox = new System.Windows.Forms.CheckedListBox();
@@ -46,8 +44,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.loadRefreshRepositories = new System.Windows.Forms.Button();
             this.repositoriesBox = new System.Windows.Forms.ListBox();
-            this.repositoryDescriptionText = new System.Windows.Forms.Label();
-            this.repositoryDescriptionTextbox = new System.Windows.Forms.TextBox();
             this.logTextBox = new System.Windows.Forms.RichTextBox();
             this.verifyUrlButton = new System.Windows.Forms.Button();
             this.categoriesLabel = new System.Windows.Forms.Label();
@@ -94,41 +90,23 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "Select .tdd file ";
             // 
-            // repositoryNameTextBox
-            // 
-            this.repositoryNameTextBox.Enabled = false;
-            this.repositoryNameTextBox.Location = new System.Drawing.Point(822, 210);
-            this.repositoryNameTextBox.Name = "repositoryNameTextBox";
-            this.repositoryNameTextBox.Size = new System.Drawing.Size(166, 22);
-            this.repositoryNameTextBox.TabIndex = 10;
-            // 
-            // repositoryNameText
-            // 
-            this.repositoryNameText.AutoSize = true;
-            this.repositoryNameText.BackColor = System.Drawing.Color.Transparent;
-            this.repositoryNameText.Location = new System.Drawing.Point(646, 213);
-            this.repositoryNameText.Name = "repositoryNameText";
-            this.repositoryNameText.Size = new System.Drawing.Size(141, 17);
-            this.repositoryNameText.TabIndex = 5;
-            this.repositoryNameText.Text = "New repository name";
-            // 
             // createRepositoryButton
             // 
             this.createRepositoryButton.Enabled = false;
-            this.createRepositoryButton.Location = new System.Drawing.Point(1015, 210);
+            this.createRepositoryButton.Location = new System.Drawing.Point(1014, 62);
             this.createRepositoryButton.Name = "createRepositoryButton";
-            this.createRepositoryButton.Size = new System.Drawing.Size(130, 49);
+            this.createRepositoryButton.Size = new System.Drawing.Size(130, 43);
             this.createRepositoryButton.TabIndex = 12;
-            this.createRepositoryButton.Text = "Create repository";
+            this.createRepositoryButton.Text = "New repository";
             this.createRepositoryButton.UseVisualStyleBackColor = true;
             this.createRepositoryButton.Click += new System.EventHandler(this.CreateRepositoryButton_Click);
             // 
             // clearRepositoryButton
             // 
             this.clearRepositoryButton.Enabled = false;
-            this.clearRepositoryButton.Location = new System.Drawing.Point(1014, 61);
+            this.clearRepositoryButton.Location = new System.Drawing.Point(1014, 111);
             this.clearRepositoryButton.Name = "clearRepositoryButton";
-            this.clearRepositoryButton.Size = new System.Drawing.Size(130, 45);
+            this.clearRepositoryButton.Size = new System.Drawing.Size(130, 43);
             this.clearRepositoryButton.TabIndex = 7;
             this.clearRepositoryButton.Text = "Clear repository";
             this.clearRepositoryButton.UseVisualStyleBackColor = true;
@@ -140,19 +118,20 @@
             this.categoriesListBox.ColumnWidth = 111;
             this.categoriesListBox.Enabled = false;
             this.categoriesListBox.FormattingEnabled = true;
-            this.categoriesListBox.Location = new System.Drawing.Point(632, 322);
+            this.categoriesListBox.Location = new System.Drawing.Point(632, 295);
             this.categoriesListBox.Name = "categoriesListBox";
             this.categoriesListBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.categoriesListBox.Size = new System.Drawing.Size(356, 225);
+            this.categoriesListBox.Size = new System.Drawing.Size(356, 276);
             this.categoriesListBox.Sorted = true;
             this.categoriesListBox.TabIndex = 15;
             this.categoriesListBox.ThreeDCheckBoxes = true;
+            this.categoriesListBox.SelectedIndexChanged += new System.EventHandler(this.CategoriesListBox_SelectedIndexChanged);
             this.categoriesListBox.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.CategoriesListBox_Format);
             // 
             // deselectAllButton
             // 
             this.deselectAllButton.Enabled = false;
-            this.deselectAllButton.Location = new System.Drawing.Point(1010, 361);
+            this.deselectAllButton.Location = new System.Drawing.Point(1010, 334);
             this.deselectAllButton.Name = "deselectAllButton";
             this.deselectAllButton.Size = new System.Drawing.Size(130, 33);
             this.deselectAllButton.TabIndex = 6;
@@ -163,7 +142,7 @@
             // selectAllButton
             // 
             this.selectAllButton.Enabled = false;
-            this.selectAllButton.Location = new System.Drawing.Point(1010, 322);
+            this.selectAllButton.Location = new System.Drawing.Point(1010, 295);
             this.selectAllButton.Name = "selectAllButton";
             this.selectAllButton.Size = new System.Drawing.Size(130, 33);
             this.selectAllButton.TabIndex = 5;
@@ -193,7 +172,7 @@
             // deleteRepositoryButton
             // 
             this.deleteRepositoryButton.Enabled = false;
-            this.deleteRepositoryButton.Location = new System.Drawing.Point(1014, 112);
+            this.deleteRepositoryButton.Location = new System.Drawing.Point(1014, 160);
             this.deleteRepositoryButton.Name = "deleteRepositoryButton";
             this.deleteRepositoryButton.Size = new System.Drawing.Size(130, 43);
             this.deleteRepositoryButton.TabIndex = 8;
@@ -205,7 +184,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.Transparent;
-            this.label3.Location = new System.Drawing.Point(633, 33);
+            this.label3.Location = new System.Drawing.Point(629, 33);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(87, 17);
             this.label3.TabIndex = 19;
@@ -214,7 +193,7 @@
             // loadRefreshRepositories
             // 
             this.loadRefreshRepositories.Enabled = false;
-            this.loadRefreshRepositories.Location = new System.Drawing.Point(1014, 161);
+            this.loadRefreshRepositories.Location = new System.Drawing.Point(1014, 209);
             this.loadRefreshRepositories.Name = "loadRefreshRepositories";
             this.loadRefreshRepositories.Size = new System.Drawing.Size(130, 32);
             this.loadRefreshRepositories.TabIndex = 9;
@@ -224,40 +203,24 @@
             // 
             // repositoriesBox
             // 
+            this.repositoriesBox.DisplayMember = "Name";
             this.repositoriesBox.Enabled = false;
             this.repositoriesBox.FormattingEnabled = true;
             this.repositoriesBox.ItemHeight = 16;
             this.repositoriesBox.Location = new System.Drawing.Point(632, 61);
             this.repositoriesBox.Name = "repositoriesBox";
-            this.repositoriesBox.Size = new System.Drawing.Size(356, 132);
+            this.repositoriesBox.Size = new System.Drawing.Size(356, 180);
             this.repositoriesBox.Sorted = true;
             this.repositoriesBox.TabIndex = 16;
+            this.repositoriesBox.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.RepositoriesBox_Format);
             this.repositoriesBox.SelectedValueChanged += new System.EventHandler(this.RepositoriesBox_SelectedValueChanged);
-            // 
-            // repositoryDescriptionText
-            // 
-            this.repositoryDescriptionText.AutoSize = true;
-            this.repositoryDescriptionText.BackColor = System.Drawing.Color.Transparent;
-            this.repositoryDescriptionText.Location = new System.Drawing.Point(646, 240);
-            this.repositoryDescriptionText.Name = "repositoryDescriptionText";
-            this.repositoryDescriptionText.Size = new System.Drawing.Size(175, 17);
-            this.repositoryDescriptionText.TabIndex = 23;
-            this.repositoryDescriptionText.Text = "New repository description";
-            // 
-            // repositoryDescriptionTextbox
-            // 
-            this.repositoryDescriptionTextbox.Enabled = false;
-            this.repositoryDescriptionTextbox.Location = new System.Drawing.Point(822, 237);
-            this.repositoryDescriptionTextbox.Name = "repositoryDescriptionTextbox";
-            this.repositoryDescriptionTextbox.Size = new System.Drawing.Size(166, 22);
-            this.repositoryDescriptionTextbox.TabIndex = 11;
             // 
             // logTextBox
             // 
             this.logTextBox.Location = new System.Drawing.Point(56, 100);
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
-            this.logTextBox.Size = new System.Drawing.Size(512, 535);
+            this.logTextBox.Size = new System.Drawing.Size(512, 546);
             this.logTextBox.TabIndex = 14;
             this.logTextBox.Text = "";
             this.logTextBox.TextChanged += new System.EventHandler(this.LogTextBox_TextChanged);
@@ -276,7 +239,7 @@
             // 
             this.categoriesLabel.AutoSize = true;
             this.categoriesLabel.BackColor = System.Drawing.Color.Transparent;
-            this.categoriesLabel.Location = new System.Drawing.Point(629, 291);
+            this.categoriesLabel.Location = new System.Drawing.Point(629, 264);
             this.categoriesLabel.Name = "categoriesLabel";
             this.categoriesLabel.Size = new System.Drawing.Size(76, 17);
             this.categoriesLabel.TabIndex = 26;
@@ -284,7 +247,7 @@
             // 
             // tddFileProcessingProgressBar
             // 
-            this.tddFileProcessingProgressBar.Location = new System.Drawing.Point(711, 293);
+            this.tddFileProcessingProgressBar.Location = new System.Drawing.Point(711, 266);
             this.tddFileProcessingProgressBar.MarqueeAnimationSpeed = 25;
             this.tddFileProcessingProgressBar.Name = "tddFileProcessingProgressBar";
             this.tddFileProcessingProgressBar.Size = new System.Drawing.Size(277, 15);
@@ -295,7 +258,7 @@
             // loadIntoRepositoryButton
             // 
             this.loadIntoRepositoryButton.Enabled = false;
-            this.loadIntoRepositoryButton.Location = new System.Drawing.Point(632, 576);
+            this.loadIntoRepositoryButton.Location = new System.Drawing.Point(632, 587);
             this.loadIntoRepositoryButton.Name = "loadIntoRepositoryButton";
             this.loadIntoRepositoryButton.Size = new System.Drawing.Size(508, 59);
             this.loadIntoRepositoryButton.TabIndex = 13;
@@ -305,10 +268,10 @@
             // 
             // migrationProgressBar
             // 
-            this.migrationProgressBar.Location = new System.Drawing.Point(751, 641);
+            this.migrationProgressBar.Location = new System.Drawing.Point(632, 565);
             this.migrationProgressBar.MarqueeAnimationSpeed = 25;
             this.migrationProgressBar.Name = "migrationProgressBar";
-            this.migrationProgressBar.Size = new System.Drawing.Size(273, 15);
+            this.migrationProgressBar.Size = new System.Drawing.Size(356, 16);
             this.migrationProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.migrationProgressBar.TabIndex = 28;
             this.migrationProgressBar.Visible = false;
@@ -318,14 +281,12 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-            this.ClientSize = new System.Drawing.Size(1192, 678);
+            this.ClientSize = new System.Drawing.Size(1192, 683);
             this.Controls.Add(this.migrationProgressBar);
             this.Controls.Add(this.tddFileProcessingProgressBar);
             this.Controls.Add(this.categoriesLabel);
             this.Controls.Add(this.verifyUrlButton);
             this.Controls.Add(this.logTextBox);
-            this.Controls.Add(this.repositoryDescriptionText);
-            this.Controls.Add(this.repositoryDescriptionTextbox);
             this.Controls.Add(this.repositoriesBox);
             this.Controls.Add(this.loadRefreshRepositories);
             this.Controls.Add(this.label3);
@@ -337,8 +298,6 @@
             this.Controls.Add(this.categoriesListBox);
             this.Controls.Add(this.clearRepositoryButton);
             this.Controls.Add(this.createRepositoryButton);
-            this.Controls.Add(this.repositoryNameText);
-            this.Controls.Add(this.repositoryNameTextBox);
             this.Controls.Add(this.loadIntoRepositoryButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.TDDPathTextBox);
@@ -361,8 +320,6 @@
         private System.Windows.Forms.TextBox TDDPathTextBox;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox repositoryNameTextBox;
-        private System.Windows.Forms.Label repositoryNameText;
         private System.Windows.Forms.Button createRepositoryButton;
         private System.Windows.Forms.Button clearRepositoryButton;
         private System.Windows.Forms.CheckedListBox categoriesListBox;
@@ -373,15 +330,13 @@
         private System.Windows.Forms.Button deleteRepositoryButton;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button loadRefreshRepositories;
-        private System.Windows.Forms.ListBox repositoriesBox;
-        private System.Windows.Forms.Label repositoryDescriptionText;
-        private System.Windows.Forms.TextBox repositoryDescriptionTextbox;
-        private System.Windows.Forms.RichTextBox logTextBox;
         private System.Windows.Forms.Button verifyUrlButton;
         private System.Windows.Forms.Label categoriesLabel;
         private System.Windows.Forms.ProgressBar tddFileProcessingProgressBar;
         private System.Windows.Forms.Button loadIntoRepositoryButton;
         private System.Windows.Forms.ProgressBar migrationProgressBar;
+        public System.Windows.Forms.ListBox repositoriesBox;
+        public System.Windows.Forms.RichTextBox logTextBox;
     }
 }
 

@@ -74,6 +74,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateRepositoryDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateRepositoryDialog.Designer.cs">
+      <DependentUpon>CreateRepositoryDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="TdsMigrator.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -82,6 +88,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CreateRepositoryDialog.resx">
+      <DependentUpon>CreateRepositoryDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TdsMigrator.resx">
       <DependentUpon>TdsMigrator.cs</DependentUpon>
     </EmbeddedResource>
@@ -119,12 +128,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\fabric-texture-blue-background.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\514987530.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
@@ -137,8 +140,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="cropped-512px_Product-Logo-Icon.ico" />
     <Content Include="Icon.ico" />
+    <None Include="Resources\fonmdappd.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

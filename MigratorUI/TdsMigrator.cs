@@ -20,6 +20,7 @@ namespace MigratorUI {
             InitializeComponent();
         }
 
+
         private Dictionary<string, TestDataCategory> testData;
 
         private TdmDataDocument tdmDataSheet;
@@ -27,6 +28,8 @@ namespace MigratorUI {
         private string apiUrl;
 
         private Boolean migrationInWork;
+
+        public string ApiUrl { get => apiUrl; set => apiUrl = value; }
 
 
         //Initialization 
@@ -48,55 +51,44 @@ namespace MigratorUI {
                 filteredTestData = testData;
             }
             PrintEstimatedWaitTimeMessage(filteredTestData);
-            return await HttpRequest.Migrate(filteredTestData, repositoriesBox.SelectedItem.ToString(), apiUrl);
+            return await HttpRequest.Migrate(filteredTestData, (TestDataRepository)repositoriesBox.SelectedItem, ApiUrl);
         }
 
-        private void ClearRepository(string repositoryName) {
+        private void ClearRepository(TestDataRepository repository) {
             DialogResult confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
                                                          "Clear " + repositoriesBox.SelectedItem + " repository",
                                                          MessageBoxButtons.OKCancel,
                                                          MessageBoxIcon.Warning);
             if (confirmResult == DialogResult.OK) {
-                Boolean clearanceSuccessful = HttpRequest.ClearRepository(repositoryName).IsSuccessStatusCode;
+                Boolean clearanceSuccessful = HttpRequest.ClearRepository(repository).IsSuccessStatusCode;
                 if (clearanceSuccessful) {
-                    PrintClearedRepositoryMessage(repositoryName);
+                    PrintClearedRepositoryMessage(repository);
                 } else {
-                    logTextBox.AppendText("Could not clear " + repositoryName + "\n");
+                    logTextBox.AppendText("Could not clear " + repository.Name + "\n");
                 }
             }
         }
 
-        private void DeleteRepository(string repositoryName) {
+        private void DeleteRepository(TestDataRepository repository) {
             DialogResult confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
                                                          "Clear " + repositoriesBox.SelectedItem + " repository",
                                                          MessageBoxButtons.OKCancel,
                                                          MessageBoxIcon.Warning);
-
+        
             if (confirmResult == DialogResult.OK) {
-                Boolean deletionSuccessful = HttpRequest.ClearRepository(repositoryName).IsSuccessStatusCode
-                                             && HttpRequest.DeleteRepository(repositoryName).IsSuccessStatusCode;
+                Boolean deletionSuccessful = HttpRequest.ClearRepository(repository).IsSuccessStatusCode
+                                             && HttpRequest.DeleteRepository(repository).IsSuccessStatusCode;
 
                 if (deletionSuccessful) {
-                    PrintDeletedRepositoryMessage(repositoryName);
-                    repositoriesBox.Items.Remove(repositoryName);
+                    PrintDeletedRepositoryMessage(repository);
+                    repositoriesBox.Items.Remove(repository);
+                    if (repositoriesBox.Items.Count > 0)
+                    {
+                        repositoriesBox.SelectedItem = repositoriesBox.Items[0];
+                    }
                 } else {
-                    logTextBox.AppendText("Could not delete " + repositoryName + "\n");
+                    logTextBox.AppendText("Could not delete " + repository.Name + "\n");
                 }
-
-                if (repositoriesBox.Items.Count > 0) {
-                    repositoriesBox.SelectedItem = repositoriesBox.Items[0];
-                }
-            }
-        }
-
-        private void CreateRepository(string repositoryName, string repositoryDescription) {
-            Boolean creationSuccessful = HttpRequest.CreateRepository(repositoryName, repositoryDescription, apiUrl).IsSuccessStatusCode;
-            if (creationSuccessful) {
-                logTextBox.AppendText(PrintCreatedRepositoryMessage(repositoryName, repositoryDescriptionTextbox.Text));
-                repositoriesBox.Items.Add(repositoryName);
-                repositoriesBox.SelectedItem = repositoryName;
-            } else {
-                logTextBox.AppendText("Could not create repository " + repositoryName + "\n");
             }
         }
 
@@ -112,7 +104,6 @@ namespace MigratorUI {
         }
 
         private async void ProcessTddFile() {
-
             TddFileProcessingInWork();
             await Task.Delay(10);
             tdmDataSheet = new TdmDataDocument(TDDPathTextBox.Text);
@@ -138,33 +129,6 @@ namespace MigratorUI {
             return (int)(35 * CountNumberOfObjects(data) / (float)2713) + 1;
         }
 
-        private string RemoveCategorySizeFromString(string category) {
-            //ex : "People (5)" ---> "People"
-            return category.Remove(category.LastIndexOf(" ", StringComparison.Ordinal));
-        }
-
-        private Boolean IsValidRepositoryName(string repositoryName) {
-            if (repositoryName == "") {
-                logTextBox.AppendText("Please enter a repository name");
-                return false;
-            }
-            if (repositoriesBox.Items.Contains(repositoryNameTextBox.Text))
-            {
-                logTextBox.AppendText("Repository \"" + repositoryNameTextBox.Text + "\" already exists \n");
-                return false;
-            }
-            char[] unallowedRepositoryCharacters = { '/', '|', '\\', '<', '>', '#', '*', '+', ':', ';', '"', '.', ',', '?' };
-            foreach (char unallowedCharacter in unallowedRepositoryCharacters) {
-                if (repositoryName.Contains(unallowedCharacter.ToString())) {
-                    logTextBox.AppendText("A repository name cannot contain the following characters :\n");
-                    foreach (char character in unallowedRepositoryCharacters) {
-                           logTextBox.AppendText(character+ " ");
-                    }
-                    return false;
-                }
-            }
-            return true;
-        }
 
         private Boolean ApplyFilter() {
             return categoriesListBox.SelectedItems.Count < categoriesListBox.Items.Count;
@@ -238,8 +202,6 @@ namespace MigratorUI {
             loadIntoRepositoryButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             loadRefreshRepositories.Enabled = apiConnectionOk;
             repositoriesBox.Enabled = apiConnectionOk;
-            repositoryDescriptionTextbox.Enabled = apiConnectionOk;
-            repositoryNameTextBox.Enabled = apiConnectionOk;
             categoriesListBox.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             selectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             deselectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
@@ -255,43 +217,40 @@ namespace MigratorUI {
             }
         }
 
-        private void RefreshRepositoriesList() {
-            repositoriesBox.Items.Clear();
-            List<TestDataRepository> repositories = JsonConvert.DeserializeObject<List<TestDataRepository>>(HttpRequest.GetRepositories());
-
-            foreach (TestDataRepository repository in repositories) {
-                repositoriesBox.Items.Add(repository.Name);
+        public void RefreshRepositoriesList() {
+            TestDataRepository previouslySelectedRepository = null;
+            if (repositoriesBox.SelectedItem!=null) {
+                previouslySelectedRepository = (TestDataRepository)repositoriesBox.SelectedItem;
             }
-            if (repositoriesBox.Items.Count > 0) {
+            repositoriesBox.Items.Clear();
+            List<TestDataRepository> repositories = HttpRequest.GetRepositories();
+            foreach (TestDataRepository repository in repositories) {
+                repositoriesBox.Items.Add(repository);
+            }
+            if (previouslySelectedRepository!=null && repositoriesBox.Items.Contains(previouslySelectedRepository)) {
+                repositoriesBox.SelectedItem = previouslySelectedRepository;
+            } else if (repositoriesBox.Items.Count!=0) {
                 repositoriesBox.SelectedItem = repositoriesBox.Items[0];
             }
         }
 
         //logText message generation methoids
-        private string PrintCreatedRepositoryMessage(string name, string description) {
-            StringBuilder s = new StringBuilder();
-            s.Append("Repository Created : " + name);
-            if (description != "") {
-                s.Append(" , Description : " + description);
-            }
 
-            s.Append("\n");
-            return s.ToString();
+        private void PrintDeletedRepositoryMessage(TestDataRepository repository) {
+            logTextBox.AppendText("Repository Deleted : " + repository.Name + "\n");
         }
 
-        private void PrintDeletedRepositoryMessage(string name) {
-            logTextBox.AppendText("Repository Deleted : " + name + "\n");
+        private void PrintClearedRepositoryMessage(TestDataRepository repository) {
+            logTextBox.AppendText("Repository Cleared : " + repository.Name + "\n");
         }
-
-        private void PrintClearedRepositoryMessage(string name) {
-            logTextBox.AppendText("Repository Cleared : " + name + "\n");
+        private void PrintMigrationLaunchedMessage(int numberOfCategories, TestDataRepository repository)
+        {
+            logTextBox.AppendText("Migrating " + numberOfCategories + " categories into \"" + ((TestDataRepository)repositoriesBox.SelectedItem).Name + "\". Please wait...\n");
         }
-
-        private void PrintMigrationFinishedMessage(int numberOfCategories, string repositoryName) {
+        private void PrintMigrationFinishedMessage(int numberOfCategories, TestDataRepository repository) {
             logTextBox.AppendText("Successfully migrated " + numberOfCategories + " out of " + categoriesListBox.Items.Count + " available categories into the repository : \""
-                                  + repositoryName + "\".\n");
+                                  + repository.Name + "\".\n");
         }
-
         private void PrintEstimatedWaitTimeMessage(Dictionary<string, TestDataCategory> data) {
             if (EstimatedWaitTime(data) > 5) {
                 logTextBox.AppendText("Estimated waiting time : " + EstimatedWaitTime(data) + " seconds\n");
@@ -306,11 +265,11 @@ namespace MigratorUI {
                 logTextBox.AppendText("Please pick at least one category\n");
             } else {
                 int numberOfCategories = categoriesListBox.CheckedItems.Count;
-                logTextBox.AppendText("Migrating " + numberOfCategories + " categories into \"" + repositoriesBox.SelectedItem + "\". Please wait...\n");
+                PrintMigrationLaunchedMessage(numberOfCategories, (TestDataRepository)repositoriesBox.SelectedItem);
                 MigrationInWork(true);
                 await LaunchMigration();
                 MigrationInWork(false);
-                PrintMigrationFinishedMessage(numberOfCategories, repositoriesBox.SelectedItem.ToString());
+                PrintMigrationFinishedMessage(numberOfCategories, (TestDataRepository)repositoriesBox.SelectedItem);
             }
         }
 
@@ -328,15 +287,14 @@ namespace MigratorUI {
         }
 
         private void CreateRepositoryButton_Click(object sender, EventArgs e) {
-            RefreshRepositoriesList();
-            if (IsValidRepositoryName(repositoryNameTextBox.Text)) {
-                CreateRepository(repositoryNameTextBox.Text, repositoryDescriptionTextbox.Text);
-            } 
+            
+
+            new CreateRepositoryDialog(this).ShowDialog();
         }
 
         private void ClearRepositoryButton_Click(object sender, EventArgs e) {
             if (repositoriesBox.SelectedItem != null) {
-                ClearRepository(repositoriesBox.SelectedItem.ToString());
+                ClearRepository((TestDataRepository)repositoriesBox.SelectedItem);
             } else {
                 logTextBox.AppendText("Please select a repository to clear \n");
             }
@@ -344,7 +302,7 @@ namespace MigratorUI {
 
         private void DeleteRepositoryButton_Click(object sender, EventArgs e) {
             if (repositoriesBox.SelectedItem != null) {
-                DeleteRepository(repositoriesBox.SelectedItem.ToString());
+                DeleteRepository((TestDataRepository)repositoriesBox.SelectedItem);
             } else {
                 logTextBox.AppendText("Please select a repository to delete \n");
             }
@@ -373,7 +331,7 @@ namespace MigratorUI {
             } else {
                 Boolean connectionSuccessfull = HttpRequest.SetConnection(apiUrlTextBox.Text);
                 if (connectionSuccessfull) {
-                    apiUrl = apiUrlTextBox.Text;
+                    ApiUrl = apiUrlTextBox.Text;
                     apiUrlTextBox.BackColor = Color.Lime;
                     ApiConnectionOk(true, sender, e);
                     verifyUrlButton.Text = "Change URL";
@@ -399,12 +357,28 @@ namespace MigratorUI {
 
         private void RepositoriesBox_SelectedValueChanged(object sender, EventArgs e)
         {
-            loadIntoRepositoryButton.Text = "Load categories into repository : \" " + repositoriesBox.SelectedItem + " \"";
+            if (repositoriesBox.SelectedItem!=null) {
+                loadIntoRepositoryButton.Text = "Load categories into repository : \" " + ((TestDataRepository)repositoriesBox.SelectedItem).Name + " \"";
+            }
         }
 
         private void CategoriesListBox_Format(object sender, ListControlConvertEventArgs e)
         {
             e.Value = ((TestDataCategory)e.ListItem).Name + " (" + ((TestDataCategory)e.ListItem).ElementCount+")";
+        }
+
+        private void CategoriesListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            categoriesListBox.ClearSelected();
+        }
+
+        private void RepositoriesBox_Format(object sender, ListControlConvertEventArgs e)
+        {
+            if (((TestDataRepository)e.ListItem).Description != "") {
+                e.Value = ((TestDataRepository)e.ListItem).Name + " (" + ((TestDataRepository)e.ListItem).Description + ")";
+            } else {
+                e.Value = ((TestDataRepository)e.ListItem).Name;
+            }
         }
     }
 }
