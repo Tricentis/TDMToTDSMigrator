@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Reflection;
 using System.Xml;
 
 using Newtonsoft.Json.Linq;
@@ -21,17 +20,6 @@ namespace TDMtoTDSMigrator {
         public List<MetaInfoAssociation> MetaInfoAssociations;
 
         public Dictionary<string, List<StringAttribute>> StringAttributes;
-
-        public int NumberOfObjects {
-            get {
-                if (StringAttributes != null) {
-                    return StringAttributes.Keys.Count;
-                }
-                return 0;
-            }
-        }
-
-        public int estimatedMigrationTime;
 
 
         public TdmDataDocument(string tddPath) {
