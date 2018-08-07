@@ -56,8 +56,6 @@
     <Compile Include="TdmDataDocument.cs" />
     <Compile Include="HttpRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RawDataObject.cs" />
-    <Compile Include="XmlParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

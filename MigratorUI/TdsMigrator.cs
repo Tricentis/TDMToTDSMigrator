@@ -36,8 +36,6 @@ namespace MigratorUI {
             logTextBox.AppendText(
                     "Welcome to Tricentis TDM to TDS Migrator.\nPlease enter a valid API URL and click on \"Verify Url\". \nExample : http://localhost:80/testdataservice \n");
             verifyUrlButton.Select();
-
-
         }
 
         //Migration and API related methods
@@ -105,13 +103,11 @@ namespace MigratorUI {
         }
 
         private void CheckForAssociations() {
-            RawDataObject obj = new RawDataObject();
             StringBuilder stringBuilder = new StringBuilder();
             if (tdmDataSheet.MetaInfoAssociations.Count != 0) {
                 stringBuilder.Append("Please note that the following associations will no longer be supported by Tricentis TDS :\n\n");
                 foreach (MetaInfoAssociation metaInfoAssociation in tdmDataSheet.MetaInfoAssociations) {
-                    obj.SetCategoryId(metaInfoAssociation.AssociatedCategoryId);
-                    stringBuilder.Append(metaInfoAssociation.CategoryName + " and " + obj.FindCategoryName(tdmDataSheet) + "\n");
+                    stringBuilder.Append(metaInfoAssociation.CategoryName + " and " + tdmDataSheet.FindCategoryName(metaInfoAssociation.PartnerId) + "\n");
                 }
                 MessageBox.Show(stringBuilder.ToString(), "Associations not supported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
@@ -121,13 +117,12 @@ namespace MigratorUI {
 
             TddFileProcessingInWork();
             await Task.Delay(10);
-            tdmDataSheet = new TdmDataDocument(XmlParser.DecompressTddFileIntoXml(new FileInfo(TDDPathTextBox.Text)));
+            tdmDataSheet = new TdmDataDocument(TDDPathTextBox.Text);
             BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (s, r) => { r.Result = XmlParser.CreateDataList(tdmDataSheet); };
+            worker.DoWork += (s, r) => { r.Result = tdmDataSheet.CreateDataList(); };
             worker.RunWorkerCompleted += (s, r) => {
                                              testData = (Dictionary<string, List<TestDataObject>>)r.Result;
                                              TddFileProcessingFinished();
-
                                          };
             worker.RunWorkerAsync();
         }
@@ -180,8 +175,19 @@ namespace MigratorUI {
         //UI element attributes and logText methods 
         private void LoadCategoriesIntoListBox() {
             categoriesListBox.Items.Clear();
+            Boolean oneCategoryIsEmpty=false;
+            StringBuilder emptyCategoriesStringBuilder = new StringBuilder();
+            emptyCategoriesStringBuilder.Append("\nThe following categories were empty and have been removed from the list :\n");
             foreach (string category in testData.Keys) {
-                categoriesListBox.Items.Add(category + " (" + testData[category].Count + ")", true);
+                if (testData[category].Count!=0) {
+                    categoriesListBox.Items.Add(category + " (" + testData[category].Count + ")", true);
+                } else {
+                    oneCategoryIsEmpty = true;
+                    emptyCategoriesStringBuilder.Append(category + ", ");
+                }
+            }
+            if (oneCategoryIsEmpty) {
+                logTextBox.AppendText(emptyCategoriesStringBuilder.Remove(emptyCategoriesStringBuilder.ToString().LastIndexOf(", ", StringComparison.Ordinal),2).ToString());
             }
         }
 
@@ -201,7 +207,7 @@ namespace MigratorUI {
             LoadCategoriesIntoListBox();
             CheckForAssociations();
             logTextBox.AppendText(
-                    "\n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n\n");
+                    "\n\nPlease filter out the categories you need, pick a target repository, then click \"Load categories into repository\" to launch the transfer.\n");
             loadIntoRepositoryButton.Enabled = true;
             categoriesListBox.Enabled = true;
             selectAllButton.Enabled = true;
@@ -300,13 +306,12 @@ namespace MigratorUI {
             } else if (categoriesListBox.CheckedItems.Count == 0) {
                 logTextBox.AppendText("Please pick at least one category\n");
             } else {
-                logTextBox.AppendText("Migrating " + categoriesListBox.CheckedItems.Count + " categories into \"" + repositoriesBox.SelectedItem + "\". Please wait...\n");
+                int numberOfCategories = categoriesListBox.CheckedItems.Count;
+                logTextBox.AppendText("Migrating " + numberOfCategories + " categories into \"" + repositoriesBox.SelectedItem + "\". Please wait...\n");
                 MigrationInWork(true);
-
                 await LaunchMigration();
-
-                PrintMigrationFinishedMessage(categoriesListBox.CheckedItems.Count, repositoriesBox.SelectedItem.ToString());
                 MigrationInWork(false);
+                PrintMigrationFinishedMessage(numberOfCategories, repositoriesBox.SelectedItem.ToString());
             }
         }
 
