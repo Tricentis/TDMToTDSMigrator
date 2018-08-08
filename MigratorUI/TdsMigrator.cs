@@ -33,6 +33,30 @@ namespace MigratorUI {
         }
 
         //Migration and API related methods
+        private void VerifyUrl(string apiUrl) {
+            if (verifyUrlButton.Text == "Change URL") {
+                verifyUrlButton.Text = "Verify URL";
+                ApiConnectionOk(false);
+            } else {
+                bool connectionSuccessfull = HttpRequest.SetConnection(apiUrl);
+                if (connectionSuccessfull) {
+                    this.ApiUrl = apiUrl;
+                    apiUrlTextBox.BackColor = Color.Lime;
+                    ApiConnectionOk(true);
+                    verifyUrlButton.Text = "Change URL";
+                    logTextBox.AppendText("Valid URL. \n");
+                    if (string.IsNullOrEmpty(TDDPathTextBox.Text)) {
+                        logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
+                    }
+                } else {
+                    apiUrlTextBox.BackColor = Color.PaleVioletRed;
+                    ApiConnectionOk(false);
+                    repositoriesBox.Items.Clear();
+                    logTextBox.AppendText("Not a valid URL.\n");
+                }
+            }
+        }
+
         private async void ProcessTddFile() {
             TddFileProcessingInWork();
             await Task.Delay(10);
@@ -162,10 +186,9 @@ namespace MigratorUI {
 
         private void LoadCategoriesIntoListBox() {
             categoriesListBox.Items.Clear();
-            categoriesListBox.ValueMember = "Name";
-            foreach (string category in testData.Keys) {
-                if (testData[category].ElementCount != 0) {
-                    categoriesListBox.Items.Add(testData[category], true);
+            foreach (TestDataCategory category in testData.Values) {
+                if (category.ElementCount != 0) {
+                    categoriesListBox.Items.Add(category, true);
                 }
             }
             PrintEmptyCategoriesWarningMessage();
@@ -268,29 +291,7 @@ namespace MigratorUI {
 
         //OnEvent methods
         private void VerifyUrlButton_Click(object sender, EventArgs e) {
-            if (verifyUrlButton.Text == "Change URL") {
-                verifyUrlButton.Text = "Verify URL";
-                ApiConnectionOk(false);
-            } else {
-                bool connectionSuccessfull = HttpRequest.SetConnection(apiUrlTextBox.Text);
-                if (connectionSuccessfull) {
-                    ApiUrl = apiUrlTextBox.Text;
-                    apiUrlTextBox.BackColor = Color.Lime;
-                    ApiConnectionOk(true);
-                    verifyUrlButton.Text = "Change URL";
-                    logTextBox.AppendText("Valid URL. \n");
-                    if (string.IsNullOrEmpty(TDDPathTextBox.Text)) {
-                        logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
-                    }
-                    //for testing purposes, delete for release
-                    repositoriesBox.SelectedItem = "data";
-                } else {
-                    apiUrlTextBox.BackColor = Color.PaleVioletRed;
-                    ApiConnectionOk(false);
-                    repositoriesBox.Items.Clear();
-                    logTextBox.AppendText("Not a valid URL.\n");
-                }
-            }
+            VerifyUrl(apiUrlTextBox.Text);
         }
 
         private void PickFileButton_Click(object sender, EventArgs e) {

@@ -80,7 +80,6 @@
             this.repositoryTypeComboBox.Size = new System.Drawing.Size(406, 24);
             this.repositoryTypeComboBox.TabIndex = 4;
             this.repositoryTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.RepositoryTypeComboBox_SelectedIndexChanged);
-            this.repositoryTypeComboBox.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.RepositoryTypeComboBox_Format);
             // 
             // repositoryDescriptionText
             // 

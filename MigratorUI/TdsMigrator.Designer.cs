@@ -56,7 +56,7 @@
             // 
             this.pickFileButton.BackColor = System.Drawing.SystemColors.Control;
             this.pickFileButton.Enabled = false;
-            this.pickFileButton.Location = new System.Drawing.Point(438, 60);
+            this.pickFileButton.Location = new System.Drawing.Point(438, 70);
             this.pickFileButton.Name = "pickFileButton";
             this.pickFileButton.Size = new System.Drawing.Size(130, 27);
             this.pickFileButton.TabIndex = 4;
@@ -67,7 +67,7 @@
             // TDDPathTextBox
             // 
             this.TDDPathTextBox.Enabled = false;
-            this.TDDPathTextBox.Location = new System.Drawing.Point(164, 62);
+            this.TDDPathTextBox.Location = new System.Drawing.Point(164, 72);
             this.TDDPathTextBox.Name = "TDDPathTextBox";
             this.TDDPathTextBox.Size = new System.Drawing.Size(248, 22);
             this.TDDPathTextBox.TabIndex = 3;
@@ -84,7 +84,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Location = new System.Drawing.Point(57, 67);
+            this.label1.Location = new System.Drawing.Point(57, 77);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(101, 17);
             this.label1.TabIndex = 2;
@@ -154,7 +154,7 @@
             // 
             this.apiURL.AutoSize = true;
             this.apiURL.BackColor = System.Drawing.Color.Transparent;
-            this.apiURL.Location = new System.Drawing.Point(57, 36);
+            this.apiURL.Location = new System.Drawing.Point(57, 38);
             this.apiURL.Name = "apiURL";
             this.apiURL.Size = new System.Drawing.Size(69, 17);
             this.apiURL.TabIndex = 13;
@@ -163,7 +163,7 @@
             // apiUrlTextBox
             // 
             this.apiUrlTextBox.BackColor = System.Drawing.Color.White;
-            this.apiUrlTextBox.Location = new System.Drawing.Point(164, 33);
+            this.apiUrlTextBox.Location = new System.Drawing.Point(164, 35);
             this.apiUrlTextBox.Name = "apiUrlTextBox";
             this.apiUrlTextBox.Size = new System.Drawing.Size(248, 22);
             this.apiUrlTextBox.TabIndex = 1;
@@ -217,19 +217,19 @@
             // 
             // logTextBox
             // 
-            this.logTextBox.Location = new System.Drawing.Point(56, 100);
+            this.logTextBox.Location = new System.Drawing.Point(56, 111);
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
-            this.logTextBox.Size = new System.Drawing.Size(512, 546);
+            this.logTextBox.Size = new System.Drawing.Size(512, 535);
             this.logTextBox.TabIndex = 14;
             this.logTextBox.Text = "";
             this.logTextBox.TextChanged += new System.EventHandler(this.LogTextBox_TextChanged);
             // 
             // verifyUrlButton
             // 
-            this.verifyUrlButton.Location = new System.Drawing.Point(438, 32);
+            this.verifyUrlButton.Location = new System.Drawing.Point(438, 29);
             this.verifyUrlButton.Name = "verifyUrlButton";
-            this.verifyUrlButton.Size = new System.Drawing.Size(130, 25);
+            this.verifyUrlButton.Size = new System.Drawing.Size(130, 35);
             this.verifyUrlButton.TabIndex = 2;
             this.verifyUrlButton.Text = "Verify Url";
             this.verifyUrlButton.UseVisualStyleBackColor = true;

@@ -71,7 +71,7 @@ namespace TDMtoTDSMigrator {
                 foreach (TestDataObject obj in testData[category].Elements) {
                     message = PostObject(JsonConvert.SerializeObject(obj), repository, apiUrl);
                 }
-            } 
+            }
             return message;
         }
 
@@ -80,32 +80,26 @@ namespace TDMtoTDSMigrator {
         //DELETE AFTER INMEMORY API BUGFIX
         //
         //
-        public static async Task<HttpResponseMessage> MigrateInMemory(Dictionary<string, TestDataCategory> testData, TestDataRepository repository, string apiUrl)
-        {
-            foreach (string category in testData.Keys)
-            {
-                foreach (TestDataObject obj in testData[category].Elements)
-                {
+        public static async Task<HttpResponseMessage> MigrateInMemory(Dictionary<string, TestDataCategory> testData, TestDataRepository repository, string apiUrl) {
+            foreach (string category in testData.Keys) {
+                foreach (TestDataObject obj in testData[category].Elements) {
                     await PostObject(JsonConvert.SerializeObject(obj), repository, apiUrl);
                 }
             }
             return new HttpResponseMessage();
         }
 
-        public static int EstimatedMigrationWaitTime(Dictionary<string, TestDataCategory> data, TestDataRepository repository)
-        {
+        public static int EstimatedMigrationWaitTime(Dictionary<string, TestDataCategory> data, TestDataRepository repository) {
             //
             //
             //DELETE AFTER INMEMORY API BUGFIX
             //
             //
-            if (repository.Type == DataBaseType.InMemory)
-            {
+            if (repository.Type == DataBaseType.InMemory) {
                 return (int)(230 * TdmDataDocument.CountNumberOfObjects(data) / (float)618);
             }
             //in seconds, based on the number of objects
             return (int)(35 * TdmDataDocument.CountNumberOfObjects(data) / (float)2713) + 1;
         }
-
     }
 }

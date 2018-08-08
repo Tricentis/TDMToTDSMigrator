@@ -10,7 +10,6 @@ using TestDataContract.TestData;
 
 namespace TDMtoTDSMigrator {
     public class TdmDataDocument {
-
         public XmlNode RepositoryDump;
 
         public Dictionary<string, MetaInfoType> MetaInfoTypes;
@@ -20,7 +19,6 @@ namespace TDMtoTDSMigrator {
         public List<MetaInfoAssociation> MetaInfoAssociations;
 
         public Dictionary<string, List<StringAttribute>> StringAttributes;
-
 
         public TdmDataDocument(string tddPath) {
             XmlDocument doc = new XmlDocument();
@@ -116,7 +114,6 @@ namespace TDMtoTDSMigrator {
                     StringAttributes.Add(node.Attributes?[0].Value ?? throw new InvalidOperationException(), new List<StringAttribute>());
                     StringAttributes[node.Attributes?[0].Value].Add(new StringAttribute(this, node));
                 }
-
             }
         }
 
@@ -165,16 +162,12 @@ namespace TDMtoTDSMigrator {
             return null;
         }
 
-        public static int CountNumberOfObjects(Dictionary<string, TestDataCategory> data)
-        {
+        public static int CountNumberOfObjects(Dictionary<string, TestDataCategory> data) {
             int numberOfObjects = 0;
-            foreach (string category in data.Keys)
-            {
+            foreach (string category in data.Keys) {
                 numberOfObjects += data[category].ElementCount;
             }
             return numberOfObjects;
         }
-
     }
-
 }
