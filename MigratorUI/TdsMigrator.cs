@@ -362,7 +362,10 @@ namespace MigratorUI {
         }
 
         private void ReverseButton_Click(object sender, EventArgs e) {
-
+            for (int i = 0; i < categoriesListBox.Items.Count; i++)
+            {
+                categoriesListBox.SetItemChecked(i, !categoriesListBox.GetItemChecked(i));
+            }
         }
 
         private async void LoadIntoRepositoryButton_Click(object sender, EventArgs e) {
