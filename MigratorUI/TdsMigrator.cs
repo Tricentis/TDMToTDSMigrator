@@ -78,6 +78,7 @@ namespace MigratorUI {
                     stringBuilder.Append(metaInfoAssociation.CategoryName + " and " + tdmDataSheet.FindCategoryName(metaInfoAssociation.PartnerId) + "\n");
                 }
                 MessageBox.Show(stringBuilder.ToString(), "Associations not supported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                
             }
         }
 
@@ -118,10 +119,7 @@ namespace MigratorUI {
         }
 
         private async Task<HttpResponseMessage> LaunchMigration() {
-            Dictionary<string, TestDataCategory> filteredTestData = new Dictionary<string, TestDataCategory>();
-            foreach (TestDataCategory category in categoriesListBox.CheckedItems) {
-                filteredTestData.Add(category.Name, category);
-            }
+            Dictionary<string, TestDataCategory> filteredTestData = FilterTestData();
             PrintEstimatedWaitTimeMessage(filteredTestData, (TestDataRepository)repositoriesBox.SelectedItem);
             //
             //
@@ -132,6 +130,15 @@ namespace MigratorUI {
                 return await HttpRequest.MigrateInMemory(filteredTestData, (TestDataRepository)repositoriesBox.SelectedItem, ApiUrl);
             }
             return await HttpRequest.Migrate(filteredTestData, (TestDataRepository)repositoriesBox.SelectedItem, ApiUrl);
+        }
+
+        private Dictionary<string, TestDataCategory> FilterTestData() {
+            Dictionary<string, TestDataCategory> filteredTestData = new Dictionary<string, TestDataCategory>();
+            foreach (TestDataCategory category in categoriesListBox.CheckedItems)
+            {
+                filteredTestData.Add(category.Name, category);
+            }
+            return filteredTestData;
         }
 
         //UI element attributes and logText methods 
@@ -173,6 +180,7 @@ namespace MigratorUI {
         private void TddFileProcessingFinished() {
             PrintNumberOfRecordsAndCategoriesFoundMessage();
             LoadCategoriesIntoListBox();
+            tddFileProcessingProgressBar.Visible = false;
             CheckForAssociations();
             PrintTddProcessingFinishedMessage();
             loadIntoRepositoryButton.Enabled = true;
@@ -181,7 +189,6 @@ namespace MigratorUI {
             deselectAllButton.Enabled = true;
             verifyUrlButton.Enabled = true;
             pickFileButton.Enabled = true;
-            tddFileProcessingProgressBar.Visible = false;
         }
 
         private void LoadCategoriesIntoListBox() {
