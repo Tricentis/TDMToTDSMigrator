@@ -50,6 +50,7 @@
             this.tddFileProcessingProgressBar = new System.Windows.Forms.ProgressBar();
             this.loadIntoRepositoryButton = new System.Windows.Forms.Button();
             this.migrationProgressBar = new System.Windows.Forms.ProgressBar();
+            this.reverseButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // pickFileButton
@@ -258,7 +259,7 @@
             this.verifyUrlButton.Name = "verifyUrlButton";
             this.verifyUrlButton.Size = new System.Drawing.Size(130, 28);
             this.verifyUrlButton.TabIndex = 2;
-            this.verifyUrlButton.Text = "Verify Url";
+            this.verifyUrlButton.Text = "Verify URL";
             this.verifyUrlButton.UseVisualStyleBackColor = false;
             this.verifyUrlButton.Click += new System.EventHandler(this.VerifyUrlButton_Click);
             // 
@@ -307,6 +308,20 @@
             this.migrationProgressBar.TabIndex = 28;
             this.migrationProgressBar.Visible = false;
             // 
+            // reverseButton
+            // 
+            this.reverseButton.BackColor = System.Drawing.Color.Gainsboro;
+            this.reverseButton.Enabled = false;
+            this.reverseButton.FlatAppearance.BorderSize = 0;
+            this.reverseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.reverseButton.Location = new System.Drawing.Point(972, 381);
+            this.reverseButton.Name = "reverseButton";
+            this.reverseButton.Size = new System.Drawing.Size(130, 33);
+            this.reverseButton.TabIndex = 29;
+            this.reverseButton.Text = "Reverse";
+            this.reverseButton.UseVisualStyleBackColor = false;
+            this.reverseButton.Click += new System.EventHandler(this.ReverseButton_Click);
+            // 
             // TdsMigrator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -314,6 +329,7 @@
             this.BackColor = System.Drawing.SystemColors.MenuBar;
             this.BackgroundImage = global::MigratorUI.Properties.Resources.fonmdappd;
             this.ClientSize = new System.Drawing.Size(1141, 683);
+            this.Controls.Add(this.reverseButton);
             this.Controls.Add(this.migrationProgressBar);
             this.Controls.Add(this.tddFileProcessingProgressBar);
             this.Controls.Add(this.categoriesLabel);
@@ -369,6 +385,7 @@
         private System.Windows.Forms.ProgressBar migrationProgressBar;
         public System.Windows.Forms.ListBox repositoriesBox;
         public System.Windows.Forms.RichTextBox logTextBox;
+        private System.Windows.Forms.Button reverseButton;
     }
 }
 

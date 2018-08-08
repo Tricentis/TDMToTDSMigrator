@@ -26,6 +26,7 @@ namespace MigratorUI {
             InitializeComponent();
         }
 
+
         //Initialization 
         private void TdsMigrator_Load(object sender, EventArgs e) {
             PrintWelcomeMessage();
@@ -34,10 +35,7 @@ namespace MigratorUI {
 
         //Migration and API related methods
         private void VerifyUrl(string apiUrl) {
-            if (verifyUrlButton.Text == "Change URL") {
-                verifyUrlButton.Text = "Verify URL";
-                ApiConnectionOk(false);
-            } else {
+            if (verifyUrlButton.Text == "Verify URL") {
                 bool connectionSuccessfull = HttpRequest.SetConnection(apiUrl);
                 if (connectionSuccessfull) {
                     this.ApiUrl = apiUrl;
@@ -48,17 +46,21 @@ namespace MigratorUI {
                     if (string.IsNullOrEmpty(TDDPathTextBox.Text)) {
                         logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
                     }
-                } else {
+                }
+                else {
                     apiUrlTextBox.BackColor = Color.PaleVioletRed;
                     ApiConnectionOk(false);
                     repositoriesBox.Items.Clear();
                     logTextBox.AppendText("Not a valid URL.\n");
                 }
+            } else {
+                verifyUrlButton.Text = "Verify URL";
+                ApiConnectionOk(false);
             }
         }
 
         private async void ProcessTddFile() {
-            TddFileProcessingInWork();
+            TddFileProcessingLaunched();
             await Task.Delay(10);
             tdmDataSheet = new TdmDataDocument(TDDPathTextBox.Text);
             BackgroundWorker worker = new BackgroundWorker();
@@ -154,6 +156,7 @@ namespace MigratorUI {
             categoriesListBox.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             selectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             deselectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
+            reverseButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             apiUrlTextBox.Enabled = !apiConnectionOk & !migrationInWork;
             pickFileButton.Enabled = apiConnectionOk & !migrationInWork;
 
@@ -166,12 +169,13 @@ namespace MigratorUI {
             }
         }
 
-        private void TddFileProcessingInWork() {
+        private void TddFileProcessingLaunched() {
             PrintTddProcessingLaunchedMessage();
             loadIntoRepositoryButton.Enabled = false;
             categoriesListBox.Enabled = false;
             selectAllButton.Enabled = false;
             deselectAllButton.Enabled = false;
+            reverseButton.Enabled = false;
             verifyUrlButton.Enabled = false;
             pickFileButton.Enabled = false;
             tddFileProcessingProgressBar.Visible = true;
@@ -187,6 +191,7 @@ namespace MigratorUI {
             categoriesListBox.Enabled = true;
             selectAllButton.Enabled = true;
             deselectAllButton.Enabled = true;
+            reverseButton.Enabled = true;
             verifyUrlButton.Enabled = true;
             pickFileButton.Enabled = true;
         }
@@ -356,6 +361,10 @@ namespace MigratorUI {
             }
         }
 
+        private void ReverseButton_Click(object sender, EventArgs e) {
+
+        }
+
         private async void LoadIntoRepositoryButton_Click(object sender, EventArgs e) {
             if (repositoriesBox.SelectedItem == null) {
                 logTextBox.AppendText("Please pick a repository, or create one\n");
@@ -390,6 +399,11 @@ namespace MigratorUI {
 
         private void CategoriesListBox_Format(object sender, ListControlConvertEventArgs e) {
             e.Value = ((TestDataCategory)e.ListItem).Name + " (" + ((TestDataCategory)e.ListItem).ElementCount + ")";
+        }
+
+        private void reverseButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
