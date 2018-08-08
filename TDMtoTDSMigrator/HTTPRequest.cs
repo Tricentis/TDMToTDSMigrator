@@ -71,9 +71,25 @@ namespace TDMtoTDSMigrator {
                 foreach (TestDataObject obj in testData[category].Elements) {
                     message = PostObject(JsonConvert.SerializeObject(obj), repository, apiUrl);
                 }
-            }
-            //The response message of the last request is returned 
+            } 
             return message;
         }
+
+        //DELETE AFTER INMEMORY API BUGFIX
+        public static async Task<HttpResponseMessage> MigrateInMemory(Dictionary<string, TestDataCategory> testData, TestDataRepository repository, string apiUrl)
+        {
+            Task<HttpResponseMessage> message = null;
+            foreach (string category in testData.Keys)
+            {
+                foreach (TestDataObject obj in testData[category].Elements)
+                {
+                    await PostObject(JsonConvert.SerializeObject(obj), repository, apiUrl);
+                }
+            }
+            return new HttpResponseMessage();
+        }
+
+
+
     }
 }

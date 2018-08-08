@@ -46,7 +46,7 @@
             this.repositoryLocationTextBox.Location = new System.Drawing.Point(115, 107);
             this.repositoryLocationTextBox.Name = "repositoryLocationTextBox";
             this.repositoryLocationTextBox.Size = new System.Drawing.Size(406, 22);
-            this.repositoryLocationTextBox.TabIndex = 41;
+            this.repositoryLocationTextBox.TabIndex = 5;
             this.repositoryLocationTextBox.Text = "%PROGRAMDATA%\\Tricentis\\TestDataService\\";
             this.repositoryLocationTextBox.TextChanged += new System.EventHandler(this.RepositoryLocationTextBox_TextChanged);
             // 
@@ -78,7 +78,7 @@
             this.repositoryTypeComboBox.Location = new System.Drawing.Point(115, 77);
             this.repositoryTypeComboBox.Name = "repositoryTypeComboBox";
             this.repositoryTypeComboBox.Size = new System.Drawing.Size(406, 24);
-            this.repositoryTypeComboBox.TabIndex = 38;
+            this.repositoryTypeComboBox.TabIndex = 4;
             this.repositoryTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.RepositoryTypeComboBox_SelectedIndexChanged);
             this.repositoryTypeComboBox.Format += new System.Windows.Forms.ListControlConvertEventHandler(this.RepositoryTypeComboBox_Format);
             // 
@@ -97,14 +97,14 @@
             this.repositoryDescriptionTextbox.Location = new System.Drawing.Point(115, 48);
             this.repositoryDescriptionTextbox.Name = "repositoryDescriptionTextbox";
             this.repositoryDescriptionTextbox.Size = new System.Drawing.Size(406, 22);
-            this.repositoryDescriptionTextbox.TabIndex = 35;
+            this.repositoryDescriptionTextbox.TabIndex = 2;
             // 
             // createRepositoryButton
             // 
             this.createRepositoryButton.Location = new System.Drawing.Point(115, 147);
             this.createRepositoryButton.Name = "createRepositoryButton";
             this.createRepositoryButton.Size = new System.Drawing.Size(406, 32);
-            this.createRepositoryButton.TabIndex = 36;
+            this.createRepositoryButton.TabIndex = 3;
             this.createRepositoryButton.Text = "Create repository";
             this.createRepositoryButton.UseVisualStyleBackColor = true;
             this.createRepositoryButton.Click += new System.EventHandler(this.CreateRepositoryButton_Click);
@@ -124,7 +124,7 @@
             this.repositoryNameTextBox.Location = new System.Drawing.Point(115, 19);
             this.repositoryNameTextBox.Name = "repositoryNameTextBox";
             this.repositoryNameTextBox.Size = new System.Drawing.Size(406, 22);
-            this.repositoryNameTextBox.TabIndex = 34;
+            this.repositoryNameTextBox.TabIndex = 1;
             this.repositoryNameTextBox.TextChanged += new System.EventHandler(this.RepositoryNameTextBox_TextChanged);
             // 
             // cancelButton
@@ -132,7 +132,7 @@
             this.cancelButton.Location = new System.Drawing.Point(28, 147);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(76, 32);
-            this.cancelButton.TabIndex = 42;
+            this.cancelButton.TabIndex = 6;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.CancelButton_Click);

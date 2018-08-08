@@ -46,6 +46,9 @@ namespace MigratorUI {
                 filteredTestData = testData;
             }
             PrintEstimatedWaitTimeMessage(filteredTestData);
+            if (((TestDataRepository)repositoriesBox.SelectedItem).Type == DataBaseType.InMemory) {
+                return await HttpRequest.MigrateInMemory(filteredTestData, (TestDataRepository)repositoriesBox.SelectedItem, ApiUrl);  
+            }
             return await HttpRequest.Migrate(filteredTestData, (TestDataRepository)repositoriesBox.SelectedItem, ApiUrl);
         }
 
@@ -120,6 +123,10 @@ namespace MigratorUI {
         }
 
         private int EstimatedWaitTime(Dictionary<string, TestDataCategory> data) {
+            //DELETE AFTER API INMEMORY BUGFIX
+            if (((TestDataRepository)repositoriesBox.SelectedItem).Type== DataBaseType.InMemory) {
+                return (int)(230 * CountNumberOfObjects(data) / (float)618);
+            }
             //in seconds, based on the number of objects
             return (int)(35 * CountNumberOfObjects(data) / (float)2713) + 1;
         }
@@ -240,6 +247,11 @@ namespace MigratorUI {
         private void PrintMigrationLaunchedMessage(int numberOfCategories, TestDataRepository repository)
         {
             logTextBox.AppendText("Migrating " + numberOfCategories + " categories into \"" + repository.Name + "\". Please wait...\n");
+
+            //DELETE AFTER API INMEMORY BUGFIX
+            if (((TestDataRepository)repositoriesBox.SelectedItem).Type == DataBaseType.InMemory) {
+                logTextBox.AppendText("The process of migrating into an InMemory database is currently slow. \n");
+            }
         }
         private void PrintMigrationFinishedMessage(int numberOfCategories, TestDataRepository repository) {
             logTextBox.AppendText("Successfully migrated " + numberOfCategories + " out of " + categoriesListBox.Items.Count + " available categories into the repository : \""
