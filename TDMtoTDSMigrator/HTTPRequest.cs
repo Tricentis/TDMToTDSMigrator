@@ -31,7 +31,7 @@ namespace TDMtoTDSMigrator {
             client = new HttpClient();
         }
 
-        public static Boolean SetConnection(string apiUrl) {
+        public static bool SetConnection(string apiUrl) {
             InitializeHttpClient();
             if (apiUrl.Length == 0) {
                 return false;

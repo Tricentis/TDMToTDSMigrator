@@ -7,8 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using Newtonsoft.Json;
-
 using TDMtoTDSMigrator;
 
 using TestDataContract.Configuration;
@@ -25,12 +23,9 @@ namespace MigratorUI {
 
         private TdmDataDocument tdmDataSheet;
 
-        private string apiUrl;
+        private bool migrationInWork;
 
-        private Boolean migrationInWork;
-
-        public string ApiUrl { get => apiUrl; set => apiUrl = value; }
-
+        public string ApiUrl { get; set; }
 
         //Initialization 
         private void TdsMigrator_Load(object sender, EventArgs e) {
@@ -60,7 +55,7 @@ namespace MigratorUI {
                                                          MessageBoxButtons.OKCancel,
                                                          MessageBoxIcon.Warning);
             if (confirmResult == DialogResult.OK) {
-                Boolean clearanceSuccessful = HttpRequest.ClearRepository(repository).IsSuccessStatusCode;
+                bool clearanceSuccessful = HttpRequest.ClearRepository(repository).IsSuccessStatusCode;
                 if (clearanceSuccessful) {
                     PrintClearedRepositoryMessage(repository);
                 } else {
@@ -76,7 +71,7 @@ namespace MigratorUI {
                                                          MessageBoxIcon.Warning);
         
             if (confirmResult == DialogResult.OK) {
-                Boolean deletionSuccessful = HttpRequest.ClearRepository(repository).IsSuccessStatusCode
+                bool deletionSuccessful = HttpRequest.ClearRepository(repository).IsSuccessStatusCode
                                              && HttpRequest.DeleteRepository(repository).IsSuccessStatusCode;
 
                 if (deletionSuccessful) {
@@ -129,8 +124,7 @@ namespace MigratorUI {
             return (int)(35 * CountNumberOfObjects(data) / (float)2713) + 1;
         }
 
-
-        private Boolean ApplyFilter() {
+        private bool ApplyFilter() {
             return categoriesListBox.SelectedItems.Count < categoriesListBox.Items.Count;
         }
 
@@ -138,7 +132,7 @@ namespace MigratorUI {
         private void LoadCategoriesIntoListBox() {
             categoriesListBox.Items.Clear();
             categoriesListBox.ValueMember = "Name";
-            Boolean oneCategoryIsEmpty=false;
+            bool oneCategoryIsEmpty=false;
             StringBuilder emptyCategoriesStringBuilder = new StringBuilder();
             emptyCategoriesStringBuilder.Append("\nThe following categories were empty and have been removed from the list :\n");
             foreach (string category in testData.Keys) {
@@ -180,7 +174,7 @@ namespace MigratorUI {
             tddFileProcessingProgressBar.Visible = false;
         }
 
-        private void MigrationInWork(Boolean inWork) {
+        private void MigrationInWork(bool inWork) {
             migrationInWork = inWork;
 
             verifyUrlButton.Enabled = !migrationInWork;
@@ -193,8 +187,8 @@ namespace MigratorUI {
             loadRefreshRepositories.Enabled = !migrationInWork;
         }
 
-        private void ApiConnectionOk(Boolean apiConnectionOk, object sender, EventArgs e) {
-            Boolean tddFilePicked = TDDPathTextBox.Text != "";
+        private void ApiConnectionOk(bool apiConnectionOk, object sender, EventArgs e) {
+            bool tddFilePicked = TDDPathTextBox.Text != "";
 
             createRepositoryButton.Enabled = apiConnectionOk;
             deleteRepositoryButton.Enabled = apiConnectionOk;
@@ -245,7 +239,7 @@ namespace MigratorUI {
         }
         private void PrintMigrationLaunchedMessage(int numberOfCategories, TestDataRepository repository)
         {
-            logTextBox.AppendText("Migrating " + numberOfCategories + " categories into \"" + ((TestDataRepository)repositoriesBox.SelectedItem).Name + "\". Please wait...\n");
+            logTextBox.AppendText("Migrating " + numberOfCategories + " categories into \"" + repository.Name + "\". Please wait...\n");
         }
         private void PrintMigrationFinishedMessage(int numberOfCategories, TestDataRepository repository) {
             logTextBox.AppendText("Successfully migrated " + numberOfCategories + " out of " + categoriesListBox.Items.Count + " available categories into the repository : \""
@@ -287,8 +281,6 @@ namespace MigratorUI {
         }
 
         private void CreateRepositoryButton_Click(object sender, EventArgs e) {
-            
-
             new CreateRepositoryDialog(this).ShowDialog();
         }
 
@@ -329,14 +321,14 @@ namespace MigratorUI {
                 verifyUrlButton.Text = "Verify URL";
                 ApiConnectionOk(false, sender, e);
             } else {
-                Boolean connectionSuccessfull = HttpRequest.SetConnection(apiUrlTextBox.Text);
+                bool connectionSuccessfull = HttpRequest.SetConnection(apiUrlTextBox.Text);
                 if (connectionSuccessfull) {
                     ApiUrl = apiUrlTextBox.Text;
                     apiUrlTextBox.BackColor = Color.Lime;
                     ApiConnectionOk(true, sender, e);
                     verifyUrlButton.Text = "Change URL";
                     logTextBox.AppendText("Valid URL. \n");
-                    if (TDDPathTextBox.Text == "") {
+                    if (string.IsNullOrEmpty(TDDPathTextBox.Text)) {
                         logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
                     }
                                 //for testing purposes, delete for release
@@ -374,7 +366,7 @@ namespace MigratorUI {
 
         private void RepositoriesBox_Format(object sender, ListControlConvertEventArgs e)
         {
-            if (((TestDataRepository)e.ListItem).Description != "") {
+            if (!string.IsNullOrEmpty(((TestDataRepository)e.ListItem).Description)) {
                 e.Value = ((TestDataRepository)e.ListItem).Name + " (" + ((TestDataRepository)e.ListItem).Description + ")";
             } else {
                 e.Value = ((TestDataRepository)e.ListItem).Name;
