@@ -42,7 +42,7 @@
             this.apiUrlTextBox = new System.Windows.Forms.TextBox();
             this.deleteRepositoryButton = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.loadRefreshRepositories = new System.Windows.Forms.Button();
+            this.loadRefreshRepositoriesButton = new System.Windows.Forms.Button();
             this.repositoriesBox = new System.Windows.Forms.ListBox();
             this.logTextBox = new System.Windows.Forms.RichTextBox();
             this.verifyUrlButton = new System.Windows.Forms.Button();
@@ -190,16 +190,16 @@
             this.label3.TabIndex = 19;
             this.label3.Text = "Repositories";
             // 
-            // loadRefreshRepositories
+            // loadRefreshRepositoriesButton
             // 
-            this.loadRefreshRepositories.Enabled = false;
-            this.loadRefreshRepositories.Location = new System.Drawing.Point(1014, 209);
-            this.loadRefreshRepositories.Name = "loadRefreshRepositories";
-            this.loadRefreshRepositories.Size = new System.Drawing.Size(130, 32);
-            this.loadRefreshRepositories.TabIndex = 9;
-            this.loadRefreshRepositories.Text = "Refresh";
-            this.loadRefreshRepositories.UseVisualStyleBackColor = true;
-            this.loadRefreshRepositories.Click += new System.EventHandler(this.LoadRefreshRepositories_Click);
+            this.loadRefreshRepositoriesButton.Enabled = false;
+            this.loadRefreshRepositoriesButton.Location = new System.Drawing.Point(1014, 209);
+            this.loadRefreshRepositoriesButton.Name = "loadRefreshRepositoriesButton";
+            this.loadRefreshRepositoriesButton.Size = new System.Drawing.Size(130, 32);
+            this.loadRefreshRepositoriesButton.TabIndex = 9;
+            this.loadRefreshRepositoriesButton.Text = "Refresh";
+            this.loadRefreshRepositoriesButton.UseVisualStyleBackColor = true;
+            this.loadRefreshRepositoriesButton.Click += new System.EventHandler(this.LoadRefreshRepositoriesButton_Click);
             // 
             // repositoriesBox
             // 
@@ -233,7 +233,7 @@
             this.verifyUrlButton.TabIndex = 2;
             this.verifyUrlButton.Text = "Verify Url";
             this.verifyUrlButton.UseVisualStyleBackColor = true;
-            this.verifyUrlButton.Click += new System.EventHandler(this.VerifyUrlButton_Click_1);
+            this.verifyUrlButton.Click += new System.EventHandler(this.VerifyUrlButton_Click);
             // 
             // categoriesLabel
             // 
@@ -288,7 +288,7 @@
             this.Controls.Add(this.verifyUrlButton);
             this.Controls.Add(this.logTextBox);
             this.Controls.Add(this.repositoriesBox);
-            this.Controls.Add(this.loadRefreshRepositories);
+            this.Controls.Add(this.loadRefreshRepositoriesButton);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.deleteRepositoryButton);
             this.Controls.Add(this.apiUrlTextBox);
@@ -329,7 +329,7 @@
         private System.Windows.Forms.TextBox apiUrlTextBox;
         private System.Windows.Forms.Button deleteRepositoryButton;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button loadRefreshRepositories;
+        private System.Windows.Forms.Button loadRefreshRepositoriesButton;
         private System.Windows.Forms.Button verifyUrlButton;
         private System.Windows.Forms.Label categoriesLabel;
         private System.Windows.Forms.ProgressBar tddFileProcessingProgressBar;

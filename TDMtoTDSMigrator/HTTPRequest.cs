@@ -75,10 +75,13 @@ namespace TDMtoTDSMigrator {
             return message;
         }
 
+        //
+        //
         //DELETE AFTER INMEMORY API BUGFIX
+        //
+        //
         public static async Task<HttpResponseMessage> MigrateInMemory(Dictionary<string, TestDataCategory> testData, TestDataRepository repository, string apiUrl)
         {
-            Task<HttpResponseMessage> message = null;
             foreach (string category in testData.Keys)
             {
                 foreach (TestDataObject obj in testData[category].Elements)
@@ -89,7 +92,20 @@ namespace TDMtoTDSMigrator {
             return new HttpResponseMessage();
         }
 
-
+        public static int EstimatedMigrationWaitTime(Dictionary<string, TestDataCategory> data, TestDataRepository repository)
+        {
+            //
+            //
+            //DELETE AFTER INMEMORY API BUGFIX
+            //
+            //
+            if (repository.Type == DataBaseType.InMemory)
+            {
+                return (int)(230 * TdmDataDocument.CountNumberOfObjects(data) / (float)618);
+            }
+            //in seconds, based on the number of objects
+            return (int)(35 * TdmDataDocument.CountNumberOfObjects(data) / (float)2713) + 1;
+        }
 
     }
 }
