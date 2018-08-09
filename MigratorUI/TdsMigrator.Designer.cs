@@ -314,11 +314,11 @@
             this.reverseButton.Enabled = false;
             this.reverseButton.FlatAppearance.BorderSize = 0;
             this.reverseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.reverseButton.Location = new System.Drawing.Point(972, 381);
+            this.reverseButton.Location = new System.Drawing.Point(972, 372);
             this.reverseButton.Name = "reverseButton";
             this.reverseButton.Size = new System.Drawing.Size(130, 33);
             this.reverseButton.TabIndex = 29;
-            this.reverseButton.Text = "Reverse";
+            this.reverseButton.Text = "Revert selection";
             this.reverseButton.UseVisualStyleBackColor = false;
             this.reverseButton.Click += new System.EventHandler(this.ReverseButton_Click);
             // 

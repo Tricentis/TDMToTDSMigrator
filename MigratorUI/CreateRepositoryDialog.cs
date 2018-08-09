@@ -101,23 +101,30 @@ namespace MigratorUI {
         private void RepositoryNameTextBox_TextChanged(object sender, EventArgs e) {
             if (automaticLocationWriting && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite) {
                 repositoryLocationTextBox.Text = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text + ".db";
+            }else if (automaticLocationWriting && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory) {
+                repositoryLocationTextBox.Text = repositoryNameTextBox.Text;
             }
             repositoryNameTextBox.BackColor = Color.White;
         }
 
         private void RepositoryTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
             if ((DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory) {
-                repositoryLocationTextBox.Clear();
+                repositoryLocationTextBox.Text = repositoryNameTextBox.Text;
             } else if ((DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite) {
-                automaticLocationWriting = true;
                 repositoryLocationTextBox.Text = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text + ".db";
             }
+            automaticLocationWriting = true;
         }
 
         private void RepositoryLocationTextBox_TextChanged(object sender, EventArgs e) {
             repositoryLocationTextBox.BackColor = Color.White;
             if (automaticLocationWriting && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite
                                          && !repositoryLocationTextBox.Text.Contains(repositoryNameTextBox.Text + ".db")) {
+                automaticLocationWriting = false;
+            }
+            else if (automaticLocationWriting && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory
+                                         && repositoryLocationTextBox.Text != repositoryNameTextBox.Text)
+            {
                 automaticLocationWriting = false;
             }
         }

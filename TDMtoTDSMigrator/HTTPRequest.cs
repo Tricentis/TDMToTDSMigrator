@@ -90,16 +90,20 @@ namespace TDMtoTDSMigrator {
         }
 
         public static int EstimatedMigrationWaitTime(Dictionary<string, TestDataCategory> data, TestDataRepository repository) {
+            int numberOfRecords = 0;
+            foreach (TestDataCategory category in data.Values) {
+                numberOfRecords += category.ElementCount;
+            }
             //
             //
             //DELETE AFTER INMEMORY API BUGFIX
             //
             //
             if (repository.Type == DataBaseType.InMemory) {
-                return (int)(230 * TdmDataDocument.CountNumberOfObjects(data) / (float)618);
+                return (int)(230 * numberOfRecords / (float)618);
             }
             //in seconds, based on the number of objects
-            return (int)(35 * TdmDataDocument.CountNumberOfObjects(data) / (float)2713) + 1;
+            return (int)(35 * numberOfRecords / (float)2713) + 1;
         }
     }
 }

@@ -162,12 +162,12 @@ namespace TDMtoTDSMigrator {
             return null;
         }
 
-        public static int CountNumberOfObjects(Dictionary<string, TestDataCategory> data) {
-            int numberOfObjects = 0;
-            foreach (string category in data.Keys) {
-                numberOfObjects += data[category].ElementCount;
-            }
-            return numberOfObjects;
+        public int CountNumberOfObjects() {
+            return StringAttributes.Keys.Count;
+        }
+
+        public int CountNumberOfCategories() {
+            return MetaInfoTypes.Keys.Count;
         }
     }
 }

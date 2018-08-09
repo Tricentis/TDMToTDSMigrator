@@ -143,7 +143,7 @@ namespace MigratorUI {
             return filteredTestData;
         }
 
-        //UI element attributes and logText methods 
+        //UI element attributes methods
         private void ApiConnectionOk(bool apiConnectionOk) {
             bool tddFilePicked = TDDPathTextBox.Text != "";
 
@@ -252,7 +252,7 @@ namespace MigratorUI {
         }
 
         private void PrintNumberOfRecordsAndCategoriesFoundMessage() {
-            logTextBox.AppendText(TdmDataDocument.CountNumberOfObjects(testData) + " records among " + testData.Count + " categories were found.");
+            logTextBox.AppendText(tdmDataSheet.CountNumberOfObjects() + " records among " + tdmDataSheet.CountNumberOfCategories() + " categories were found.");
         }
 
         private void PrintEmptyCategoriesWarningMessage() {
@@ -362,8 +362,7 @@ namespace MigratorUI {
         }
 
         private void ReverseButton_Click(object sender, EventArgs e) {
-            for (int i = 0; i < categoriesListBox.Items.Count; i++)
-            {
+            for (int i = 0; i < categoriesListBox.Items.Count; i++){
                 categoriesListBox.SetItemChecked(i, !categoriesListBox.GetItemChecked(i));
             }
         }
@@ -402,11 +401,6 @@ namespace MigratorUI {
 
         private void CategoriesListBox_Format(object sender, ListControlConvertEventArgs e) {
             e.Value = ((TestDataCategory)e.ListItem).Name + " (" + ((TestDataCategory)e.ListItem).ElementCount + ")";
-        }
-
-        private void reverseButton_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
