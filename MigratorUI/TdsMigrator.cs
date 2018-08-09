@@ -80,13 +80,12 @@ namespace MigratorUI {
                     stringBuilder.Append(metaInfoAssociation.CategoryName + " and " + tdmDataSheet.FindCategoryName(metaInfoAssociation.PartnerId) + "\n");
                 }
                 MessageBox.Show(stringBuilder.ToString(), "Associations not supported", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                
             }
         }
 
         private void ClearRepository(TestDataRepository repository) {
             DialogResult confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
-                                                         "Clear " + repositoriesBox.SelectedItem + " repository",
+                                                         "Clear " + repository.Name + " repository",
                                                          MessageBoxButtons.OKCancel,
                                                          MessageBoxIcon.Warning);
             if (confirmResult == DialogResult.OK) {
@@ -101,7 +100,7 @@ namespace MigratorUI {
 
         private void DeleteRepository(TestDataRepository repository) {
             DialogResult confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
-                                                         "Clear " + repositoriesBox.SelectedItem + " repository",
+                                                         "Clear " + repository.Name + " repository",
                                                          MessageBoxButtons.OKCancel,
                                                          MessageBoxIcon.Warning);
 
