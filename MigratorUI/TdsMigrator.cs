@@ -43,7 +43,7 @@ namespace MigratorUI {
                     ApiConnectionOk(true);
                     verifyUrlButton.Text = "Change URL";
                     logTextBox.AppendText("Valid URL. \n");
-                    if (string.IsNullOrEmpty(TDDPathTextBox.Text)) {
+                    if (string.IsNullOrEmpty(tddPathTextBox.Text)) {
                         logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
                     }
                 }
@@ -62,7 +62,7 @@ namespace MigratorUI {
         private async void ProcessTddFile() {
             TddFileProcessingLaunched();
             await Task.Delay(10);
-            tdmDataSheet = new TdmDataDocument(TDDPathTextBox.Text);
+            tdmDataSheet = new TdmDataDocument(tddPathTextBox.Text);
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += (s, r) => { r.Result = tdmDataSheet.CreateDataList(); };
             worker.RunWorkerCompleted += (s, r) => {
@@ -145,7 +145,7 @@ namespace MigratorUI {
 
         //UI element attributes methods
         private void ApiConnectionOk(bool apiConnectionOk) {
-            bool tddFilePicked = TDDPathTextBox.Text != "";
+            bool tddFilePicked = tddPathTextBox.Text != "";
 
             createRepositoryButton.Enabled = apiConnectionOk;
             deleteRepositoryButton.Enabled = apiConnectionOk;
@@ -312,7 +312,7 @@ namespace MigratorUI {
 
         private void OpenFileDialog_FileOk(object sender, CancelEventArgs e) {
             categoriesListBox.Items.Clear();
-            TDDPathTextBox.Text = openFileDialog.FileName;
+            tddPathTextBox.Text = openFileDialog.FileName;
         }
 
         private void TddPathTextBox_TextChanged(object sender, EventArgs e) {

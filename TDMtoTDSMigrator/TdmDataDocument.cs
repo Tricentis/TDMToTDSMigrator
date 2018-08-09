@@ -52,7 +52,6 @@ namespace TDMtoTDSMigrator {
             using (FileStream inFile = fi.OpenRead()) {
                 string curFile = fi.FullName;
                 string origName = curFile.Remove(curFile.Length - fi.Extension.Length);
-
                 string pathOfOutput = origName + ".xml";
                 using (FileStream outFile = File.Create(pathOfOutput)) {
                     using (GZipStream decompress = new GZipStream(inFile, CompressionMode.Decompress)) {

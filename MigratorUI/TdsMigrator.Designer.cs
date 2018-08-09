@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TdsMigrator));
             this.pickFileButton = new System.Windows.Forms.Button();
-            this.TDDPathTextBox = new System.Windows.Forms.TextBox();
+            this.tddPathTextBox = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.label1 = new System.Windows.Forms.Label();
             this.createRepositoryButton = new System.Windows.Forms.Button();
@@ -67,14 +67,14 @@
             this.pickFileButton.UseVisualStyleBackColor = false;
             this.pickFileButton.Click += new System.EventHandler(this.PickFileButton_Click);
             // 
-            // TDDPathTextBox
+            // tddPathTextBox
             // 
-            this.TDDPathTextBox.Enabled = false;
-            this.TDDPathTextBox.Location = new System.Drawing.Point(122, 69);
-            this.TDDPathTextBox.Name = "TDDPathTextBox";
-            this.TDDPathTextBox.Size = new System.Drawing.Size(248, 22);
-            this.TDDPathTextBox.TabIndex = 3;
-            this.TDDPathTextBox.TextChanged += new System.EventHandler(this.TddPathTextBox_TextChanged);
+            this.tddPathTextBox.Enabled = false;
+            this.tddPathTextBox.Location = new System.Drawing.Point(122, 69);
+            this.tddPathTextBox.Name = "tddPathTextBox";
+            this.tddPathTextBox.Size = new System.Drawing.Size(248, 22);
+            this.tddPathTextBox.TabIndex = 3;
+            this.tddPathTextBox.TextChanged += new System.EventHandler(this.TddPathTextBox_TextChanged);
             // 
             // openFileDialog
             // 
@@ -348,7 +348,7 @@
             this.Controls.Add(this.createRepositoryButton);
             this.Controls.Add(this.loadIntoRepositoryButton);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.TDDPathTextBox);
+            this.Controls.Add(this.tddPathTextBox);
             this.Controls.Add(this.pickFileButton);
             this.Cursor = System.Windows.Forms.Cursors.Default;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -365,7 +365,7 @@
         #endregion
 
         private System.Windows.Forms.Button pickFileButton;
-        private System.Windows.Forms.TextBox TDDPathTextBox;
+        private System.Windows.Forms.TextBox tddPathTextBox;
         private System.Windows.Forms.OpenFileDialog openFileDialog;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button createRepositoryButton;
