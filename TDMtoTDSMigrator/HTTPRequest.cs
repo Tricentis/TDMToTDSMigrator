@@ -10,12 +10,13 @@ using Newtonsoft.Json;
 
 using TestDataContract.Configuration;
 using TestDataContract.TestData;
+using TestDataContract.Version;
 
 namespace TDMtoTDSMigrator {
     public class HttpRequest {
         private static HttpClient client;
 
-        public static readonly string Version = "v1.1";
+        public static readonly string Version = TestDataVersion.V1_1;
 
         private static HttpClient Client {
             get {
@@ -37,7 +38,7 @@ namespace TDMtoTDSMigrator {
                 return false;
             }
             try {
-                Client.BaseAddress = new Uri(apiUrl + "/" + Version);
+                Client.BaseAddress = new Uri(apiUrl + "/v" + Version);
                 Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 return Client.GetAsync("").Result.IsSuccessStatusCode;
             } catch (Exception) {

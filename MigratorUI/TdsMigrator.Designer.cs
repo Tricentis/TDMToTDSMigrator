@@ -82,7 +82,7 @@ namespace MigratorUI
             // 
             this.openFileDialog.DefaultExt = "tdd";
             this.openFileDialog.Filter = "tdd files|*.tdd";
-            this.openFileDialog.InitialDirectory = "C:\\Users\\felpo\\downloads";
+            this.openFileDialog.InitialDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)+@"\downloads";
             this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.OpenFileDialog_FileOk);
             // 
             // tddFileLabel
@@ -303,7 +303,7 @@ namespace MigratorUI
             // 
             // migrationProgressBar
             // 
-            this.migrationProgressBar.Location = new System.Drawing.Point(878, 528);
+            this.migrationProgressBar.Location = new System.Drawing.Point(878, 526);
             this.migrationProgressBar.Margin = new System.Windows.Forms.Padding(0);
             this.migrationProgressBar.MarqueeAnimationSpeed = 45;
             this.migrationProgressBar.Name = "migrationProgressBar";

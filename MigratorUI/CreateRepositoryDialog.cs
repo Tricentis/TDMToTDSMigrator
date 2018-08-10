@@ -22,9 +22,10 @@ namespace MigratorUI {
         }
 
         private void CreateRepositoryDialog_Load(object sender, EventArgs e) {
-            repositoryTypeComboBox.Items.Add(DataBaseType.Sqlite);
-            repositoryTypeComboBox.Items.Add(DataBaseType.InMemory);
-            repositoryTypeComboBox.SelectedItem = DataBaseType.Sqlite;
+            foreach (DataBaseType dataBaseType in Enum.GetValues(typeof(DataBaseType))) {
+                repositoryTypeComboBox.Items.Add(dataBaseType);
+                repositoryTypeComboBox.SelectedItem = dataBaseType;
+            }
         }
 
         public void CreateRepository(TestDataRepository repository) {

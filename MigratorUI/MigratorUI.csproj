@@ -49,8 +49,11 @@
     <CodeAnalysisRuleSet>MigratorUI.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>cropped-512px_Product-Logo-Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -75,6 +78,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="CreateRepositoryDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -142,6 +146,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\fonmdappd.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="cropped-512px_Product-Logo-Icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

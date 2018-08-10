@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 using TDMtoTDSMigrator;
 
 using TestDataContract.Configuration;
@@ -25,7 +26,21 @@ namespace MigratorUI {
         public TdsMigrator() {
             InitializeComponent();
         }
-
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == NativeMethods.WM_SHOWME)
+            {
+                ShowApp();
+            }
+            base.WndProc(ref m);
+        }
+        private void ShowApp()
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                WindowState = FormWindowState.Normal;
+            }
+        }
 
         //Initialization 
         private void TdsMigrator_Load(object sender, EventArgs e) {
@@ -310,11 +325,11 @@ namespace MigratorUI {
         }
 
         private void OpenFileDialog_FileOk(object sender, CancelEventArgs e) {
-            categoriesListBox.Items.Clear();
             tddPathTextBox.Text = openFileDialog.FileName;
         }
 
         private void TddPathTextBox_TextChanged(object sender, EventArgs e) {
+            categoriesListBox.Items.Clear();
             ProcessTddFile();
         }
 
