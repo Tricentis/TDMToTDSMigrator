@@ -30,13 +30,13 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreateRepositoryDialog));
             this.repositoryLocationTextBox = new System.Windows.Forms.TextBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
+            this.locationLabel = new System.Windows.Forms.Label();
+            this.typeLabel = new System.Windows.Forms.Label();
             this.repositoryTypeComboBox = new System.Windows.Forms.ComboBox();
-            this.repositoryDescriptionText = new System.Windows.Forms.Label();
+            this.repositoryDescriptionLabel = new System.Windows.Forms.Label();
             this.repositoryDescriptionTextbox = new System.Windows.Forms.TextBox();
             this.createRepositoryButton = new System.Windows.Forms.Button();
-            this.repositoryNameText = new System.Windows.Forms.Label();
+            this.repositoryNameLabel = new System.Windows.Forms.Label();
             this.repositoryNameTextBox = new System.Windows.Forms.TextBox();
             this.cancelButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -50,25 +50,25 @@
             this.repositoryLocationTextBox.Text = "%PROGRAMDATA%\\Tricentis\\TestDataService\\";
             this.repositoryLocationTextBox.TextChanged += new System.EventHandler(this.RepositoryLocationTextBox_TextChanged);
             // 
-            // label4
+            // locationLabel
             // 
-            this.label4.AutoSize = true;
-            this.label4.BackColor = System.Drawing.Color.Transparent;
-            this.label4.Location = new System.Drawing.Point(42, 110);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(62, 17);
-            this.label4.TabIndex = 40;
-            this.label4.Text = "Location";
+            this.locationLabel.AutoSize = true;
+            this.locationLabel.BackColor = System.Drawing.Color.Transparent;
+            this.locationLabel.Location = new System.Drawing.Point(42, 110);
+            this.locationLabel.Name = "locationLabel";
+            this.locationLabel.Size = new System.Drawing.Size(62, 17);
+            this.locationLabel.TabIndex = 40;
+            this.locationLabel.Text = "Location";
             // 
-            // label2
+            // typeLabel
             // 
-            this.label2.AutoSize = true;
-            this.label2.BackColor = System.Drawing.Color.Transparent;
-            this.label2.Location = new System.Drawing.Point(64, 80);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(40, 17);
-            this.label2.TabIndex = 39;
-            this.label2.Text = "Type";
+            this.typeLabel.AutoSize = true;
+            this.typeLabel.BackColor = System.Drawing.Color.Transparent;
+            this.typeLabel.Location = new System.Drawing.Point(64, 80);
+            this.typeLabel.Name = "typeLabel";
+            this.typeLabel.Size = new System.Drawing.Size(40, 17);
+            this.typeLabel.TabIndex = 39;
+            this.typeLabel.Text = "Type";
             // 
             // repositoryTypeComboBox
             // 
@@ -81,15 +81,15 @@
             this.repositoryTypeComboBox.TabIndex = 4;
             this.repositoryTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.RepositoryTypeComboBox_SelectedIndexChanged);
             // 
-            // repositoryDescriptionText
+            // repositoryDescriptionLabel
             // 
-            this.repositoryDescriptionText.AutoSize = true;
-            this.repositoryDescriptionText.BackColor = System.Drawing.Color.Transparent;
-            this.repositoryDescriptionText.Location = new System.Drawing.Point(25, 51);
-            this.repositoryDescriptionText.Name = "repositoryDescriptionText";
-            this.repositoryDescriptionText.Size = new System.Drawing.Size(79, 17);
-            this.repositoryDescriptionText.TabIndex = 37;
-            this.repositoryDescriptionText.Text = "Description";
+            this.repositoryDescriptionLabel.AutoSize = true;
+            this.repositoryDescriptionLabel.BackColor = System.Drawing.Color.Transparent;
+            this.repositoryDescriptionLabel.Location = new System.Drawing.Point(25, 51);
+            this.repositoryDescriptionLabel.Name = "repositoryDescriptionLabel";
+            this.repositoryDescriptionLabel.Size = new System.Drawing.Size(79, 17);
+            this.repositoryDescriptionLabel.TabIndex = 37;
+            this.repositoryDescriptionLabel.Text = "Description";
             // 
             // repositoryDescriptionTextbox
             // 
@@ -108,15 +108,15 @@
             this.createRepositoryButton.UseVisualStyleBackColor = true;
             this.createRepositoryButton.Click += new System.EventHandler(this.CreateRepositoryButton_Click);
             // 
-            // repositoryNameText
+            // repositoryNameLabel
             // 
-            this.repositoryNameText.AutoSize = true;
-            this.repositoryNameText.BackColor = System.Drawing.Color.Transparent;
-            this.repositoryNameText.Location = new System.Drawing.Point(59, 22);
-            this.repositoryNameText.Name = "repositoryNameText";
-            this.repositoryNameText.Size = new System.Drawing.Size(45, 17);
-            this.repositoryNameText.TabIndex = 33;
-            this.repositoryNameText.Text = "Name";
+            this.repositoryNameLabel.AutoSize = true;
+            this.repositoryNameLabel.BackColor = System.Drawing.Color.Transparent;
+            this.repositoryNameLabel.Location = new System.Drawing.Point(59, 22);
+            this.repositoryNameLabel.Name = "repositoryNameLabel";
+            this.repositoryNameLabel.Size = new System.Drawing.Size(45, 17);
+            this.repositoryNameLabel.TabIndex = 33;
+            this.repositoryNameLabel.Text = "Name";
             // 
             // repositoryNameTextBox
             // 
@@ -144,13 +144,13 @@
             this.ClientSize = new System.Drawing.Size(553, 199);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.repositoryLocationTextBox);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.locationLabel);
+            this.Controls.Add(this.typeLabel);
             this.Controls.Add(this.repositoryTypeComboBox);
-            this.Controls.Add(this.repositoryDescriptionText);
+            this.Controls.Add(this.repositoryDescriptionLabel);
             this.Controls.Add(this.repositoryDescriptionTextbox);
             this.Controls.Add(this.createRepositoryButton);
-            this.Controls.Add(this.repositoryNameText);
+            this.Controls.Add(this.repositoryNameLabel);
             this.Controls.Add(this.repositoryNameTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -165,13 +165,13 @@
         #endregion
 
         private System.Windows.Forms.TextBox repositoryLocationTextBox;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label locationLabel;
+        private System.Windows.Forms.Label typeLabel;
         private System.Windows.Forms.ComboBox repositoryTypeComboBox;
-        private System.Windows.Forms.Label repositoryDescriptionText;
+        private System.Windows.Forms.Label repositoryDescriptionLabel;
         private System.Windows.Forms.TextBox repositoryDescriptionTextbox;
         private System.Windows.Forms.Button createRepositoryButton;
-        private System.Windows.Forms.Label repositoryNameText;
+        private System.Windows.Forms.Label repositoryNameLabel;
         private System.Windows.Forms.TextBox repositoryNameTextBox;
         private System.Windows.Forms.Button cancelButton;
     }
