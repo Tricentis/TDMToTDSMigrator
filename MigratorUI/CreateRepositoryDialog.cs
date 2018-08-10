@@ -11,14 +11,14 @@ namespace MigratorUI {
     public partial class CreateRepositoryDialog : Form {
         private readonly TdsMigrator migrator;
 
-        private bool automaticLocationWriting;
+        private bool automaticLocationWritingEnabled;
 
         readonly char[] unallowedRepositoryCharacters = { '/', '|', '\\', '<', '>', '#', '*', '+', ':', ';', '"', '.', ',', '?' };
 
         public CreateRepositoryDialog(TdsMigrator migrator) {
             InitializeComponent();
             this.migrator = migrator;
-            automaticLocationWriting = true;
+            automaticLocationWritingEnabled = true;
         }
 
         private void CreateRepositoryDialog_Load(object sender, EventArgs e) {
@@ -100,9 +100,9 @@ namespace MigratorUI {
         }
 
         private void RepositoryNameTextBox_TextChanged(object sender, EventArgs e) {
-            if (automaticLocationWriting && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite) {
+            if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite) {
                 repositoryLocationTextBox.Text = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text + ".db";
-            }else if (automaticLocationWriting && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory) {
+            }else if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory) {
                 repositoryLocationTextBox.Text = repositoryNameTextBox.Text;
             }
             repositoryNameTextBox.BackColor = Color.White;
@@ -114,19 +114,19 @@ namespace MigratorUI {
             } else if ((DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite) {
                 repositoryLocationTextBox.Text = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text + ".db";
             }
-            automaticLocationWriting = true;
+            automaticLocationWritingEnabled = true;
         }
 
         private void RepositoryLocationTextBox_TextChanged(object sender, EventArgs e) {
             repositoryLocationTextBox.BackColor = Color.White;
-            if (automaticLocationWriting && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite
+            if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite
                                          && !repositoryLocationTextBox.Text.Contains(repositoryNameTextBox.Text + ".db")) {
-                automaticLocationWriting = false;
+                automaticLocationWritingEnabled = false;
             }
-            else if (automaticLocationWriting && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory
+            else if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory
                                          && repositoryLocationTextBox.Text != repositoryNameTextBox.Text)
             {
-                automaticLocationWriting = false;
+                automaticLocationWritingEnabled = false;
             }
         }
 

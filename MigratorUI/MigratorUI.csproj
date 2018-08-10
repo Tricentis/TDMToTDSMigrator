@@ -49,11 +49,10 @@
     <CodeAnalysisRuleSet>MigratorUI.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>cropped-512px_Product-Logo-Icon.ico</ApplicationIcon>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject>MigratorUI.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -148,7 +147,10 @@
     <None Include="Resources\fonmdappd.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="cropped-512px_Product-Logo-Icon.ico" />
+    <Content Include="Icon.ico" />
+    <None Include="Resources\createrepository.ico" />
+    <None Include="Resources\Icon.ico" />
+    <None Include="Resources\icon.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

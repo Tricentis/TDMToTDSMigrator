@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
 
 using TDMtoTDSMigrator;
 
@@ -17,6 +17,10 @@ namespace MigratorUI {
     public partial class TdsMigrator : Form {
         private Dictionary<string, TestDataCategory> testData;
 
+        private Dictionary<string, Boolean> alreadyMigratedCategories = new Dictionary<string, bool>();
+
+        private bool allDataWasMigrated;
+
         private TdmDataDocument tdmDataSheet;
 
         private bool migrationInWork;
@@ -26,18 +30,16 @@ namespace MigratorUI {
         public TdsMigrator() {
             InitializeComponent();
         }
-        protected override void WndProc(ref Message m)
-        {
-            if (m.Msg == NativeMethods.WM_SHOWME)
-            {
+
+        protected override void WndProc(ref Message m) {
+            if (m.Msg == NativeMethods.WM_SHOWME) {
                 ShowApp();
             }
             base.WndProc(ref m);
         }
-        private void ShowApp()
-        {
-            if (WindowState == FormWindowState.Minimized)
-            {
+
+        private void ShowApp() {
+            if (WindowState == FormWindowState.Minimized) {
                 WindowState = FormWindowState.Normal;
             }
         }
@@ -61,8 +63,7 @@ namespace MigratorUI {
                     if (string.IsNullOrEmpty(tddPathTextBox.Text)) {
                         logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
                     }
-                }
-                else {
+                } else {
                     apiUrlTextBox.BackColor = Color.PaleVioletRed;
                     ApiConnectionOk(false);
                     repositoriesBox.Items.Clear();
@@ -150,10 +151,16 @@ namespace MigratorUI {
 
         private Dictionary<string, TestDataCategory> FilterTestData() {
             Dictionary<string, TestDataCategory> filteredTestData = new Dictionary<string, TestDataCategory>();
-            foreach (TestDataCategory category in categoriesListBox.CheckedItems)
-            {
-                filteredTestData.Add(category.Name, category);
+            foreach (TestDataCategory category in testData.Values) {
+                if (categoriesListBox.CheckedItems.Contains(category)) {
+                    filteredTestData.Add(category.Name, category);
+                    if (!allDataWasMigrated) {
+                        alreadyMigratedCategories[category.Name] = true;
+                        SendCategoryToEndOfChecklist(category);
+                    }
+                }
             }
+            //SetCategoriesCheckState();
             return filteredTestData;
         }
 
@@ -171,6 +178,7 @@ namespace MigratorUI {
             selectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             deselectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
             reverseButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
+            selectRemainingCategoriesButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork & !allDataWasMigrated;
             apiUrlTextBox.Enabled = !apiConnectionOk & !migrationInWork;
             pickFileButton.Enabled = apiConnectionOk & !migrationInWork;
 
@@ -185,11 +193,13 @@ namespace MigratorUI {
 
         private void TddFileProcessingLaunched() {
             PrintTddProcessingLaunchedMessage();
+            allDataWasMigrated = false;
             loadIntoRepositoryButton.Enabled = false;
             categoriesListBox.Enabled = false;
             selectAllButton.Enabled = false;
             deselectAllButton.Enabled = false;
             reverseButton.Enabled = false;
+            selectRemainingCategoriesButton.Enabled = false;
             verifyUrlButton.Enabled = false;
             pickFileButton.Enabled = false;
             tddFileProcessingProgressBar.Visible = true;
@@ -206,18 +216,54 @@ namespace MigratorUI {
             selectAllButton.Enabled = true;
             deselectAllButton.Enabled = true;
             reverseButton.Enabled = true;
+            selectRemainingCategoriesButton.Enabled = true;
             verifyUrlButton.Enabled = true;
             pickFileButton.Enabled = true;
         }
 
         private void LoadCategoriesIntoListBox() {
             categoriesListBox.Items.Clear();
+            alreadyMigratedCategories = new Dictionary<string, bool>();
+            categoriesListBox.Sorted = true;
             foreach (TestDataCategory category in testData.Values) {
                 if (category.ElementCount != 0) {
+                    alreadyMigratedCategories.Add(category.Name, false);
                     categoriesListBox.Items.Add(category, true);
                 }
             }
             PrintEmptyCategoriesWarningMessage();
+            categoriesListBox.Sorted = false;
+        }
+
+        private void SelectAllCategories() {
+            for (int i = 0; i < categoriesListBox.Items.Count; i++) {
+                categoriesListBox.SetItemChecked(i, true);
+            }
+        }
+
+        private void DeselectAllCategories() {
+            for (int i = 0; i < categoriesListBox.Items.Count; i++) {
+                categoriesListBox.SetItemChecked(i, false);
+            }
+        }
+
+        private void RevertSelectedCategories() {
+            for (int i = 0; i < categoriesListBox.Items.Count; i++) {
+                categoriesListBox.SetItemChecked(i, !categoriesListBox.GetItemChecked(i));
+            }
+        }
+
+        private void SelectRemainingCategories() {
+            for (int i = 0; i < categoriesListBox.Items.Count; i++) {
+                if (!categoriesListBox.GetItemChecked(i)) {
+                    categoriesListBox.SetItemChecked(i, !alreadyMigratedCategories[((TestDataCategory)categoriesListBox.Items[i]).Name]);
+                }
+            }
+        }
+
+        private void SendCategoryToEndOfChecklist(TestDataCategory category) {
+            categoriesListBox.Items.Remove(category);
+            categoriesListBox.Items.Add(category, false);
         }
 
         public void RefreshRepositoriesList() {
@@ -315,6 +361,10 @@ namespace MigratorUI {
                                   + repository.Name + "\".\n");
         }
 
+        private void PrintAllDataWasMigratedMessage() {
+            logTextBox.AppendText("\nAll your TDM data has been migrated to Tricentis TDS.\nYou can now exit the application.\n\n");
+        }
+
         //OnEvent methods
         private void VerifyUrlButton_Click(object sender, EventArgs e) {
             VerifyUrl(apiUrlTextBox.Text);
@@ -364,21 +414,19 @@ namespace MigratorUI {
         }
 
         private void SelectAllButton_Click(object sender, EventArgs e) {
-            for (int i = 0; i < categoriesListBox.Items.Count; i++) {
-                categoriesListBox.SetItemChecked(i, true);
-            }
+            SelectAllCategories();
         }
 
         private void DeselectAllButton_Click(object sender, EventArgs e) {
-            for (int i = 0; i < categoriesListBox.Items.Count; i++) {
-                categoriesListBox.SetItemChecked(i, false);
-            }
+            DeselectAllCategories();
         }
 
-        private void ReverseButton_Click(object sender, EventArgs e) {
-            for (int i = 0; i < categoriesListBox.Items.Count; i++){
-                categoriesListBox.SetItemChecked(i, !categoriesListBox.GetItemChecked(i));
-            }
+        private void RevertSelectedCategoriesButton_Click(object sender, EventArgs e) {
+            RevertSelectedCategories();
+        }
+
+        private void SelectRemainingCategoriesButton_Click(object sender, EventArgs e) {
+            SelectRemainingCategories();
         }
 
         private async void LoadIntoRepositoryButton_Click(object sender, EventArgs e) {
@@ -393,6 +441,12 @@ namespace MigratorUI {
                 await LaunchMigration();
                 MigrationInWork(false);
                 PrintMigrationFinishedMessage(numberOfCategoriesToMigrate, (TestDataRepository)repositoriesBox.SelectedItem);
+                if (!alreadyMigratedCategories.Values.Contains(false) && !allDataWasMigrated) {
+                    PrintAllDataWasMigratedMessage();
+                    selectRemainingCategoriesButton.Enabled = false;
+                    categoriesListBox.Sorted = true;
+                    allDataWasMigrated = true;
+                }
             }
         }
 
@@ -414,7 +468,11 @@ namespace MigratorUI {
         }
 
         private void CategoriesListBox_Format(object sender, ListControlConvertEventArgs e) {
-            e.Value = ((TestDataCategory)e.ListItem).Name + " (" + ((TestDataCategory)e.ListItem).ElementCount + ")";
+            e.Value = "";
+            if (alreadyMigratedCategories[((TestDataCategory)e.ListItem).Name]) {
+                e.Value += "✓ ";
+            }
+            e.Value += ((TestDataCategory)e.ListItem).Name + " (" + ((TestDataCategory)e.ListItem).ElementCount + ")";
         }
     }
 }

@@ -53,6 +53,7 @@ namespace MigratorUI
             this.loadIntoRepositoryButton = new System.Windows.Forms.Button();
             this.migrationProgressBar = new System.Windows.Forms.ProgressBar();
             this.reverseButton = new System.Windows.Forms.Button();
+            this.selectRemainingCategoriesButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // pickFileButton
@@ -82,7 +83,7 @@ namespace MigratorUI
             // 
             this.openFileDialog.DefaultExt = "tdd";
             this.openFileDialog.Filter = "tdd files|*.tdd";
-            this.openFileDialog.InitialDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)+@"\downloads";
+            this.openFileDialog.InitialDirectory = "C:\\Users\\felpo\\downloads";
             this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.OpenFileDialog_FileOk);
             // 
             // tddFileLabel
@@ -146,7 +147,7 @@ namespace MigratorUI
             this.deselectAllButton.Enabled = false;
             this.deselectAllButton.FlatAppearance.BorderSize = 0;
             this.deselectAllButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.deselectAllButton.Location = new System.Drawing.Point(878, 305);
+            this.deselectAllButton.Location = new System.Drawing.Point(878, 357);
             this.deselectAllButton.Name = "deselectAllButton";
             this.deselectAllButton.Size = new System.Drawing.Size(130, 33);
             this.deselectAllButton.TabIndex = 11;
@@ -318,13 +319,27 @@ namespace MigratorUI
             this.reverseButton.Enabled = false;
             this.reverseButton.FlatAppearance.BorderSize = 0;
             this.reverseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.reverseButton.Location = new System.Drawing.Point(878, 344);
+            this.reverseButton.Location = new System.Drawing.Point(878, 396);
             this.reverseButton.Name = "reverseButton";
             this.reverseButton.Size = new System.Drawing.Size(130, 33);
             this.reverseButton.TabIndex = 29;
             this.reverseButton.Text = "Revert selection";
             this.reverseButton.UseVisualStyleBackColor = false;
-            this.reverseButton.Click += new System.EventHandler(this.ReverseButton_Click);
+            this.reverseButton.Click += new System.EventHandler(this.RevertSelectedCategoriesButton_Click);
+            // 
+            // selectRemainingCategoriesButton
+            // 
+            this.selectRemainingCategoriesButton.BackColor = System.Drawing.Color.Gainsboro;
+            this.selectRemainingCategoriesButton.Enabled = false;
+            this.selectRemainingCategoriesButton.FlatAppearance.BorderSize = 0;
+            this.selectRemainingCategoriesButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.selectRemainingCategoriesButton.Location = new System.Drawing.Point(878, 305);
+            this.selectRemainingCategoriesButton.Name = "selectRemainingCategoriesButton";
+            this.selectRemainingCategoriesButton.Size = new System.Drawing.Size(130, 46);
+            this.selectRemainingCategoriesButton.TabIndex = 30;
+            this.selectRemainingCategoriesButton.Text = "Select remaining categories";
+            this.selectRemainingCategoriesButton.UseVisualStyleBackColor = false;
+            this.selectRemainingCategoriesButton.Click += new System.EventHandler(this.SelectRemainingCategoriesButton_Click);
             // 
             // TdsMigrator
             // 
@@ -333,6 +348,7 @@ namespace MigratorUI
             this.BackColor = System.Drawing.SystemColors.MenuBar;
             this.BackgroundImage = global::MigratorUI.Properties.Resources.fonmdappd;
             this.ClientSize = new System.Drawing.Size(1058, 673);
+            this.Controls.Add(this.selectRemainingCategoriesButton);
             this.Controls.Add(this.reverseButton);
             this.Controls.Add(this.migrationProgressBar);
             this.Controls.Add(this.tddFileProcessingProgressBar);
@@ -390,6 +406,7 @@ namespace MigratorUI
         public System.Windows.Forms.ListBox repositoriesBox;
         public System.Windows.Forms.RichTextBox logTextBox;
         private System.Windows.Forms.Button reverseButton;
+        private System.Windows.Forms.Button selectRemainingCategoriesButton;
     }
 }
 
