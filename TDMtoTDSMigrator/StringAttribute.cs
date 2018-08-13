@@ -10,23 +10,9 @@ namespace TDMtoTDSMigrator {
 
         public string AttributeValue;
 
-        public string AttributeName {
-            get {
-                if (AttributeId != null) {
-                    return tdmDataSheet.FindAttributeName(AttributeId);
-                }
-                return "Not Found";
-            }
-        }
+        public string AttributeName => AttributeId != null ? tdmDataSheet.FindAttributeName(AttributeId) : "Not Found";
 
-        public string CategoryName {
-            get {
-                if (AttributeId != null) {
-                    return tdmDataSheet.FindCategoryName(tdmDataSheet.FindCategoryId(AttributeId));
-                }
-                return "Not Found";
-            }
-        }
+        public string CategoryName => AttributeId != null ? tdmDataSheet.FindCategoryName(tdmDataSheet.FindCategoryId(AttributeId)) : "Not Found";
 
         public StringAttribute(TdmDataDocument tdmDataSheet, XmlNode stringAttribute) {
             this.tdmDataSheet = tdmDataSheet;
