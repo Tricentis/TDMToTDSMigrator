@@ -147,7 +147,7 @@ namespace MigratorUI
             this.deselectAllButton.Enabled = false;
             this.deselectAllButton.FlatAppearance.BorderSize = 0;
             this.deselectAllButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.deselectAllButton.Location = new System.Drawing.Point(878, 357);
+            this.deselectAllButton.Location = new System.Drawing.Point(878, 305);
             this.deselectAllButton.Name = "deselectAllButton";
             this.deselectAllButton.Size = new System.Drawing.Size(130, 33);
             this.deselectAllButton.TabIndex = 11;
@@ -321,11 +321,11 @@ namespace MigratorUI
             this.reverseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.reverseButton.Location = new System.Drawing.Point(878, 396);
             this.reverseButton.Name = "reverseButton";
-            this.reverseButton.Size = new System.Drawing.Size(130, 33);
+            this.reverseButton.Size = new System.Drawing.Size(130, 46);
             this.reverseButton.TabIndex = 29;
-            this.reverseButton.Text = "Revert selection";
+            this.reverseButton.Text = "Reverse selection";
             this.reverseButton.UseVisualStyleBackColor = false;
-            this.reverseButton.Click += new System.EventHandler(this.RevertSelectedCategoriesButton_Click);
+            this.reverseButton.Click += new System.EventHandler(this.ReverseSelectedCategoriesButton_Click);
             // 
             // selectRemainingCategoriesButton
             // 
@@ -333,7 +333,7 @@ namespace MigratorUI
             this.selectRemainingCategoriesButton.Enabled = false;
             this.selectRemainingCategoriesButton.FlatAppearance.BorderSize = 0;
             this.selectRemainingCategoriesButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.selectRemainingCategoriesButton.Location = new System.Drawing.Point(878, 305);
+            this.selectRemainingCategoriesButton.Location = new System.Drawing.Point(878, 344);
             this.selectRemainingCategoriesButton.Name = "selectRemainingCategoriesButton";
             this.selectRemainingCategoriesButton.Size = new System.Drawing.Size(130, 46);
             this.selectRemainingCategoriesButton.TabIndex = 30;

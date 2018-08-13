@@ -24,8 +24,8 @@ namespace MigratorUI {
         private void CreateRepositoryDialog_Load(object sender, EventArgs e) {
             foreach (DataBaseType dataBaseType in Enum.GetValues(typeof(DataBaseType))) {
                 repositoryTypeComboBox.Items.Add(dataBaseType);
-                repositoryTypeComboBox.SelectedItem = dataBaseType;
             }
+            repositoryTypeComboBox.SelectedItem = DataBaseType.Sqlite;
         }
 
         public void CreateRepository(TestDataRepository repository) {
@@ -89,10 +89,10 @@ namespace MigratorUI {
 
         private void CreateRepositoryButton_Click(object sender, EventArgs e) {
             TestDataRepository repository = new TestDataRepository {
-                    Description = repositoryDescriptionTextbox.Text,
-                    Name = repositoryNameTextBox.Text,
+                    Description = repositoryDescriptionTextbox.Text.Trim(),
+                    Name = repositoryNameTextBox.Text.Trim(),
                     Type = (DataBaseType)repositoryTypeComboBox.SelectedItem,
-                    Location = repositoryLocationTextBox.Text,
+                    Location = repositoryLocationTextBox.Text.Trim(),
             };
             if (IsValidRepository(repository)) {
                 CreateRepository(repository);

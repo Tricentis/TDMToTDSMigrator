@@ -69,6 +69,7 @@ namespace MigratorUI {
                 }
             } else {
                 verifyUrlButton.Text = "Verify URL";
+                apiUrlTextBox.SelectionStart = apiUrlTextBox.TextLength;
                 ApiConnectionOk(false);
             }
         }
@@ -122,10 +123,7 @@ namespace MigratorUI {
 
                 if (deletionSuccessful) {
                     PrintDeletedRepositoryMessage(repository);
-                    repositoriesBox.Items.Remove(repository);
-                    if (repositoriesBox.Items.Count > 0) {
-                        repositoriesBox.SelectedItem = repositoriesBox.Items[0];
-                    }
+                    RefreshRepositoriesList();
                 } else {
                     logTextBox.AppendText("Could not delete " + repository.Name + "\n");
                 }
@@ -148,16 +146,13 @@ namespace MigratorUI {
 
         private Dictionary<string, TestDataCategory> FilterTestData() {
             Dictionary<string, TestDataCategory> filteredTestData = new Dictionary<string, TestDataCategory>();
-            foreach (TestDataCategory category in tdmData.TestDataCategories.Values) {
-                if (categoriesListBox.CheckedItems.Contains(category)) {
-                    filteredTestData.Add(category.Name, category);
-                    if (!allDataWasMigrated) {
-                        wasMigratedCategory[category] = true;
-                        SendCategoryToEndOfChecklist(category);
-                    }
+            foreach (TestDataCategory category in categoriesListBox.CheckedItems.OfType<TestDataCategory>().ToList()) {
+                filteredTestData.Add(category.Name, category);
+                if (!allDataWasMigrated) {
+                    wasMigratedCategory[category] = true;
+                    SendCategoryToEndOfChecklist(category);
                 }
             }
-            //SetCategoriesCheckState();
             return filteredTestData;
         }
 
@@ -244,7 +239,7 @@ namespace MigratorUI {
             }
         }
 
-        private void RevertSelectedCategories() {
+        private void ReverseSelectedCategories() {
             for (int i = 0; i < categoriesListBox.Items.Count; i++) {
                 categoriesListBox.SetItemChecked(i, !categoriesListBox.GetItemChecked(i));
             }
@@ -417,8 +412,8 @@ namespace MigratorUI {
             DeselectAllCategories();
         }
 
-        private void RevertSelectedCategoriesButton_Click(object sender, EventArgs e) {
-            RevertSelectedCategories();
+        private void ReverseSelectedCategoriesButton_Click(object sender, EventArgs e) {
+            ReverseSelectedCategories();
         }
 
         private void SelectRemainingCategoriesButton_Click(object sender, EventArgs e) {
@@ -447,7 +442,6 @@ namespace MigratorUI {
         }
 
         private void LogTextBox_TextChanged(object sender, EventArgs e) {
-            logTextBox.SelectionStart = logTextBox.Text.Length;
             logTextBox.ScrollToCaret();
         }
 

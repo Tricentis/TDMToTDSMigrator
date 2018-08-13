@@ -43,7 +43,6 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="TestDataContract, Version=11.2.0.1, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\TestDataContract.11.3.0.64\lib\netstandard2.0\TestDataContract.dll</HintPath>
