@@ -20,6 +20,8 @@ namespace TDMtoTDSMigrator {
 
         public Dictionary<string, List<StringAttribute>> StringAttributes;
 
+        public Dictionary<string, TestDataCategory> TestDataCategories;
+
         public TdmDataDocument(string tddPath) {
             XmlDocument doc = new XmlDocument();
             doc.Load(DecompressTddFileIntoXml(tddPath));
@@ -30,10 +32,10 @@ namespace TDMtoTDSMigrator {
             LoadStringAttributes();
         }
 
-        public Dictionary<string, TestDataCategory> CreateDataList() {
-            Dictionary<string, TestDataCategory> testData = new Dictionary<string, TestDataCategory>();
+        public void CreateDataList() {
+            TestDataCategories = new Dictionary<string, TestDataCategory>();
             foreach (MetaInfoType metaInfoType in MetaInfoTypes.Values) {
-                testData.Add(metaInfoType.CategoryName, new TestDataCategory() { Name = metaInfoType.CategoryName, Elements = new List<TestDataObject>(), ElementCount = 0 });
+                TestDataCategories.Add(metaInfoType.CategoryName, new TestDataCategory() { Name = metaInfoType.CategoryName, Elements = new List<TestDataObject>(), ElementCount = 0 });
             }
             foreach (string objectId in StringAttributes.Keys) {
                 JObject data = new JObject();
@@ -41,10 +43,9 @@ namespace TDMtoTDSMigrator {
                     data.Add(stringAttribute.AttributeName, stringAttribute.AttributeValue);
                 }
                 TestDataObject obj = new TestDataObject() { Category = StringAttributes[objectId][0].CategoryName, Data = JObject.Parse(data.ToString()), Consumed = false };
-                testData[obj.Category].Elements.Add(obj);
-                testData[obj.Category].ElementCount++;
+                TestDataCategories[obj.Category].Elements.Add(obj);
+                TestDataCategories[obj.Category].ElementCount++;
             }
-            return testData;
         }
 
         public static string DecompressTddFileIntoXml(string tddPath) {
