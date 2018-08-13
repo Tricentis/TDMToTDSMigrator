@@ -131,6 +131,7 @@ namespace MigratorUI
             this.categoriesListBox.ColumnWidth = 111;
             this.categoriesListBox.Enabled = false;
             this.categoriesListBox.FormattingEnabled = true;
+            this.categoriesListBox.HorizontalScrollbar = true;
             this.categoriesListBox.Location = new System.Drawing.Point(496, 266);
             this.categoriesListBox.Name = "categoriesListBox";
             this.categoriesListBox.RightToLeft = System.Windows.Forms.RightToLeft.No;

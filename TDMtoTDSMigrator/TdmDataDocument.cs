@@ -20,7 +20,7 @@ namespace TDMtoTDSMigrator {
 
         public Dictionary<string, List<StringAttribute>> StringAttributes;
 
-        public Dictionary<string, TestDataCategory> TestDataCategories;
+        public Dictionary<string, TestDataCategory> TestData;
 
         public TdmDataDocument(string tddPath) {
             XmlDocument doc = new XmlDocument();
@@ -32,19 +32,19 @@ namespace TDMtoTDSMigrator {
             LoadStringAttributes();
         }
 
-        public void CreateDataList() {
-            TestDataCategories = new Dictionary<string, TestDataCategory>();
+        public void CreateDataDictionary() {
+            TestData = new Dictionary<string, TestDataCategory>();
             foreach (MetaInfoType metaInfoType in MetaInfoTypes.Values) {
-                TestDataCategories.Add(metaInfoType.CategoryName, new TestDataCategory() { Name = metaInfoType.CategoryName, Elements = new List<TestDataObject>(), ElementCount = 0 });
+                TestData.Add(metaInfoType.CategoryName, new TestDataCategory { Name = metaInfoType.CategoryName, Elements = new List<TestDataObject>(), ElementCount = 0 });
             }
             foreach (string objectId in StringAttributes.Keys) {
                 JObject data = new JObject();
                 foreach (StringAttribute stringAttribute in StringAttributes[objectId]) {
                     data.Add(stringAttribute.AttributeName, stringAttribute.AttributeValue);
                 }
-                TestDataObject obj = new TestDataObject() { Category = StringAttributes[objectId][0].CategoryName, Data = JObject.Parse(data.ToString()), Consumed = false };
-                TestDataCategories[obj.Category].Elements.Add(obj);
-                TestDataCategories[obj.Category].ElementCount++;
+                TestDataObject obj = new TestDataObject { Category = StringAttributes[objectId][0].CategoryName, Data = JObject.Parse(data.ToString()), Consumed = false };
+                TestData[obj.Category].Elements.Add(obj);
+                TestData[obj.Category].ElementCount++;
             }
         }
 
@@ -87,14 +87,16 @@ namespace TDMtoTDSMigrator {
         private void LoadMetaInfoTypes() {
             MetaInfoTypes = new Dictionary<string, MetaInfoType>();
             foreach (XmlNode node in GetMetaInfoTypes()) {
-                MetaInfoTypes.Add(node.Attributes?[0].Value ?? throw new InvalidOperationException(), new MetaInfoType(node));
+                MetaInfoType metaInfoType = new MetaInfoType(node);
+                MetaInfoTypes.Add(metaInfoType.CategoryId, metaInfoType);
             }
         }
 
         private void LoadMetaInfoAttributes() {
             MetaInfoAttributes = new Dictionary<string, MetaInfoAttribute>();
             foreach (XmlNode node in GetMetaInfoAttributes()) {
-                MetaInfoAttributes.Add(node.Attributes?[0].Value ?? throw new InvalidOperationException(), new MetaInfoAttribute(node));
+                MetaInfoAttribute metaInfoAttribute = new MetaInfoAttribute(node);
+                MetaInfoAttributes.Add(metaInfoAttribute.AttributeId, metaInfoAttribute);
             }
         }
 
@@ -108,11 +110,12 @@ namespace TDMtoTDSMigrator {
         private void LoadStringAttributes() {
             StringAttributes = new Dictionary<string, List<StringAttribute>>();
             foreach (XmlNode node in GetStringAttributes()) {
+                StringAttribute attribute = new StringAttribute(this, node);
                 try {
-                    StringAttributes[node.Attributes?[0].Value ?? throw new InvalidOperationException()].Add(new StringAttribute(this, node));
+                    StringAttributes[attribute.ObjectId].Add(attribute);
                 } catch (Exception) {
-                    StringAttributes.Add(node.Attributes?[0].Value ?? throw new InvalidOperationException(), new List<StringAttribute>());
-                    StringAttributes[node.Attributes?[0].Value].Add(new StringAttribute(this, node));
+                    StringAttributes.Add(attribute.ObjectId, new List<StringAttribute>());
+                    StringAttributes[attribute.ObjectId].Add(attribute);
                 }
             }
         }

@@ -30,9 +30,9 @@ namespace TDMtoTDSMigrator {
 
         public StringAttribute(TdmDataDocument tdmDataSheet, XmlNode stringAttribute) {
             this.tdmDataSheet = tdmDataSheet;
-            ObjectId = stringAttribute.Attributes?[0].Value;
-            AttributeId = stringAttribute.Attributes?[1].Value;
-            AttributeValue = stringAttribute.Attributes?[2].Value;
+            ObjectId = stringAttribute.Attributes?[0].Value; //ex:"8567"
+            AttributeId = stringAttribute.Attributes?[1].Value; //ex:"3"
+            AttributeValue = stringAttribute.Attributes?[2].Value; //ex:"10, Downing Street"
         }
     }
 }

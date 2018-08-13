@@ -65,10 +65,7 @@ namespace MigratorUI {
             }
             foreach (char unallowedCharacter in unallowedRepositoryCharacters) {
                 if (repository.Name.Contains(unallowedCharacter.ToString())) {
-                    migrator.logTextBox.AppendText("A repository name cannot contain the following characters :\n");
-                    foreach (char character in unallowedRepositoryCharacters) {
-                        migrator.logTextBox.AppendText(character + " ");
-                    }
+                    migrator.logTextBox.AppendText("A repository name cannot contain the following characters :\n"+new string(unallowedRepositoryCharacters)+"\n");
                     migrator.logTextBox.AppendText("\n");
                     repositoryNameTextBox.BackColor = Color.PaleVioletRed;
                     return false;
@@ -88,14 +85,14 @@ namespace MigratorUI {
         }
 
         private void CreateRepositoryButton_Click(object sender, EventArgs e) {
-            TestDataRepository repository = new TestDataRepository {
+            TestDataRepository newRepository = new TestDataRepository {
                     Description = repositoryDescriptionTextbox.Text.Trim(),
                     Name = repositoryNameTextBox.Text.Trim(),
                     Type = (DataBaseType)repositoryTypeComboBox.SelectedItem,
                     Location = repositoryLocationTextBox.Text.Trim(),
             };
-            if (IsValidRepository(repository)) {
-                CreateRepository(repository);
+            if (IsValidRepository(newRepository)) {
+                CreateRepository(newRepository);
             }
         }
 
@@ -120,7 +117,7 @@ namespace MigratorUI {
         private void RepositoryLocationTextBox_TextChanged(object sender, EventArgs e) {
             repositoryLocationTextBox.BackColor = Color.White;
             if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite
-                                         && !repositoryLocationTextBox.Text.Contains(repositoryNameTextBox.Text + ".db")) {
+                                         && repositoryLocationTextBox.Text!= @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text + ".db") {
                 automaticLocationWritingEnabled = false;
             }
             else if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory
