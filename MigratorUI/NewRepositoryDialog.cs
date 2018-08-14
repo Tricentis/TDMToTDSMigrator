@@ -8,14 +8,14 @@ using TDMtoTDSMigrator;
 using TestDataContract.Configuration;
 
 namespace MigratorUI {
-    public partial class CreateRepositoryDialog : Form {
+    public partial class NewRepositoryDialog : Form {
         private readonly TdsMigrator migrator;
 
         private bool automaticLocationWritingEnabled;
 
         readonly char[] unallowedRepositoryCharacters = { '/', '|', '\\', '<', '>', '#', '*', '+', ':', ';', '"', '.', ',', '?' };
 
-        public CreateRepositoryDialog(TdsMigrator migrator) {
+        public NewRepositoryDialog(TdsMigrator migrator) {
             InitializeComponent();
             this.migrator = migrator;
             automaticLocationWritingEnabled = true;

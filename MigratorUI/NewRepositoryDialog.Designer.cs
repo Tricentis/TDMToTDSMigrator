@@ -1,6 +1,6 @@
 ﻿namespace MigratorUI
 {
-    partial class CreateRepositoryDialog
+    partial class NewRepositoryDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreateRepositoryDialog));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewRepositoryDialog));
             this.repositoryLocationTextBox = new System.Windows.Forms.TextBox();
             this.locationLabel = new System.Windows.Forms.Label();
             this.typeLabel = new System.Windows.Forms.Label();
@@ -154,7 +154,7 @@
             this.Controls.Add(this.repositoryNameTextBox);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "CreateRepositoryDialog";
+            this.Name = "NewRepositoryDialog";
             this.Text = "Create new TDS Repository";
             this.Load += new System.EventHandler(this.CreateRepositoryDialog_Load);
             this.ResumeLayout(false);

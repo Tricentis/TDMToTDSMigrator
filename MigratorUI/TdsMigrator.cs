@@ -386,7 +386,7 @@ namespace MigratorUI {
         }
 
         private void CreateRepositoryButton_Click(object sender, EventArgs e) {
-            new CreateRepositoryDialog(this).ShowDialog();
+            new NewRepositoryDialog(this).ShowDialog();
         }
 
         private void ClearRepositoryButton_Click(object sender, EventArgs e) {
