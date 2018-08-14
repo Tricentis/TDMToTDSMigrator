@@ -28,48 +28,48 @@ namespace MigratorUI {
             repositoryTypeComboBox.SelectedItem = DataBaseType.Sqlite;
         }
 
-        public void CreateRepository(TestDataRepository repository) {
-            bool creationSuccessful = HttpRequest.CreateRepository(repository).IsSuccessStatusCode;
+        public void CreateRepository(TestDataRepository newRepository) {
+            bool creationSuccessful = HttpRequest.CreateRepository(newRepository).IsSuccessStatusCode;
             if (creationSuccessful) {
-                PrintCreatedRepositoryMessage(repository);
-                migrator.repositoriesBox.Items.Add(repository);
-                migrator.repositoriesBox.SelectedItem = repository;
+                PrintCreatedRepositoryMessage(newRepository);
+                migrator.repositoriesBox.Items.Add(newRepository);
+                migrator.repositoriesBox.SelectedItem = newRepository;
                 Dispose();
             } else {
-                migrator.logTextBox.AppendText("Could not create repository " + repository.Name + "\n");
+                migrator.logTextBox.AppendText("Could not create repository " + newRepository.Name + "\n");
             }
         }
 
-        private bool IsValidRepository(TestDataRepository repository) {
-            if (string.IsNullOrEmpty(repository.Name)) {
+        private bool IsValidRepository(TestDataRepository newRepository) {
+            if (string.IsNullOrEmpty(newRepository.Name)) {
                 migrator.logTextBox.AppendText("Please enter a repository name\n");
                 repositoryNameTextBox.BackColor = Color.PaleVioletRed;
                 return false;
             }
-            if (repository.Name.Trim().Contains("  ")) {
+            if (newRepository.Name.Trim().Contains("  ")) {
                 migrator.logTextBox.AppendText("Please remove double white spaces in repository name\n");
                 repositoryNameTextBox.BackColor = Color.PaleVioletRed;
                 return false;
             }
-            if (string.IsNullOrEmpty(repository.Location)) {
+            if (string.IsNullOrEmpty(newRepository.Location)) {
                 migrator.logTextBox.AppendText("Please enter a repository location\n");
                 repositoryLocationTextBox.BackColor = Color.PaleVioletRed;
                 return false;
             }
             foreach (TestDataRepository existingRepository in HttpRequest.GetRepositories()) {
-                if (existingRepository.Name == repository.Name) {
-                    migrator.logTextBox.AppendText("Repository \"" + repository.Name + "\" already exists \n");
+                if (existingRepository.Name == newRepository.Name) {
+                    migrator.logTextBox.AppendText("Repository \"" + newRepository.Name + "\" already exists \n");
                     repositoryNameTextBox.BackColor = Color.PaleVioletRed;
                     return false;
                 }
-                if (existingRepository.Location == repository.Location) {
-                    migrator.logTextBox.AppendText("Repository \"" + existingRepository.Name + "\" already occupies the location " + repository.Location + "\n");
+                if (existingRepository.Location == newRepository.Location) {
+                    migrator.logTextBox.AppendText("Repository \"" + existingRepository.Name + "\" already occupies the location " + newRepository.Location + "\n");
                     repositoryLocationTextBox.BackColor = Color.PaleVioletRed;
                     return false;
                 }
             }
             foreach (char unallowedCharacter in unallowedRepositoryCharacters) {
-                if (repository.Name.Contains(unallowedCharacter.ToString())) {
+                if (newRepository.Name.Contains(unallowedCharacter.ToString())) {
                     migrator.logTextBox.AppendText("A repository name cannot contain the following characters :\n"+new string(unallowedRepositoryCharacters)+"\n");
                     migrator.logTextBox.AppendText("\n");
                     repositoryNameTextBox.BackColor = Color.PaleVioletRed;
@@ -79,11 +79,11 @@ namespace MigratorUI {
             return true;
         }
 
-        private void PrintCreatedRepositoryMessage(TestDataRepository repository) {
+        private void PrintCreatedRepositoryMessage(TestDataRepository newRepository) {
             StringBuilder s = new StringBuilder();
-            s.Append("Repository Created : " + repository.Name);
-            if (repository.Description != "") {
-                s.Append(" , Description : " + repository.Description + ".");
+            s.Append("Repository Created : " + newRepository.Name);
+            if (newRepository.Description != "") {
+                s.Append(" , Description : " + newRepository.Description + ".");
             }
             s.Append("\n");
             migrator.logTextBox.AppendText(s.ToString());
