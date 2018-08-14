@@ -46,6 +46,11 @@ namespace MigratorUI {
                 repositoryNameTextBox.BackColor = Color.PaleVioletRed;
                 return false;
             }
+            if (repository.Name.Trim().Contains("  ")) {
+                migrator.logTextBox.AppendText("Please remove double white spaces in repository name\n");
+                repositoryNameTextBox.BackColor = Color.PaleVioletRed;
+                return false;
+            }
             if (string.IsNullOrEmpty(repository.Location)) {
                 migrator.logTextBox.AppendText("Please enter a repository location\n");
                 repositoryLocationTextBox.BackColor = Color.PaleVioletRed;
@@ -98,18 +103,18 @@ namespace MigratorUI {
 
         private void RepositoryNameTextBox_TextChanged(object sender, EventArgs e) {
             if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite) {
-                repositoryLocationTextBox.Text = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text + ".db";
+                repositoryLocationTextBox.Text = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text.Trim() + ".db";
             }else if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory) {
-                repositoryLocationTextBox.Text = repositoryNameTextBox.Text;
+                repositoryLocationTextBox.Text = repositoryNameTextBox.Text.Trim();
             }
             repositoryNameTextBox.BackColor = Color.White;
         }
 
         private void RepositoryTypeComboBox_SelectedIndexChanged(object sender, EventArgs e) {
             if ((DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory) {
-                repositoryLocationTextBox.Text = repositoryNameTextBox.Text;
+                repositoryLocationTextBox.Text = repositoryNameTextBox.Text.Trim();
             } else if ((DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite) {
-                repositoryLocationTextBox.Text = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text + ".db";
+                repositoryLocationTextBox.Text = @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text.Trim() + ".db";
             }
             automaticLocationWritingEnabled = true;
         }
@@ -117,12 +122,10 @@ namespace MigratorUI {
         private void RepositoryLocationTextBox_TextChanged(object sender, EventArgs e) {
             repositoryLocationTextBox.BackColor = Color.White;
             if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.Sqlite
-                                         && repositoryLocationTextBox.Text!= @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text + ".db") {
+                                                && repositoryLocationTextBox.Text != @"%PROGRAMDATA%\Tricentis\TestDataService\" + repositoryNameTextBox.Text.Trim() + ".db") {
                 automaticLocationWritingEnabled = false;
-            }
-            else if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory
-                                         && repositoryLocationTextBox.Text != repositoryNameTextBox.Text)
-            {
+            } else if (automaticLocationWritingEnabled && (DataBaseType)repositoryTypeComboBox.SelectedItem == DataBaseType.InMemory
+                                                       && repositoryLocationTextBox.Text != repositoryNameTextBox.Text.Trim()) {
                 automaticLocationWritingEnabled = false;
             }
         }

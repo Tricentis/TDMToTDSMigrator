@@ -5,7 +5,6 @@ using System.Drawing;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using TDMtoTDSMigrator;
@@ -17,7 +16,7 @@ namespace MigratorUI {
     public partial class TdsMigrator : Form {
         private TdmDataDocument tdmData;
 
-        private Dictionary<TestDataCategory, Boolean> categoryMigrated = new Dictionary<TestDataCategory, bool>();
+        private Dictionary<TestDataCategory, Boolean> categoryMigrated = new Dictionary<TestDataCategory, Boolean>();
 
         private bool allDataWasMigrated;
 
@@ -69,20 +68,16 @@ namespace MigratorUI {
                 }
             } else {
                 verifyUrlButton.Text = "Verify URL";
-                apiUrlTextBox.SelectionStart = apiUrlTextBox.TextLength;
                 ApiConnectionOk(false);
             }
         }
 
-        private async void ProcessTddFile() {
+        private void ProcessTddFile() {
             TddFileProcessingLaunched();
-            await Task.Delay(10);
             tdmData = new TdmDataDocument(tddPathTextBox.Text);
             BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (s, r) => {  tdmData.CreateDataDictionary(); };
-            worker.RunWorkerCompleted += (s, r) => {
-                                             TddFileProcessingFinished();
-                                         };
+            worker.DoWork += (s, r) => { tdmData.CreateDataDictionary(); };
+            worker.RunWorkerCompleted += (s, r) => { TddFileProcessingFinished(); };
             worker.RunWorkerAsync();
         }
 
@@ -129,30 +124,34 @@ namespace MigratorUI {
             }
         }
 
-        private async Task<HttpResponseMessage> LaunchMigration() {
+        private async void LaunchMigration() {
             Dictionary<string, TestDataCategory> filteredTestData = FilterTestData();
-            PrintEstimatedWaitTimeMessage(filteredTestData, (TestDataRepository)repositoriesBox.SelectedItem);
-            //
-            //
-            //DELETE AFTER INMEMORY API BUGFIX
-            //
-            //
+            TestDataRepository targetRepository = (TestDataRepository)repositoriesBox.SelectedItem;
+            PrintMigrationLaunchedMessage(filteredTestData, targetRepository);
+            PrintEstimatedWaitTimeMessage(filteredTestData, targetRepository);
+            MigrationInWork(true);
+            HttpResponseMessage message;
             if (((TestDataRepository)repositoriesBox.SelectedItem).Type == DataBaseType.InMemory) {
-                return await HttpRequest.MigrateInMemory(filteredTestData, (TestDataRepository)repositoriesBox.SelectedItem, ApiUrl);
+                //DELETE AFTER INMEMORY API BUGFIX
+                message = await HttpRequest.MigrateInMemory(filteredTestData, targetRepository, ApiUrl);
+            } else {
+                message = await HttpRequest.Migrate(filteredTestData, targetRepository, ApiUrl);
             }
-            return await HttpRequest.Migrate(filteredTestData, (TestDataRepository)repositoriesBox.SelectedItem, ApiUrl);
-        }
-
-        private Dictionary<string, TestDataCategory> FilterTestData() {
-            Dictionary<string, TestDataCategory> filteredTestData = new Dictionary<string, TestDataCategory>();
-            foreach (TestDataCategory category in categoriesListBox.CheckedItems.OfType<TestDataCategory>().ToList()) {
-                filteredTestData.Add(category.Name, category);
-                if (!allDataWasMigrated) {
-                    categoryMigrated[category] = true;
-                    SendCategoryToEndOfChecklist(category);
+            MigrationInWork(false);
+            if (message.IsSuccessStatusCode) {
+                PrintMigrationSuccessfullMessage(filteredTestData, targetRepository);
+                SortCategoriesCheckBox(filteredTestData);
+                if (categoryMigrated.Values.Contains(false) || allDataWasMigrated) {
+                    return;
                 }
+                allDataWasMigrated = true;
+                PrintAllDataWasMigratedMessage();
+                selectRemainingCategoriesButton.Enabled = false;
+                categoriesListBox.Sorted = true;
+            } else {
+                logTextBox.AppendText("Migration failed. Reason: " + message.ReasonPhrase
+                                                                   + "\nPlease make sure the repository was correctly created (no extra spaces or unallowed characters in name, correct location)\n");
             }
-            return filteredTestData;
         }
 
         //UI element attributes methods
@@ -252,11 +251,6 @@ namespace MigratorUI {
             }
         }
 
-        private void SendCategoryToEndOfChecklist(TestDataCategory category) {
-            categoriesListBox.Items.Remove(category);
-            categoriesListBox.Items.Add(category, false);
-        }
-
         public void RefreshRepositoriesList() {
             int previouslySelectedIndex = 0;
             if (repositoriesBox.SelectedItem != null) {
@@ -266,11 +260,9 @@ namespace MigratorUI {
             foreach (TestDataRepository repository in HttpRequest.GetRepositories()) {
                 repositoriesBox.Items.Add(repository);
             }
-            if (previouslySelectedIndex > repositoriesBox.Items.Count - 1) {
-                repositoriesBox.SelectedItem = repositoriesBox.Items[repositoriesBox.Items.Count - 1];
-            } else {
-                repositoriesBox.SelectedItem = repositoriesBox.Items[previouslySelectedIndex];
-            }
+            repositoriesBox.SelectedItem = previouslySelectedIndex > repositoriesBox.Items.Count - 1
+                                                   ? repositoriesBox.Items[repositoriesBox.Items.Count - 1]
+                                                   : repositoriesBox.Items[previouslySelectedIndex];
         }
 
         private void MigrationInWork(bool inWork) {
@@ -284,6 +276,26 @@ namespace MigratorUI {
             createRepositoryButton.Enabled = !migrationInWork;
             loadIntoRepositoryButton.Enabled = !migrationInWork;
             loadRefreshRepositoriesButton.Enabled = !migrationInWork;
+        }
+
+        private Dictionary<string, TestDataCategory> FilterTestData() {
+            Dictionary<string, TestDataCategory> filteredTestData = new Dictionary<string, TestDataCategory>();
+            foreach (TestDataCategory category in categoriesListBox.CheckedItems.OfType<TestDataCategory>().ToList()) {
+                filteredTestData.Add(category.Name, category);
+            }
+            return filteredTestData;
+        }
+
+        private void SortCategoriesCheckBox(Dictionary<string, TestDataCategory> filteredTestData) {
+            foreach (TestDataCategory category in filteredTestData.Values) {
+                categoryMigrated[category] = true;
+                SendCategoryToEndOfCheckBox(category);
+            }
+        }
+
+        private void SendCategoryToEndOfCheckBox(TestDataCategory category) {
+            categoriesListBox.Items.Remove(category);
+            categoriesListBox.Items.Add(category, false);
         }
 
         //logText message generation methoids
@@ -328,8 +340,8 @@ namespace MigratorUI {
             logTextBox.AppendText("Repository Cleared : " + repository.Name + "\n");
         }
 
-        private void PrintMigrationLaunchedMessage(int numberOfCategories, TestDataRepository repository) {
-            logTextBox.AppendText("Migrating " + numberOfCategories + " categories into \"" + repository.Name + "\". Please wait...\n");
+        private void PrintMigrationLaunchedMessage(Dictionary<string, TestDataCategory> filteredTestData, TestDataRepository repository) {
+            logTextBox.AppendText("Migrating " + filteredTestData.Keys.Count + " categories into \"" + repository.Name + "\". Please wait...\n");
             //
             //
             //DELETE AFTER INMEMORY API BUGFIX
@@ -340,15 +352,15 @@ namespace MigratorUI {
             }
         }
 
-        private void PrintEstimatedWaitTimeMessage(Dictionary<string, TestDataCategory> data, TestDataRepository repository) {
-            if (HttpRequest.EstimatedMigrationWaitTime(data, repository) > 5) {
-                logTextBox.AppendText("Estimated waiting time : " + HttpRequest.EstimatedMigrationWaitTime(data, repository) + " seconds\n");
+        private void PrintEstimatedWaitTimeMessage(Dictionary<string, TestDataCategory> filteredTestData, TestDataRepository repository) {
+            if (HttpRequest.EstimatedMigrationWaitTime(filteredTestData, repository) > 5) {
+                logTextBox.AppendText("Estimated waiting time : " + HttpRequest.EstimatedMigrationWaitTime(filteredTestData, repository) + " seconds\n");
             }
         }
 
-        private void PrintMigrationFinishedMessage(int numberOfCategories, TestDataRepository repository) {
-            logTextBox.AppendText("Successfully migrated " + numberOfCategories + " out of " + categoriesListBox.Items.Count + " available categories into the repository : \""
-                                  + repository.Name + "\".\n");
+        private void PrintMigrationSuccessfullMessage(Dictionary<string, TestDataCategory> filteredTestData, TestDataRepository repository) {
+            logTextBox.AppendText("Successfully migrated " + filteredTestData.Keys.Count + " out of " + categoriesListBox.Items.Count
+                                  + " available categories into the repository : \"" + repository.Name + "\".\n");
         }
 
         private void PrintAllDataWasMigratedMessage() {
@@ -419,25 +431,13 @@ namespace MigratorUI {
             SelectRemainingCategories();
         }
 
-        private async void LoadIntoRepositoryButton_Click(object sender, EventArgs e) {
+        private void LoadIntoRepositoryButton_Click(object sender, EventArgs e) {
             if (repositoriesBox.SelectedItem == null) {
                 logTextBox.AppendText("Please pick a repository, or create one\n");
             } else if (categoriesListBox.CheckedItems.Count == 0) {
                 logTextBox.AppendText("Please pick at least one category\n");
             } else {
-                int numberOfCategoriesToMigrate = categoriesListBox.CheckedItems.Count;
-                PrintMigrationLaunchedMessage(numberOfCategoriesToMigrate, (TestDataRepository)repositoriesBox.SelectedItem);
-                MigrationInWork(true);
-                await LaunchMigration();
-                MigrationInWork(false);
-                PrintMigrationFinishedMessage(numberOfCategoriesToMigrate, (TestDataRepository)repositoriesBox.SelectedItem);
-                if (categoryMigrated.Values.Contains(false) || allDataWasMigrated) {
-                    return;
-                }
-                allDataWasMigrated = true;
-                PrintAllDataWasMigratedMessage();
-                selectRemainingCategoriesButton.Enabled = false;
-                categoriesListBox.Sorted = true;
+                LaunchMigration();
             }
         }
 
