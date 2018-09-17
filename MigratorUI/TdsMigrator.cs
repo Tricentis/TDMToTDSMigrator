@@ -12,17 +12,16 @@ using TDMtoTDSMigrator;
 using TestDataContract.Configuration;
 using TestDataContract.TestData;
 
-namespace MigratorUI {
+namespace MigratorUI
+{
     public partial class TdsMigrator : Form {
+        public string ApiUrl;
+
         private TdmDataDocument tdmData;
 
         private Dictionary<TestDataCategory, Boolean> categoryMigrated = new Dictionary<TestDataCategory, Boolean>();
 
         private bool allDataWasMigrated;
-
-        private bool migrationInWork;
-
-        public string ApiUrl;
 
         public TdsMigrator() {
             InitializeComponent();
@@ -44,31 +43,34 @@ namespace MigratorUI {
         //Initialization 
         private void TdsMigrator_Load(object sender, EventArgs e) {
             PrintWelcomeMessage();
-            verifyUrlButton.Select();
         }
 
         //Migration and API related methods
         private void VerifyUrl(string apiUrl) {
-            if (verifyUrlButton.Text == "Verify URL") {
-                bool connectionSuccessfull = HttpRequest.SetConnection(apiUrl);
-                if (connectionSuccessfull) {
-                    this.ApiUrl = apiUrl;
-                    apiUrlTextBox.BackColor = Color.Lime;
-                    ApiConnectionOk(true);
-                    verifyUrlButton.Text = "Change URL";
-                    logTextBox.AppendText("Valid URL. \n");
-                    if (string.IsNullOrEmpty(tddPathTextBox.Text)) {
-                        logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
+            switch (urlButton.Text) {
+                case "Verify URL":
+                    bool connectionSuccessfull = HttpRequest.SetConnection(apiUrl);
+                    if (connectionSuccessfull) {
+                        urlButton.Text = "Change URL";
+                        logTextBox.AppendText("Valid URL. \n");
+                        apiUrlTextBox.BackColor = Color.Lime;
+                        this.ApiUrl = apiUrl;
+                        ApiConnectionOk(true);
+                        if (string.IsNullOrEmpty(tddPathTextBox.Text)) {
+                            logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
+                        }
+                    } else {
+                        repositoriesBox.Items.Clear();
+                        logTextBox.AppendText("Url is not valid\n");
+                        apiUrlTextBox.BackColor = Color.PaleVioletRed;
+                        ApiConnectionOk(false);
                     }
-                } else {
-                    apiUrlTextBox.BackColor = Color.PaleVioletRed;
+                    break;
+                case "Change URL":
+                    urlButton.Text = "Verify URL";
                     ApiConnectionOk(false);
-                    repositoriesBox.Items.Clear();
-                    logTextBox.AppendText("Not a valid URL.\n");
-                }
-            } else {
-                verifyUrlButton.Text = "Verify URL";
-                ApiConnectionOk(false);
+                    ActiveControl = apiUrlTextBox;
+                    break;
             }
         }
 
@@ -107,6 +109,7 @@ namespace MigratorUI {
             }
         }
 
+
         private void DeleteRepository(TestDataRepository repository) {
             DialogResult confirmResult = MessageBox.Show("All the data contained in this repository will be erased",
                                                          "Clear " + repository.Name + " repository",
@@ -131,23 +134,24 @@ namespace MigratorUI {
             PrintEstimatedWaitTimeMessage(filteredTestData, targetRepository);
             MigrationInWork(true);
             HttpResponseMessage message;
-            if (((TestDataRepository)repositoriesBox.SelectedItem).Type == DataBaseType.InMemory) {
+            switch (targetRepository.Type) {
                 //DELETE AFTER INMEMORY API BUGFIX
-                message = await HttpRequest.MigrateInMemory(filteredTestData, targetRepository, ApiUrl);
-            } else {
-                message = await HttpRequest.Migrate(filteredTestData, targetRepository, ApiUrl);
+                case DataBaseType.InMemory:
+                    message = await HttpRequest.MigrateInMemory(filteredTestData, targetRepository, ApiUrl);
+                    break;
+                default:
+                    message = await HttpRequest.Migrate(filteredTestData, targetRepository, ApiUrl);
+                    break;
             }
             MigrationInWork(false);
             if (message.IsSuccessStatusCode) {
                 PrintMigrationSuccessfullMessage(filteredTestData, targetRepository);
                 SortCategoriesCheckBox(filteredTestData);
-                if (categoryMigrated.Values.Contains(false) || allDataWasMigrated) {
-                    return;
+                if (!categoryMigrated.Values.Contains(false) && !allDataWasMigrated) {
+                    allDataWasMigrated = true;
+                    PrintAllDataWasMigratedMessage();
+                    selectRemainingCategoriesButton.Enabled = false;
                 }
-                allDataWasMigrated = true;
-                PrintAllDataWasMigratedMessage();
-                selectRemainingCategoriesButton.Enabled = false;
-                categoriesListBox.Sorted = true;
             } else {
                 logTextBox.AppendText("Migration failed. Reason: " + message.ReasonPhrase
                                                                    + "\nPlease make sure the repository was correctly created (no extra spaces or unallowed characters in name, correct location)\n");
@@ -156,21 +160,21 @@ namespace MigratorUI {
 
         //UI element attributes methods
         private void ApiConnectionOk(bool apiConnectionOk) {
-            bool tddFilePicked = string.IsNullOrEmpty(tddPathTextBox.Text);
+            bool tddFilePicked = !string.IsNullOrEmpty(tddPathTextBox.Text);
 
             createRepositoryButton.Enabled = apiConnectionOk;
             deleteRepositoryButton.Enabled = apiConnectionOk;
             clearRepositoryButton.Enabled = apiConnectionOk;
-            loadIntoRepositoryButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
+            loadIntoRepositoryButton.Enabled = apiConnectionOk & tddFilePicked;
             loadRefreshRepositoriesButton.Enabled = apiConnectionOk;
             repositoriesBox.Enabled = apiConnectionOk;
-            categoriesListBox.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
-            selectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
-            deselectAllButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
-            reverseButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork;
-            selectRemainingCategoriesButton.Enabled = apiConnectionOk & tddFilePicked & !migrationInWork & !allDataWasMigrated;
-            apiUrlTextBox.Enabled = !apiConnectionOk & !migrationInWork;
-            pickFileButton.Enabled = apiConnectionOk & !migrationInWork;
+            categoriesListBox.Enabled = apiConnectionOk & tddFilePicked;
+            selectAllButton.Enabled = apiConnectionOk & tddFilePicked;
+            deselectAllButton.Enabled = apiConnectionOk & tddFilePicked;
+            reverseButton.Enabled = apiConnectionOk & tddFilePicked;
+            selectRemainingCategoriesButton.Enabled = apiConnectionOk & tddFilePicked & !allDataWasMigrated;
+            apiUrlTextBox.Enabled = !apiConnectionOk;
+            pickFileButton.Enabled = apiConnectionOk;
 
             if (apiConnectionOk) {
                 pickFileButton.Text = "Browse...";
@@ -190,7 +194,7 @@ namespace MigratorUI {
             deselectAllButton.Enabled = false;
             reverseButton.Enabled = false;
             selectRemainingCategoriesButton.Enabled = false;
-            verifyUrlButton.Enabled = false;
+            urlButton.Enabled = false;
             pickFileButton.Enabled = false;
             tddFileProcessingProgressBar.Visible = true;
         }
@@ -207,22 +211,25 @@ namespace MigratorUI {
             deselectAllButton.Enabled = true;
             reverseButton.Enabled = true;
             selectRemainingCategoriesButton.Enabled = true;
-            verifyUrlButton.Enabled = true;
+            urlButton.Enabled = true;
             pickFileButton.Enabled = true;
+            categoryMigrated = new Dictionary<TestDataCategory, bool>();
+            foreach (TestDataCategory category in tdmData.TestData.Values) {
+                if (category.ElementCount != 0) {
+                    categoryMigrated.Add(category, false);
+                }
+            }
         }
 
         private void LoadCategoriesIntoListBox() {
             categoriesListBox.Items.Clear();
-            categoryMigrated = new Dictionary<TestDataCategory, bool>();
             categoriesListBox.Sorted = true;
             foreach (TestDataCategory category in tdmData.TestData.Values) {
                 if (category.ElementCount != 0) {
-                    categoryMigrated.Add(category, false);
                     categoriesListBox.Items.Add(category, true);
                 }
             }
             PrintEmptyCategoriesWarningMessage();
-            categoriesListBox.Sorted = false;
         }
 
         private void SelectAllCategories() {
@@ -245,9 +252,7 @@ namespace MigratorUI {
 
         private void SelectRemainingCategories() {
             for (int i = 0; i < categoriesListBox.Items.Count; i++) {
-                if (!categoriesListBox.GetItemChecked(i)) {
-                    categoriesListBox.SetItemChecked(i, !categoryMigrated[(TestDataCategory)categoriesListBox.Items[i]]);
-                }
+                categoriesListBox.SetItemChecked(i, !categoryMigrated[(TestDataCategory)categoriesListBox.Items[i]]);
             }
         }
 
@@ -265,12 +270,10 @@ namespace MigratorUI {
                                                    : repositoriesBox.Items[previouslySelectedIndex];
         }
 
-        private void MigrationInWork(bool inWork) {
-            migrationInWork = inWork;
-
-            verifyUrlButton.Enabled = !migrationInWork;
-            pickFileButton.Enabled = !migrationInWork;
+        private void MigrationInWork(bool migrationInWork) {
             migrationProgressBar.Visible = migrationInWork;
+            urlButton.Enabled = !migrationInWork;
+            pickFileButton.Enabled = !migrationInWork;
             deleteRepositoryButton.Enabled = !migrationInWork;
             clearRepositoryButton.Enabled = !migrationInWork;
             createRepositoryButton.Enabled = !migrationInWork;
@@ -298,7 +301,7 @@ namespace MigratorUI {
             categoriesListBox.Items.Add(category, false);
         }
 
-        //logText message generation methoids
+        //logText message generation methods
         private void PrintWelcomeMessage() {
             logTextBox.AppendText(
                     "Welcome to Tricentis TDM to TDS Migrator.\nPlease enter a valid API URL and click on \"Verify Url\". \nExample : http://localhost:80/testdataservice \n");
@@ -321,11 +324,9 @@ namespace MigratorUI {
             bool oneCategoryIsEmpty = false;
             StringBuilder emptyCategoriesStringBuilder = new StringBuilder();
             emptyCategoriesStringBuilder.Append("\nThe following categories were empty and have been removed from the list :\n");
-            foreach (TestDataCategory category in tdmData.TestData.Values) {
-                if (category.ElementCount == 0) {
-                    oneCategoryIsEmpty = true;
-                    emptyCategoriesStringBuilder.Append(category.Name + ", ");
-                }
+            foreach(TestDataCategory category in tdmData.TestData.Values.Where(category => category.ElementCount == 0).ToList()){
+                emptyCategoriesStringBuilder.Append(category.Name + ", ");
+                oneCategoryIsEmpty = true;
             }
             if (oneCategoryIsEmpty) {
                 logTextBox.AppendText(emptyCategoriesStringBuilder.Remove(emptyCategoriesStringBuilder.ToString().LastIndexOf(", ", StringComparison.Ordinal), 2).ToString());
@@ -342,13 +343,9 @@ namespace MigratorUI {
 
         private void PrintMigrationLaunchedMessage(Dictionary<string, TestDataCategory> filteredTestData, TestDataRepository repository) {
             logTextBox.AppendText("Migrating " + filteredTestData.Keys.Count + " categories into \"" + repository.Name + "\". Please wait...\n");
-            //
-            //
             //DELETE AFTER INMEMORY API BUGFIX
-            //
-            //
             if (((TestDataRepository)repositoriesBox.SelectedItem).Type == DataBaseType.InMemory) {
-                logTextBox.AppendText("The process of migrating into an InMemory database is currently slow. \n");
+                logTextBox.AppendText("The process of migrating into an InMemory database is currently slower. \n");
             }
         }
 
@@ -360,11 +357,11 @@ namespace MigratorUI {
 
         private void PrintMigrationSuccessfullMessage(Dictionary<string, TestDataCategory> filteredTestData, TestDataRepository repository) {
             logTextBox.AppendText("Successfully migrated " + filteredTestData.Keys.Count + " out of " + categoriesListBox.Items.Count
-                                  + " available categories into the repository : \"" + repository.Name + "\".\n");
+                                  + " available categories into \"" + repository.Name + "\".\n");
         }
 
         private void PrintAllDataWasMigratedMessage() {
-            logTextBox.AppendText("\nAll your TDM data has been migrated to Tricentis TDS.\nYou can now exit the application.\n\n");
+            logTextBox.AppendText("\nAll TDM data has been migrated to Tricentis TDS.\nYou can now exit the application.\n\n");
         }
 
         //OnEvent methods
@@ -458,8 +455,13 @@ namespace MigratorUI {
 
         private void CategoriesListBox_Format(object sender, ListControlConvertEventArgs e) {
             e.Value = "";
-            if (categoryMigrated[(TestDataCategory)e.ListItem]) {
-                e.Value += "✓ ";
+            try {
+                if (categoryMigrated[(TestDataCategory)e.ListItem]) {
+                    e.Value += " ✓ ";
+                }
+            } catch (KeyNotFoundException) {
+                e.Value += ((TestDataCategory)e.ListItem).Name + " (" + ((TestDataCategory)e.ListItem).ElementCount + ")";
+                return;
             }
             e.Value += ((TestDataCategory)e.ListItem).Name + " (" + ((TestDataCategory)e.ListItem).ElementCount + ")";
         }

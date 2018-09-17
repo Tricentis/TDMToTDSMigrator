@@ -13,11 +13,11 @@ namespace TDMtoTDSMigrator {
         public string PartnerName;
 
         public MetaInfoAssociation(XmlNode metaInfoAssociation) {
-            AssociationId = metaInfoAssociation.Attributes?[0].Value; //ex:"1"
-            CategoryName = metaInfoAssociation.Attributes?[1].Value; //ex:"Person"
-            CategoryId = metaInfoAssociation.Attributes?[2].Value; //ex:"4"
-            PartnerId = metaInfoAssociation.Attributes?[3].Value; //ex:"2"
-            PartnerName = metaInfoAssociation.Attributes?[4].Value; //ex:"City"
+            AssociationId = metaInfoAssociation.Attributes?[0].Value; 
+            CategoryName = metaInfoAssociation.Attributes?[1].Value; 
+            CategoryId = metaInfoAssociation.Attributes?[2].Value; 
+            PartnerId = metaInfoAssociation.Attributes?[3].Value; 
+            PartnerName = metaInfoAssociation.Attributes?[4].Value; 
         }
     }
 }

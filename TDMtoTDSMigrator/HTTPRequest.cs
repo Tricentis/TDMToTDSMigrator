@@ -66,6 +66,10 @@ namespace TDMtoTDSMigrator {
             return await Client.PostAsync(repository.Name, new StringContent(jSon, Encoding.UTF8, "application/json"));
         }
 
+        public static List<TestDataObject> GetRecords(TestDataRepository repository, TestDataCategory category) {
+            return JsonConvert.DeserializeObject<List<TestDataObject>>(Client.GetStringAsync(repository.Name+"/"+category.Name).Result);
+        }
+
         public static Task<HttpResponseMessage> Migrate(Dictionary<string, TestDataCategory> testData, TestDataRepository repository, string apiUrl) {
             Task<HttpResponseMessage> message = null;
             foreach (string category in testData.Keys) {
@@ -76,30 +80,25 @@ namespace TDMtoTDSMigrator {
             return message;
         }
 
-        //
-        //
         //DELETE AFTER INMEMORY API BUGFIX
-        //
-        //
         public static async Task<HttpResponseMessage> MigrateInMemory(Dictionary<string, TestDataCategory> testData, TestDataRepository repository, string apiUrl) {
+            HttpResponseMessage message = null;
             foreach (string category in testData.Keys) {
                 foreach (TestDataObject obj in testData[category].Elements) {
-                    await PostObject(JsonConvert.SerializeObject(obj), repository, apiUrl);
+                    message = await PostObject(JsonConvert.SerializeObject(obj), repository, apiUrl);
                 }
             }
-            return new HttpResponseMessage();
+            return message;
         }
+
+        
 
         public static int EstimatedMigrationWaitTime(Dictionary<string, TestDataCategory> data, TestDataRepository repository) {
             int numberOfRecords = 0;
             foreach (TestDataCategory category in data.Values) {
                 numberOfRecords += category.ElementCount;
             }
-            //
-            //
             //DELETE AFTER INMEMORY API BUGFIX
-            //
-            //
             if (repository.Type == DataBaseType.InMemory) {
                 return (int)(230 * numberOfRecords / (float)618);
             }

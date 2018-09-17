@@ -1,0 +1,15 @@
+
+
+
+
+	-RepoNameMaxLength : 207
+	-SetAllAttributes method
+	-diff .get("") and .get(conf/repositories) (Location of repo missing in first)
+	-Small bug Space in repository name refresh api webpage
+	-Name cannot be longer than 20 characters.
+	-CreateDataList()
+	-.Equals method in data contract ?
+	-icon
+	-TDS freeze while loading
+	
+	-Records with same ID in repo ?

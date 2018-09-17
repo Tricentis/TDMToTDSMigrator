@@ -47,7 +47,7 @@ namespace MigratorUI
             this.loadRefreshRepositoriesButton = new System.Windows.Forms.Button();
             this.repositoriesBox = new System.Windows.Forms.ListBox();
             this.logTextBox = new System.Windows.Forms.RichTextBox();
-            this.verifyUrlButton = new System.Windows.Forms.Button();
+            this.urlButton = new System.Windows.Forms.Button();
             this.categoriesLabel = new System.Windows.Forms.Label();
             this.tddFileProcessingProgressBar = new System.Windows.Forms.ProgressBar();
             this.loadIntoRepositoryButton = new System.Windows.Forms.Button();
@@ -93,9 +93,9 @@ namespace MigratorUI
             this.tddFileLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tddFileLabel.Location = new System.Drawing.Point(52, 72);
             this.tddFileLabel.Name = "tddFileLabel";
-            this.tddFileLabel.Size = new System.Drawing.Size(63, 18);
+            this.tddFileLabel.Size = new System.Drawing.Size(59, 18);
             this.tddFileLabel.TabIndex = 2;
-            this.tddFileLabel.Text = ".tdd File ";
+            this.tddFileLabel.Text = "tdd File ";
             // 
             // createRepositoryButton
             // 
@@ -117,7 +117,7 @@ namespace MigratorUI
             this.clearRepositoryButton.Enabled = false;
             this.clearRepositoryButton.FlatAppearance.BorderSize = 0;
             this.clearRepositoryButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.clearRepositoryButton.Location = new System.Drawing.Point(878, 98);
+            this.clearRepositoryButton.Location = new System.Drawing.Point(878, 97);
             this.clearRepositoryButton.Name = "clearRepositoryButton";
             this.clearRepositoryButton.Size = new System.Drawing.Size(130, 43);
             this.clearRepositoryButton.TabIndex = 7;
@@ -255,18 +255,18 @@ namespace MigratorUI
             this.logTextBox.Text = "";
             this.logTextBox.TextChanged += new System.EventHandler(this.LogTextBox_TextChanged);
             // 
-            // verifyUrlButton
+            // urlButton
             // 
-            this.verifyUrlButton.BackColor = System.Drawing.Color.Gainsboro;
-            this.verifyUrlButton.FlatAppearance.BorderSize = 0;
-            this.verifyUrlButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.verifyUrlButton.Location = new System.Drawing.Point(328, 46);
-            this.verifyUrlButton.Name = "verifyUrlButton";
-            this.verifyUrlButton.Size = new System.Drawing.Size(130, 28);
-            this.verifyUrlButton.TabIndex = 2;
-            this.verifyUrlButton.Text = "Verify URL";
-            this.verifyUrlButton.UseVisualStyleBackColor = false;
-            this.verifyUrlButton.Click += new System.EventHandler(this.VerifyUrlButton_Click);
+            this.urlButton.BackColor = System.Drawing.Color.Gainsboro;
+            this.urlButton.FlatAppearance.BorderSize = 0;
+            this.urlButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.urlButton.Location = new System.Drawing.Point(328, 46);
+            this.urlButton.Name = "urlButton";
+            this.urlButton.Size = new System.Drawing.Size(130, 28);
+            this.urlButton.TabIndex = 2;
+            this.urlButton.Text = "Verify URL";
+            this.urlButton.UseVisualStyleBackColor = false;
+            this.urlButton.Click += new System.EventHandler(this.VerifyUrlButton_Click);
             // 
             // categoriesLabel
             // 
@@ -354,7 +354,7 @@ namespace MigratorUI
             this.Controls.Add(this.migrationProgressBar);
             this.Controls.Add(this.tddFileProcessingProgressBar);
             this.Controls.Add(this.categoriesLabel);
-            this.Controls.Add(this.verifyUrlButton);
+            this.Controls.Add(this.urlButton);
             this.Controls.Add(this.logTextBox);
             this.Controls.Add(this.repositoriesBox);
             this.Controls.Add(this.loadRefreshRepositoriesButton);
@@ -399,7 +399,7 @@ namespace MigratorUI
         private System.Windows.Forms.Button deleteRepositoryButton;
         private System.Windows.Forms.Label repositoriesLabel;
         private System.Windows.Forms.Button loadRefreshRepositoriesButton;
-        private System.Windows.Forms.Button verifyUrlButton;
+        private System.Windows.Forms.Button urlButton;
         private System.Windows.Forms.Label categoriesLabel;
         private System.Windows.Forms.ProgressBar tddFileProcessingProgressBar;
         private System.Windows.Forms.Button loadIntoRepositoryButton;

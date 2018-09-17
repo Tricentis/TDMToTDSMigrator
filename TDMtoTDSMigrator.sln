@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TDMtoTDSMigrator", "TDMtoTD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigratorUI", "MigratorUI\MigratorUI.csproj", "{547A4193-25FE-4B38-8080-61A52CC426B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{24A9B080-E2A3-4636-B94D-34401604A59E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{547A4193-25FE-4B38-8080-61A52CC426B5}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{547A4193-25FE-4B38-8080-61A52CC426B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{547A4193-25FE-4B38-8080-61A52CC426B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24A9B080-E2A3-4636-B94D-34401604A59E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24A9B080-E2A3-4636-B94D-34401604A59E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24A9B080-E2A3-4636-B94D-34401604A59E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24A9B080-E2A3-4636-B94D-34401604A59E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

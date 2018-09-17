@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Windows.Forms;
 using System.Xml;
 
 using Newtonsoft.Json.Linq;
@@ -26,10 +27,17 @@ namespace TDMtoTDSMigrator {
             XmlDocument doc = new XmlDocument();
             doc.Load(DecompressTddFileIntoXml(tddPath));
             RepositoryDump = GetRepositoryDump(doc);
-            LoadMetaInfoAssociations();
-            LoadMetaInfoTypes();
-            LoadMetaInfoAttributes();
-            LoadStringAttributes();
+            try
+            {
+                LoadMetaInfoAssociations();
+                LoadMetaInfoTypes();
+                LoadMetaInfoAttributes();
+                LoadStringAttributes();
+            }
+            catch {
+                MessageBox.Show("Could not parse data from file. The .tdd file seems to be corrupted. Please contact support for more information.");
+            }
+            File.Delete(tddPath.Replace(".tdd",".xml"));
         }
 
         public void CreateDataDictionary() {
@@ -42,7 +50,7 @@ namespace TDMtoTDSMigrator {
                 foreach (StringAttribute stringAttribute in StringAttributes[objectId]) {
                     data.Add(stringAttribute.AttributeName, stringAttribute.AttributeValue);
                 }
-                TestDataObject obj = new TestDataObject { Category = StringAttributes[objectId][0].CategoryName, Data = JObject.Parse(data.ToString()), Consumed = false };
+                TestDataObject obj = new TestDataObject { Id = objectId , Category = StringAttributes[objectId][0].CategoryName, Data = JObject.Parse(data.ToString()), Consumed = false };
                 TestData[obj.Category].Elements.Add(obj);
                 TestData[obj.Category].ElementCount++;
             }
@@ -68,12 +76,7 @@ namespace TDMtoTDSMigrator {
         }
 
         public string FindAttributeName(string attributeId) {
-            foreach (MetaInfoAttribute metaInfoAttribute in MetaInfoAttributes.Values) {
-                if (metaInfoAttribute.AttributeId == attributeId) {
-                    return metaInfoAttribute.AttributeName;
-                }
-            }
-            return "Attribute not found";
+            return MetaInfoAttributes.Values.FirstOrDefault(metaInfoAttribute => metaInfoAttribute.AttributeId == attributeId).AttributeName; 
         }
 
         public string FindCategoryName(string categoryId) {
@@ -113,7 +116,7 @@ namespace TDMtoTDSMigrator {
                 StringAttribute attribute = new StringAttribute(this, node);
                 try {
                     StringAttributes[attribute.ObjectId].Add(attribute);
-                } catch (Exception) {
+                } catch {
                     StringAttributes.Add(attribute.ObjectId, new List<StringAttribute>());
                     StringAttributes[attribute.ObjectId].Add(attribute);
                 }

@@ -25,7 +25,18 @@ namespace MigratorUI {
             foreach (DataBaseType dataBaseType in Enum.GetValues(typeof(DataBaseType))) {
                 repositoryTypeComboBox.Items.Add(dataBaseType);
             }
-            repositoryTypeComboBox.SelectedItem = DataBaseType.Sqlite;
+            try {
+                repositoryTypeComboBox.SelectedItem = DataBaseType.Sqlite;
+            }
+            catch { 
+                try {
+                    repositoryTypeComboBox.SelectedItem = repositoryTypeComboBox.Items[0];
+                }
+                catch
+                {
+                    //Do nothing
+                }
+            }
         }
 
         public void CreateRepository(TestDataRepository newRepository) {
@@ -43,11 +54,6 @@ namespace MigratorUI {
         private bool IsValidRepository(TestDataRepository newRepository) {
             if (string.IsNullOrEmpty(newRepository.Name)) {
                 migrator.logTextBox.AppendText("Please enter a repository name\n");
-                repositoryNameTextBox.BackColor = Color.PaleVioletRed;
-                return false;
-            }
-            if (newRepository.Name.Trim().Contains("  ")) {
-                migrator.logTextBox.AppendText("Please remove double white spaces in repository name\n");
                 repositoryNameTextBox.BackColor = Color.PaleVioletRed;
                 return false;
             }

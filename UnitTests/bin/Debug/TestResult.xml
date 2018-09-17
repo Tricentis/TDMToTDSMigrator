@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="C:\Users\felpo\source\repos\XML\UnitTests\bin\Debug\UnitTests.dll" total="1" errors="0" failures="0" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2018-09-17" time="13:12:00">
+  <environment nunit-version="2.6.2.12296" clr-version="2.0.50727.8825" os-version="Microsoft Windows NT 6.2.9200.0" platform="Win32NT" cwd="C:\Program Files (x86)\NUnit 2.6.2\bin" machine-name="TRI-NB0716" user="felpo" user-domain="TRICENTIS" />
+  <culture-info current-culture="de-AT" current-uiculture="en-US" />
+  <test-suite type="Assembly" name="C:\Users\felpo\source\repos\XML\UnitTests\bin\Debug\UnitTests.dll" executed="True" result="Success" success="True" time="0.006" asserts="0">
+    <results>
+      <test-suite type="Namespace" name="UnitTests" executed="True" result="Success" success="True" time="0.006" asserts="0">
+        <results>
+          <test-suite type="TestFixture" name="UnitTests" executed="True" result="Success" success="True" time="0.005" asserts="0">
+            <results>
+              <test-case name="UnitTests.UnitTests.TestDataArrangement" executed="True" result="Success" success="True" time="0.005" asserts="4" />
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
