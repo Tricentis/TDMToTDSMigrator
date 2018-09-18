@@ -11,7 +11,7 @@ namespace UnitTests
     [TestFixture]
     public class UnitTests {
         private static TdmDataDocument data;
-        private static string tddPath = "resources/temp.tdd";
+        private static string tddPath = "temp.tdd";
         [SetUp]
         public void Startup() {
             byte[] byteArray = Resources.Dump_110718_0118;
