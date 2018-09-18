@@ -1,8 +1,10 @@
 ﻿using System.IO;
+
+using NUnit.Framework;
+
 using TDMtoTDSMigrator;
 
 using UnitTests.Properties;
-using NUnit.Framework;
     
 namespace UnitTests
 {
