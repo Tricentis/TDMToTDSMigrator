@@ -28,14 +28,14 @@ namespace MigratorUI
         private bool isTdsConnected;
 
         private void UpdateUi() {
-            apiUrlTextBox.Enabled = isUrlChangeable;
+            apiUrlTextBox.Enabled = isUrlChangeable && !IsMigrationInProgress;
             urlButton.Text = isUrlChangeable ? "Verify URL" : "Change URL";
 
-            createRepositoryButton.Enabled = IsTdsConnected;
-            clearRepositoryButton.Enabled = IsTdsConnected;
-            deleteRepositoryButton.Enabled = IsTdsConnected;
-            loadRefreshRepositoriesButton.Enabled = IsTdsConnected;
-            pickFileButton.Enabled = !IsLoadingTddFile;
+            createRepositoryButton.Enabled = IsTdsConnected && !IsMigrationInProgress;
+            clearRepositoryButton.Enabled = IsTdsConnected && !IsMigrationInProgress;
+            deleteRepositoryButton.Enabled = IsTdsConnected && !IsMigrationInProgress;
+            loadRefreshRepositoriesButton.Enabled = IsTdsConnected && !IsMigrationInProgress;
+            pickFileButton.Enabled = !IsLoadingTddFile && !IsMigrationInProgress;
             pickFileButton.Text = IsTdsConnected ? "Browse..." : "...";
             repositoriesBox.Enabled = IsTdsConnected;
             apiUrlTextBox.BackColor = IsTdsConnected ? Color.Lime : Color.PaleVioletRed;
@@ -45,9 +45,10 @@ namespace MigratorUI
             deselectAllButton.Enabled = IsReadyForMigration && !IsLoadingTddFile;
             selectRemainingCategoriesButton.Enabled = IsReadyForMigration && !allDataWasMigrated && !IsLoadingTddFile;
             reverseButton.Enabled = IsReadyForMigration && !IsLoadingTddFile;
-            loadIntoRepositoryButton.Enabled = IsReadyForMigration && categoriesListBox.SelectedItems.Count > 0 && !IsLoadingTddFile;
+            loadIntoRepositoryButton.Enabled = IsReadyForMigration && !IsLoadingTddFile && !IsMigrationInProgress;
 
             tddFileProcessingProgressBar.Visible = IsLoadingTddFile;
+            migrationProgressBar.Visible = IsMigrationInProgress;
         }
 
         private bool IsValidTddSelected {
@@ -59,6 +60,8 @@ namespace MigratorUI
         }
 
         private bool IsLoadingTddFile { get; set; }
+
+        private bool IsMigrationInProgress { get; set; }
 
         private bool isValidTddSelected;
 
@@ -178,7 +181,7 @@ namespace MigratorUI
             TestDataRepository targetRepository = (TestDataRepository)repositoriesBox.SelectedItem;
             PrintMigrationLaunchedMessage(filteredTestData, targetRepository);
             PrintEstimatedWaitTimeMessage(filteredTestData, targetRepository);
-            MigrationInWork(true);
+            IsMigrationInProgress = true;
             HttpResponseMessage message;
             switch (targetRepository.Type) {
                 case DataBaseType.InMemory:
@@ -188,7 +191,7 @@ namespace MigratorUI
                     message = await HttpRequest.Migrate(filteredTestData, targetRepository, ApiUrl);
                     break;
             }
-            MigrationInWork(false);
+            IsMigrationInProgress = false;
             if (message.IsSuccessStatusCode) {
                 PrintMigrationSuccessfullMessage(filteredTestData, targetRepository);
                 SortCategoriesCheckBox(filteredTestData);
@@ -267,16 +270,7 @@ namespace MigratorUI
                                                    : repositoriesBox.Items[previouslySelectedIndex];
         }
 
-        private void MigrationInWork(bool migrationInWork) {
-            migrationProgressBar.Visible = migrationInWork;
-            urlButton.Enabled = !migrationInWork;
-            pickFileButton.Enabled = !migrationInWork;
-            deleteRepositoryButton.Enabled = !migrationInWork;
-            clearRepositoryButton.Enabled = !migrationInWork;
-            createRepositoryButton.Enabled = !migrationInWork;
-            loadIntoRepositoryButton.Enabled = !migrationInWork;
-            loadRefreshRepositoriesButton.Enabled = !migrationInWork;
-        }
+
 
         private Dictionary<string, TestDataCategory> FilterTestData() {
             Dictionary<string, TestDataCategory> filteredTestData = new Dictionary<string, TestDataCategory>();
