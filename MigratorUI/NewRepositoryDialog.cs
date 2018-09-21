@@ -9,13 +9,13 @@ using TestDataContract.Configuration;
 
 namespace MigratorUI {
     public partial class NewRepositoryDialog : Form {
-        private readonly TdsMigrator migrator;
+        private readonly TdsMigratorDialog migrator;
 
         private bool automaticLocationWritingEnabled;
 
         readonly char[] unallowedRepositoryCharacters = { '/', '|', '\\', '<', '>', '#', '*', '+', ':', ';', '"', '.', ',', '?' };
 
-        public NewRepositoryDialog(TdsMigrator migrator) {
+        public NewRepositoryDialog(TdsMigratorDialog migrator) {
             InitializeComponent();
             this.migrator = migrator;
             automaticLocationWritingEnabled = true;

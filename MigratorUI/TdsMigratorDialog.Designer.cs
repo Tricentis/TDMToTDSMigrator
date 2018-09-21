@@ -2,7 +2,7 @@
 
 namespace MigratorUI
 {
-    partial class TdsMigrator
+    partial class TdsMigratorDialog
     {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,7 @@ namespace MigratorUI
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TdsMigrator));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TdsMigratorDialog));
             this.pickFileButton = new System.Windows.Forms.Button();
             this.tddPathTextBox = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
@@ -77,13 +77,12 @@ namespace MigratorUI
             this.tddPathTextBox.Name = "tddPathTextBox";
             this.tddPathTextBox.Size = new System.Drawing.Size(248, 22);
             this.tddPathTextBox.TabIndex = 3;
-            this.tddPathTextBox.TextChanged += new System.EventHandler(this.TddPathTextBox_TextChanged);
             // 
             // openFileDialog
             // 
             this.openFileDialog.DefaultExt = "tdd";
             this.openFileDialog.Filter = "tdd files|*.tdd";
-            this.openFileDialog.InitialDirectory = "C:\\Users\\felpo\\downloads";
+            this.openFileDialog.InitialDirectory = "%UserProfile%\\Downloads";
             this.openFileDialog.FileOk += new System.ComponentModel.CancelEventHandler(this.OpenFileDialog_FileOk);
             // 
             // tddFileLabel

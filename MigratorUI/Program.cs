@@ -11,7 +11,7 @@ namespace MigratorUI {
             if (Mutex.WaitOne(TimeSpan.Zero, true)) {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new TdsMigrator());
+                Application.Run(new TdsMigratorDialog());
                 Mutex.ReleaseMutex();
             } else {
                 NativeMethods.PostMessage((IntPtr)NativeMethods.HWND_BROADCAST, NativeMethods.WM_SHOWME, IntPtr.Zero, IntPtr.Zero);

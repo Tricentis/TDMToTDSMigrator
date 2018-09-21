@@ -35,7 +35,7 @@ namespace TDMtoTDSMigrator {
                 LoadStringAttributes();
             }
             catch {
-                MessageBox.Show("Could not parse data from file. The .tdd file seems to be corrupted. Please contact support for more information.");
+                MessageBox.Show("Could not parse data from file. The .tdd file seems to be corrupted.");
             }
             File.Delete(tddPath.Replace(".tdd",".xml"));
         }
