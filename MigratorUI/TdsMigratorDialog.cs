@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net.Http;
@@ -34,17 +35,19 @@ namespace MigratorUI
             clearRepositoryButton.Enabled = IsTdsConnected;
             deleteRepositoryButton.Enabled = IsTdsConnected;
             loadRefreshRepositoriesButton.Enabled = IsTdsConnected;
-            pickFileButton.Enabled = IsTdsConnected;
+            pickFileButton.Enabled = !IsLoadingTddFile;
             pickFileButton.Text = IsTdsConnected ? "Browse..." : "...";
             repositoriesBox.Enabled = IsTdsConnected;
             apiUrlTextBox.BackColor = IsTdsConnected ? Color.Lime : Color.PaleVioletRed;
 
-            categoriesListBox.Enabled = IsReadyForMigration;
-            selectAllButton.Enabled = IsReadyForMigration;
-            deselectAllButton.Enabled = IsReadyForMigration;
-            selectRemainingCategoriesButton.Enabled = IsReadyForMigration && !allDataWasMigrated;
-            reverseButton.Enabled = IsReadyForMigration;
-            loadIntoRepositoryButton.Enabled = IsReadyForMigration && categoriesListBox.SelectedItems.Count > 0;
+            categoriesListBox.Enabled = IsReadyForMigration && !IsLoadingTddFile;
+            selectAllButton.Enabled = IsReadyForMigration && !IsLoadingTddFile;
+            deselectAllButton.Enabled = IsReadyForMigration && !IsLoadingTddFile;
+            selectRemainingCategoriesButton.Enabled = IsReadyForMigration && !allDataWasMigrated && !IsLoadingTddFile;
+            reverseButton.Enabled = IsReadyForMigration && !IsLoadingTddFile;
+            loadIntoRepositoryButton.Enabled = IsReadyForMigration && categoriesListBox.SelectedItems.Count > 0 && !IsLoadingTddFile;
+
+            tddFileProcessingProgressBar.Visible = IsLoadingTddFile;
         }
 
         private bool IsValidTddSelected {
@@ -55,7 +58,7 @@ namespace MigratorUI
             }
         }
 
-        private bool IsProcessing;
+        private bool IsLoadingTddFile { get; set; }
 
         private bool isValidTddSelected;
 
@@ -106,40 +109,23 @@ namespace MigratorUI
             if (!IsValidTddSelected) {
                 logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
             }
-
-            //switch (urlButton.Text) {
-            //    case "Verify URL":
-            //        bool connectionSuccessfull = HttpRequest.SetConnection(apiUrl);
-            //        if (connectionSuccessfull) {
-            //            urlButton.Text = "Change URL";
-            //            logTextBox.AppendText("Valid URL. \n");
-            //            apiUrlTextBox.BackColor = Color.Lime;
-            //            this.ApiUrl = apiUrl;
-            //            ApiConnectionOk(true);
-            //            if (string.IsNullOrEmpty(tddPathTextBox.Text)) {
-            //                logTextBox.AppendText("Please pick a.tdd file in your filesystem.\n");
-            //            }
-            //        } else {
-            //            repositoriesBox.Items.Clear();
-            //            logTextBox.AppendText("Url is not valid\n");
-            //            apiUrlTextBox.BackColor = Color.PaleVioletRed;
-            //            ApiConnectionOk(false);
-            //        }
-            //        break;
-            //    case "Change URL":
-            //        urlButton.Text = "Verify URL";
-            //        ApiConnectionOk(false);
-            //        ActiveControl = apiUrlTextBox;
-            //        break;
-            //}
         }
 
         private void ProcessTddFile() {
-            TddFileProcessingLaunched();
-            tdmData = new TdmDataDocument(tddPathTextBox.Text);
             BackgroundWorker worker = new BackgroundWorker();
-            worker.DoWork += (s, r) => { tdmData.CreateDataDictionary(); };
-            worker.RunWorkerCompleted += (s, r) => { TddFileProcessingFinished(); };
+            worker.DoWork += (s, r) => {
+                                 tdmData = new TdmDataDocument(tddPathTextBox.Text);
+                                 tdmData.CreateDataDictionary();
+                             };
+            worker.RunWorkerCompleted += (sender, e) => {
+                                             IsLoadingTddFile = false;
+                                             if (e.Error == null) {
+                                                TddFileProcessingFinished();
+                                                 return;
+                                             }
+                                             IsValidTddSelected = false;
+                                             logTextBox.AppendText("Unable to load .tdd file. Your .tdd file may be corrupted.");
+                                         };
             worker.RunWorkerAsync();
         }
 
@@ -217,61 +203,13 @@ namespace MigratorUI
             }
         }
 
-        //UI element attributes methods
-        //private void ApiConnectionOk(bool apiConnectionOk) {
-        //    bool tddFilePicked = !string.IsNullOrEmpty(tddPathTextBox.Text);
-
-        //    createRepositoryButton.Enabled = apiConnectionOk;
-        //    deleteRepositoryButton.Enabled = apiConnectionOk;
-        //    clearRepositoryButton.Enabled = apiConnectionOk;
-        //    loadIntoRepositoryButton.Enabled = apiConnectionOk & tddFilePicked;
-        //    loadRefreshRepositoriesButton.Enabled = apiConnectionOk;
-        //    repositoriesBox.Enabled = apiConnectionOk;
-        //    categoriesListBox.Enabled = apiConnectionOk & tddFilePicked;
-        //    selectAllButton.Enabled = apiConnectionOk & tddFilePicked;
-        //    deselectAllButton.Enabled = apiConnectionOk & tddFilePicked;
-        //    reverseButton.Enabled = apiConnectionOk & tddFilePicked;
-        //    selectRemainingCategoriesButton.Enabled = apiConnectionOk & tddFilePicked & !allDataWasMigrated;
-        //    apiUrlTextBox.Enabled = !apiConnectionOk;
-        //    pickFileButton.Enabled = apiConnectionOk;
-
-        //    if (apiConnectionOk) {
-        //        pickFileButton.Text = "Browse...";
-        //        RefreshRepositoriesList();
-        //        pickFileButton.Select();
-        //    } else {
-        //        pickFileButton.Text = "...";
-        //    }
-        //}
-
-        private void TddFileProcessingLaunched() {
-            PrintTddProcessingLaunchedMessage();
-            allDataWasMigrated = false;
-            loadIntoRepositoryButton.Enabled = false;
-            categoriesListBox.Enabled = false;
-            selectAllButton.Enabled = false;
-            deselectAllButton.Enabled = false;
-            reverseButton.Enabled = false;
-            selectRemainingCategoriesButton.Enabled = false;
-            urlButton.Enabled = false;
-            pickFileButton.Enabled = false;
-            tddFileProcessingProgressBar.Visible = true;
-        }
-
         private void TddFileProcessingFinished() {
+            IsValidTddSelected = true;
             PrintNumberOfRecordsAndCategoriesFoundMessage();
             LoadCategoriesIntoListBox();
-            tddFileProcessingProgressBar.Visible = false;
             CheckForAssociations();
+            UpdateUi();
             PrintTddProcessingFinishedMessage();
-            loadIntoRepositoryButton.Enabled = true;
-            categoriesListBox.Enabled = true;
-            selectAllButton.Enabled = true;
-            deselectAllButton.Enabled = true;
-            reverseButton.Enabled = true;
-            selectRemainingCategoriesButton.Enabled = true;
-            urlButton.Enabled = true;
-            pickFileButton.Enabled = true;
             categoryMigrated = new Dictionary<TestDataCategory, bool>();
             foreach (TestDataCategory category in tdmData.TestData.Values) {
                 if (category.ElementCount != 0) {
@@ -438,6 +376,10 @@ namespace MigratorUI
         private void OpenFileDialog_FileOk(object sender, CancelEventArgs e) {
             tddPathTextBox.Text = (sender as OpenFileDialog)?.FileName;
             categoriesListBox.Items.Clear();
+            IsLoadingTddFile = true;
+            allDataWasMigrated = false;
+            PrintTddProcessingLaunchedMessage();
+            UpdateUi();
             ProcessTddFile();
         }
 
@@ -499,6 +441,10 @@ namespace MigratorUI
 
         private void LogTextBox_TextChanged(object sender, EventArgs e) {
             logTextBox.ScrollToCaret();
+        }
+
+        private void LogTextBox_LinkClicked(object sender, LinkClickedEventArgs e) {
+            Process.Start(e.LinkText);
         }
 
         private void CategoriesListBox_SelectedIndexChanged(object sender, EventArgs e) {

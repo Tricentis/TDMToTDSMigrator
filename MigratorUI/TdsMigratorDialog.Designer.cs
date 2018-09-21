@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace MigratorUI
 {
@@ -253,6 +254,7 @@ namespace MigratorUI
             this.logTextBox.TabIndex = 14;
             this.logTextBox.Text = "";
             this.logTextBox.TextChanged += new System.EventHandler(this.LogTextBox_TextChanged);
+            logTextBox.LinkClicked += new LinkClickedEventHandler(this.LogTextBox_LinkClicked);
             // 
             // urlButton
             // 
