@@ -1,30 +1,53 @@
 ﻿using System.IO;
 
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using TDMtoTDSMigrator;
 
 using UnitTests.Properties;
-    
-namespace UnitTests
-{
-    [TestFixture]
+
+namespace UnitTests {
+    [TestClass]
     public class UnitTests {
+        #region Static Fields
+
         private static TdmDataDocument data;
+
         private static string tddPath = "temp.tdd";
-        [SetUp]
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        [TestCleanup]
+        public void Cleanup() {
+            File.Delete(tddPath);
+        }
+
+        [TestInitialize]
         public void Startup() {
             byte[] byteArray = Resources.Dump_110718_0118;
             File.WriteAllBytes(tddPath, byteArray);
             data = new TdmDataDocument(tddPath);
         }
 
-        [TearDown]
-        public void Cleanup(){
-            File.Delete(tddPath);
+        [TestMethod]
+        public void TestDataArrangement() {
+            data.CreateDataDictionary();
+            Assert.AreEqual(3, data.TestData.Keys.Count);
+            Assert.AreEqual(3, data.TestData["Customer"].ElementCount);
+            Assert.AreEqual(2, data.TestData["Product"].ElementCount);
+            Assert.AreEqual(3, data.TestData["Storage"].ElementCount);
         }
 
-        [Test]
+        [TestMethod]
+        public void TestDecompression() {
+            TdmDataDocument.DecompressTddFileIntoXml(tddPath);
+            Assert.IsTrue(File.Exists(tddPath.Replace(".tdd", ".xml")));
+            File.Delete(tddPath.Replace(".tdd", ".xml"));
+        }
+
+        [TestMethod]
         public void TestFindAttributeName() {
             Assert.AreEqual("First", data.FindAttributeName("1"));
             Assert.AreEqual("Last", data.FindAttributeName("2"));
@@ -34,19 +57,12 @@ namespace UnitTests
             Assert.AreEqual("Number", data.FindAttributeName("6"));
             Assert.AreEqual("ID", data.FindAttributeName("7"));
             Assert.AreEqual("Name", data.FindAttributeName("8"));
-            Assert.AreEqual("Status",data.FindAttributeName("9"));
-            Assert.AreEqual("ID",data.FindAttributeName("10"));
-            Assert.AreEqual("Locaction",data.FindAttributeName("11"));
+            Assert.AreEqual("Status", data.FindAttributeName("9"));
+            Assert.AreEqual("ID", data.FindAttributeName("10"));
+            Assert.AreEqual("Locaction", data.FindAttributeName("11"));
         }
 
-        [Test]
-        public void TestFindCategoryName() {
-            Assert.AreEqual("Customer", data.FindCategoryName("1"));
-            Assert.AreEqual("Product", data.FindCategoryName("2"));
-            Assert.AreEqual("Storage", data.FindCategoryName("3"));
-        }
-
-        [Test]
+        [TestMethod]
         public void TestFindCategoryId() {
             Assert.AreEqual("1", data.FindCategoryId("1"));
             Assert.AreEqual("1", data.FindCategoryId("2"));
@@ -61,26 +77,18 @@ namespace UnitTests
             Assert.AreEqual("3", data.FindCategoryId("11"));
         }
 
-        [Test]
-        public void TestDataArrangement() {
-            data.CreateDataDictionary();
-            Assert.AreEqual(3, data.TestData.Keys.Count);
-            Assert.AreEqual(3, data.TestData["Customer"].ElementCount);
-            Assert.AreEqual(2, data.TestData["Product"].ElementCount);
-            Assert.AreEqual(3, data.TestData["Storage"].ElementCount);
+        [TestMethod]
+        public void TestFindCategoryName() {
+            Assert.AreEqual("Customer", data.FindCategoryName("1"));
+            Assert.AreEqual("Product", data.FindCategoryName("2"));
+            Assert.AreEqual("Storage", data.FindCategoryName("3"));
         }
 
-        [Test]
+        [TestMethod]
         public void TestNumberOfObjects() {
-            Assert.AreEqual(8,data.StringAttributes.Count);
+            Assert.AreEqual(8, data.StringAttributes.Count);
         }
 
-
-        [Test]
-        public void TestDecompression() {
-            TdmDataDocument.DecompressTddFileIntoXml(tddPath);
-            Assert.IsTrue(File.Exists(tddPath.Replace(".tdd",".xml")));
-            File.Delete(tddPath.Replace(".tdd", ".xml"));
-        }
+        #endregion
     }
 }
